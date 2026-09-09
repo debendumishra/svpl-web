@@ -1,0 +1,258 @@
+/**
+ * Surya Vistaara Pvt. Ltd. (SVPL)
+ * Solar Theme - Modern, High-Performance, Vibrant Styling (Deep Navy, Radiant Gold, Eco Green)
+ */
+
+:root {
+    --svpl-navy: #0B2545;
+    --svpl-navy-dark: #061528;
+    --svpl-navy-light: #133E6E;
+    --svpl-gold: #F59E0B;
+    --svpl-gold-hover: #D97706;
+    --svpl-green: #10B981;
+    --svpl-green-dark: #059669;
+    --svpl-bg-light: #F8FAFC;
+    --svpl-card-bg: #FFFFFF;
+    --svpl-border: #E2E8F0;
+    --svpl-text: #1E293B;
+    --svpl-text-muted: #64748B;
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--svpl-text);
+    background-color: var(--svpl-bg-light);
+    overflow-x: hidden;
+}
+
+/* Navbar */
+.navbar-svpl {
+    background-color: var(--svpl-navy);
+    box-shadow: 0 4px 20px rgba(11, 37, 69, 0.15);
+    padding: 0.75rem 0;
+}
+
+.navbar-svpl .nav-link {
+    color: #E2E8F0 !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 0.9rem !important;
+    transition: all 0.2s ease;
+}
+
+.navbar-svpl .nav-link:hover,
+.navbar-svpl .nav-link.active {
+    color: var(--svpl-gold) !important;
+}
+
+.brand-badge {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--svpl-gold);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+/* Hero Section */
+.hero-svpl {
+    background: linear-gradient(135deg, #061528 0%, #0B2545 60%, #133E6E 100%);
+    color: #FFFFFF;
+    padding: 5rem 0 4rem;
+    position: relative;
+}
+
+.hero-svpl::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(to top right, var(--svpl-bg-light) 50%, transparent 50%);
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: var(--svpl-gold);
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+/* Cards & Stats */
+.card-svpl {
+    background: var(--svpl-card-bg);
+    border: 1px solid var(--svpl-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-svpl:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card {
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--svpl-border);
+    background: #FFFFFF;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Buttons */
+.btn-svpl-gold {
+    background-color: var(--svpl-gold);
+    color: #0B2545;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    transition: all 0.2s ease;
+}
+
+.btn-svpl-gold:hover {
+    background-color: var(--svpl-gold-hover);
+    color: #061528;
+    transform: translateY(-1px);
+}
+
+.btn-svpl-green {
+    background-color: var(--svpl-green);
+    color: #FFFFFF;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    transition: all 0.2s ease;
+}
+
+.btn-svpl-green:hover {
+    background-color: var(--svpl-green-dark);
+    color: #FFFFFF;
+}
+
+.btn-svpl-navy {
+    background-color: var(--svpl-navy);
+    color: #FFFFFF;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+}
+
+.btn-svpl-navy:hover {
+    background-color: var(--svpl-navy-light);
+    color: #FFFFFF;
+}
+
+/* Solar Progress Pipeline Bar */
+.pipeline-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 2rem 0;
+}
+
+.pipeline-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    height: 4px;
+    background: var(--svpl-border);
+    z-index: 1;
+}
+
+.step-node {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    width: 100px;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 3px solid var(--svpl-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-weight: 700;
+    color: var(--svpl-text-muted);
+}
+
+.step-node.completed .step-circle {
+    background: var(--svpl-green);
+    border-color: var(--svpl-green);
+    color: #FFFFFF;
+}
+
+.step-node.active .step-circle {
+    background: var(--svpl-gold);
+    border-color: var(--svpl-gold);
+    color: #0B2545;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--svpl-text-muted);
+}
+
+.step-node.completed .step-label,
+.step-node.active .step-label {
+    color: var(--svpl-navy);
+    font-weight: 700;
+}
+
+/* ID Card Styles */
+.id-card-wrap {
+    width: 340px;
+    height: 520px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--svpl-navy) 0%, #0F3460 65%, #FFFFFF 65%, #FFFFFF 100%);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 2px solid #E2E8F0;
+    position: relative;
+}
+
+/* Printable Clean Styling */
+@media print {
+    body {
+        background: #FFFFFF !important;
+        color: #000000 !important;
+    }
+    .no-print, header, footer, nav, .btn, .sidebar {
+        display: none !important;
+    }
+    .print-container {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}

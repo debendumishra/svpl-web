@@ -1,0 +1,27 @@
+# SVPL-Web .gitignore
+
+# Environment & local credentials
+.env
+.env.local
+
+# Logs
+storage/logs/*.log
+*.log
+
+# Temporary / Scratch
+scratch/
+.system_generated/
+.tempmediaStorage/
+.user_uploaded/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Vendor & Dependencies (if any)
+# vendor/
+# node_modules/

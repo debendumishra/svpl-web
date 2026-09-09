@@ -1,0 +1,133 @@
+/**
+ * Surya Vistaara Pvt. Ltd. (SVPL)
+ * Interactive Multi-Level Network Org-Tree Stylesheet
+ */
+
+.tree-container {
+    overflow-x: auto;
+    padding: 2rem 1rem;
+    text-align: center;
+    background: #F8FAFC;
+    border-radius: 12px;
+}
+
+.tree, .tree ul, .tree li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.tree {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.tree ul {
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.tree li {
+    text-align: center;
+    padding: 20px 10px 0 10px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+/* Connectors */
+.tree li::before, .tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #CBD5E1;
+    width: 50%;
+    height: 20px;
+}
+
+.tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #CBD5E1;
+}
+
+.tree li:only-child::after, .tree li:only-child::before {
+    display: none;
+}
+
+.tree li:only-child {
+    padding-top: 0;
+}
+
+.tree li:first-child::before, .tree li:last-child::after {
+    border: 0 none;
+}
+
+.tree li:last-child::before {
+    border-right: 2px solid #CBD5E1;
+    border-radius: 0 5px 0 0;
+}
+
+.tree li:first-child::after {
+    border-radius: 5px 0 0 0;
+}
+
+.tree ul ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #CBD5E1;
+    width: 0;
+    height: 20px;
+}
+
+/* Tree Node Card */
+.tree-node-card {
+    display: inline-block;
+    padding: 10px 14px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    min-width: 140px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: #1E293B;
+}
+
+.tree-node-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    border-color: #F59E0B;
+}
+
+.tree-node-card.qualified {
+    border-top: 3px solid #10B981;
+}
+
+.tree-node-card.new {
+    border-top: 3px solid #F59E0B;
+}
+
+.node-code {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #0B2545;
+}
+
+.node-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 2px 0;
+}
+
+.node-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
