@@ -11,6 +11,14 @@ use App\Helpers\Database;
 class Genealogy
 {
     /**
+     * Insert a new advisor into the closure table (alias for addAdvisor)
+     */
+    public static function addAdvisor(int $advisorId, ?int $sponsorId = null): void
+    {
+        self::insertNode($advisorId, $sponsorId);
+    }
+
+    /**
      * Insert a new advisor into the closure table
      */
     public static function insertNode(int $advisorId, ?int $sponsorId = null): void
