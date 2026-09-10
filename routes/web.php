@@ -66,6 +66,7 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/admin/customers', [AdminController::class, 'customers']);
     Router::get('/admin/leads', [AdminController::class, 'leads']);
     Router::get('/admin/leads/{id}', [AdminController::class, 'leadDetail']);
+    Router::get('/admin/lead/{id}', [AdminController::class, 'leadDetail']);
     Router::get('/admin/network-tree', [AdminController::class, 'networkTree']);
     Router::get('/admin/commissions', [AdminController::class, 'commissions']);
     Router::get('/admin/payments', [AdminController::class, 'payments']);
