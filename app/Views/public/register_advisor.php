@@ -25,20 +25,38 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                 <form action="<?= url('/register-advisor') ?>" method="POST" id="formRegisterAdvisor">
                     
                     <!-- 1. Sponsor / Referral Information -->
-                    <div class="p-3 bg-light rounded-3 mb-4 border">
-                        <h6 class="fw-bold text-navy mb-2" style="color: #0B2545;">
-                            <i class="bi bi-person-check-fill text-warning me-2"></i> Sponsor / Referral Details
-                        </h6>
-                        <div class="row g-3">
+                    <div class="p-4 bg-light rounded-3 mb-4 border">
+                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                            <h6 class="fw-bold text-navy mb-0" style="color: #0B2545;">
+                                <i class="bi bi-person-check-fill text-warning me-2"></i> Sponsor / Referral Details
+                            </h6>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle small">
+                                <i class="bi bi-shield-check me-1"></i> Automatic Network Attribution
+                            </span>
+                        </div>
+                        
+                        <div class="row g-3 align-items-center">
                             <div class="col-md-6">
-                                <label class="form-label small fw-semibold">Referral / Sponsor Code (Optional):</label>
-                                <input type="text" name="referral_code" id="inputReferralCode" class="form-control" placeholder="e.g. SVPL1001" value="<?= htmlspecialchars($ref ?? ($post['referral_code'] ?? '')) ?>">
-                                <div id="referralFeedback" class="small mt-1"></div>
+                                <label class="form-label small fw-semibold text-navy">
+                                    Referral / Sponsor Code or Mobile Number:
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white"><i class="bi bi-person-badge text-warning"></i></span>
+                                    <input type="text" name="referral_code" id="inputReferralCode" class="form-control font-monospace fw-bold" placeholder="e.g. REF1001, SB-A-00001, or Mobile" value="<?= htmlspecialchars($ref ?? ($post['referral_code'] ?? '')) ?>" autocomplete="off">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnVerifyReferral">
+                                        <i class="bi bi-check2-circle"></i> Verify
+                                    </button>
+                                </div>
                             </div>
-                            <div class="col-md-6 d-flex align-items-end">
-                                <span class="text-muted small">If left blank, you will be assigned to SVPL Direct Operations Head.</span>
+                            <div class="col-md-6">
+                                <div class="text-secondary small">
+                                    Entering an active Advisor's referral code links your onboarding to their 9-level mentor network. Leave blank for Direct SVPL enrollment.
+                                </div>
                             </div>
                         </div>
+
+                        <!-- LIVE VALIDATED SPONSOR DISPLAY CARD -->
+                        <div id="referralFeedback" class="mt-3"></div>
                     </div>
 
                     <!-- 2. Personal Information -->
@@ -224,3 +242,89 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const inputRef = document.getElementById('inputReferralCode');
+    const feedback = document.getElementById('referralFeedback');
+    const btnVerify = document.getElementById('btnVerifyReferral');
+    let debounceTimer = null;
+
+    function verifyReferralCode() {
+        const code = inputRef.value.trim();
+        if (!code) {
+            feedback.innerHTML = `
+                <div class="alert alert-secondary py-2 px-3 mb-0 rounded-3 border d-flex align-items-center gap-2 small">
+                    <i class="bi bi-info-circle-fill text-primary fs-5"></i>
+                    <div>
+                        <strong>Direct Corporate Enrollment:</strong> You are registering directly under <strong>SVPL Direct Operations</strong>.
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        feedback.innerHTML = `
+            <div class="text-primary small py-1">
+                <span class="spinner-border spinner-border-sm me-1" role="status"></span> Looking up sponsor details...
+            </div>
+        `;
+
+        fetch('<?= url('/api/validate-referral') ?>?code=' + encodeURIComponent(code))
+            .then(res => res.json())
+            .then(data => {
+                if (data.valid && data.advisor) {
+                    feedback.innerHTML = `
+                        <div class="alert alert-success py-2 px-3 mb-0 rounded-3 border border-success-subtle shadow-sm d-flex align-items-center gap-3">
+                            <div style="background: #10B981; color: #FFFFFF; width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;">
+                                <i class="bi bi-patch-check-fill"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
+                                    <div class="fw-bold text-navy" style="font-size: 0.95rem;">
+                                        Verified Sponsor: <span class="text-success">${data.advisor.name}</span>
+                                    </div>
+                                    <span class="badge bg-success" style="font-size: 0.68rem;">🟢 ${data.advisor.status || 'ACTIVE'}</span>
+                                </div>
+                                <div class="small text-secondary mt-1">
+                                    Advisor Code: <strong class="font-monospace text-dark">${data.advisor.code}</strong> | 
+                                    Referral Code: <strong class="font-monospace text-primary">${data.advisor.referral_code}</strong> | 
+                                    Location: <strong class="text-dark">${data.advisor.district || 'Odisha'}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    feedback.innerHTML = `
+                        <div class="alert alert-danger py-2 px-3 mb-0 rounded-3 border border-danger-subtle d-flex align-items-center gap-2 small">
+                            <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+                            <div>
+                                <strong class="text-danger">Invalid Sponsor Code:</strong> ${data.message || 'No active advisor found matching "' + code + '"'}.
+                                <div class="text-muted">Please check with your sponsor or leave blank to enroll under SVPL Direct Operations.</div>
+                            </div>
+                        </div>
+                    `;
+                }
+            })
+            .catch(err => {
+                feedback.innerHTML = `
+                    <div class="text-warning small"><i class="bi bi-exclamation-triangle me-1"></i> Unable to verify code at the moment.</div>
+                `;
+            });
+    }
+
+    if (inputRef) {
+        inputRef.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(verifyReferralCode, 400);
+        });
+
+        btnVerify?.addEventListener('click', verifyReferralCode);
+
+        // Auto verify if referral code is prefilled
+        if (inputRef.value.trim()) {
+            verifyReferralCode();
+        }
+    }
+});
+</script>

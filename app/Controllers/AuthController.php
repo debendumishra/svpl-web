@@ -259,19 +259,30 @@ class AuthController
     public function validateReferralCode(): void
     {
         $code = trim($_GET['code'] ?? '');
+        if (empty($code)) {
+            Response::json(['valid' => false, 'message' => 'Please provide a referral code.']);
+            return;
+        }
+
         $adv = Advisor::findByReferralCode($code);
         if ($adv) {
+            $fullName = trim(($adv['first_name'] ?? '') . ' ' . ($adv['last_name'] ?? ''));
+            if (empty($fullName)) {
+                $fullName = $adv['user_full_name'] ?? 'Authorized Advisor';
+            }
             Response::json([
                 'valid' => true,
                 'advisor' => [
                     'code' => $adv['advisor_code'],
-                    'name' => $adv['first_name'] . ' ' . $adv['last_name'],
-                    'district' => $adv['district'],
-                    'status' => $adv['status'],
+                    'referral_code' => $adv['referral_code'],
+                    'name' => $fullName,
+                    'district' => $adv['district'] ?? 'Odisha',
+                    'block' => $adv['block'] ?? '',
+                    'status' => $adv['status'] ?? 'ACTIVE',
                 ]
             ]);
         } else {
-            Response::json(['valid' => false, 'message' => 'Invalid or inactive referral code.']);
+            Response::json(['valid' => false, 'message' => 'No active advisor found matching "' . htmlspecialchars($code) . '".']);
         }
     }
 

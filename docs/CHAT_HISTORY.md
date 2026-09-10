@@ -3418,3 +3418,47 @@ The command `git status` has been launched and I will check the output once read
 
 ---
 
+## 🤖 Antigravity AI Assistant #33
+
+The customer registration workflow has been updated to be managed **exclusively inside the Advisor Portal**, ensuring automatic referral code locking and direct KYC document uploading.
+
+---
+
+### 🛠️ Summary of Changes Made:
+
+1. **Closed Open Public Customer Registration**:
+   - Removed open self-registration forms from public access.
+   - Any attempt to access `/register-customer` or `/register/customer` directly while logged out will automatically redirect to the login screen with the message:
+     > *"Customer registration is conducted exclusively through authorized SVPL Advisors. Please log in to your Advisor account to submit customer applications."*
+   - Public header nav, mobile drawer, and footer links now direct prospective customers to **"Customer Solar Inquiry"** (`/contact`) or **"Become an Advisor"** (`/become-advisor`).
+
+2. **Built Dedicated Advisor "Register New Customer" Portal Screen**:
+   - **Location:** [`app/Views/advisor/register_customer.php`](file:///d:/DKM/SVPL-Web/app/Views/advisor/register_customer.php)
+   - **Routes:** `GET /advisor/register-customer` and `POST /advisor/register-customer`
+   - **Locked Referral Attribution Banner:** Displays the logged-in Advisor's Name, Advisor Code (`SB-A-xxxxx`), Referral Code, and District, automatically binding the customer to the sponsor tree with 100% commission attribution.
+   - **Direct Digital Document Uploads (No WhatsApp needed):**
+     1. Latest Electricity Bill (showing CA Number & Sanctioned Load)
+     2. Customer Aadhaar Card (Front & Back)
+     3. Customer PAN Card
+     4. Land Patta / Property Ownership / Holding Tax Receipt
+     5. Bank Passbook / Cancelled Cheque (for Central & State DBT credit)
+     6. Rooftop / Site Photograph
+   - **Form Fields:** Full customer name, Father/Husband name, Mobile & Alternate Mobile, State/District/Block/Panchayat/Village, Pincode, DISCOM selection (TPCODL/TPNODL/TPSODL/TPWODL), Consumer Number, Sanctioned Load, Proposed Solar Capacity (1kW–10kW), and Electricity Bill Holder confirmation.
+
+3. **Integrated Across Advisor Workspace**:
+   - Added `+ Register Customer` button to top desktop horizontal navigation, mobile offcanvas drawer, bottom navigation, Advisor Dashboard widgets, and `My Customers` table view.
+   - Added instant success flash notifications displaying the generated Customer Code upon submission.
+
+4. **Synchronized & Pushed to GitHub**:
+   - **Local XAMPP Server:** Fully synchronized to `D:\xampp\htdocs\svpl-web`.
+   - **GitHub Repository:** Committed and pushed to `main` ([`commit: b667e2b`](https://github.com/debendumishra/svpl-web/commit/b667e2b)).
+   - **Updated Chat Log:** Exported full prompt and update history to [`docs/CHAT_HISTORY.md`](file:///d:/DKM/SVPL-Web/docs/CHAT_HISTORY.md).
+
+---
+
+## 👤 User Prompt #34
+
+when a referral code is entered, it should display the name of the advisor or customer etc registration.
+
+---
+

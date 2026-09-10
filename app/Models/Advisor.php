@@ -28,10 +28,14 @@ class Advisor
 
     public static function findByReferralCode(string $code): ?array
     {
-        return Database::fetchOne("SELECT a.*, u.full_name as user_full_name 
+        $code = trim($code);
+        if (empty($code)) {
+            return null;
+        }
+        return Database::fetchOne("SELECT a.*, u.full_name as user_full_name, u.mobile as user_mobile 
                                    FROM advisors a 
                                    JOIN users u ON a.user_id = u.id 
-                                   WHERE a.referral_code = ? OR a.advisor_code = ?", [$code, $code]);
+                                   WHERE a.referral_code = ? OR a.advisor_code = ? OR a.mobile = ? OR u.mobile = ?", [$code, $code, $code, $code]);
     }
 
     public static function create(array $data): int
