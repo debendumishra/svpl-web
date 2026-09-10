@@ -74,8 +74,8 @@ $title = "My Documents — SVPL";
                                     <td class="text-secondary"><?= date('d M Y', strtotime($doc['created_at'] ?? 'now')) ?></td>
                                     <td><span class="badge bg-success-subtle text-success border border-success-subtle"><?= htmlspecialchars($doc['status']) ?></span></td>
                                     <td>
-                                        <a href="<?= url('/document/download?file=' . urlencode($doc['file_path'])) ?>" class="btn btn-outline-primary btn-sm py-1">
-                                            <i class="bi bi-download"></i> View
+                                        <a href="<?= url('/document/download?file=' . urlencode($doc['file_path'])) ?>" target="_blank" class="btn btn-outline-primary btn-sm py-1">
+                                            <i class="bi bi-eye-fill me-1"></i> View
                                         </a>
                                     </td>
                                 </tr>

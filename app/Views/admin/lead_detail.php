@@ -134,8 +134,8 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
                                 <i class="bi bi-file-earmark-pdf-fill text-danger me-2"></i>
                                 <strong class="text-navy"><?= htmlspecialchars($doc['document_title']) ?></strong>
                             </div>
-                            <a href="<?= url('/document/download?file=' . urlencode($doc['file_path'])) ?>" class="btn btn-outline-primary btn-sm py-1">
-                                <i class="bi bi-download"></i> View
+                            <a href="<?= url('/document/download?file=' . urlencode($doc['file_path'])) ?>" target="_blank" class="btn btn-outline-primary btn-sm py-1">
+                                <i class="bi bi-eye-fill me-1"></i> View
                             </a>
                         </li>
                     <?php endforeach; ?>

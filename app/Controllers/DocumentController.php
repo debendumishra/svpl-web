@@ -80,21 +80,59 @@ class DocumentController
 
     public function download(): void
     {
-        $file = $_GET['file'] ?? '';
-        $fullPath = dirname(__DIR__, 2) . '/' . ltrim($file, '/');
+        $file = trim($_GET['file'] ?? '');
+        if (empty($file)) {
+            Response::notFound("No document file specified.");
+            return;
+        }
 
-        if (file_exists($fullPath) && is_file($fullPath)) {
-            header('Content-Description: File Transfer');
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . basename($fullPath) . '"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
+        // Clean relative path without traversal
+        $cleanFile = ltrim(str_replace(['../', '..\\'], '', $file), '/\\');
+        $rootDir = dirname(__DIR__, 2);
+
+        // Candidate search paths
+        $candidates = [
+            $rootDir . '/public/' . $cleanFile,
+            $rootDir . '/' . $cleanFile,
+            $rootDir . '/public/uploads/documents/' . basename($cleanFile),
+            $rootDir . '/public/uploads/' . basename($cleanFile),
+            $rootDir . '/uploads/documents/' . basename($cleanFile),
+            'D:/xampp/htdocs/svpl-web/public/' . $cleanFile,
+            'D:/xampp/htdocs/svpl-web/public/uploads/documents/' . basename($cleanFile),
+        ];
+
+        $foundPath = null;
+        foreach ($candidates as $cand) {
+            if (!empty($cand) && file_exists($cand) && is_file($cand)) {
+                $foundPath = $cand;
+                break;
+            }
+        }
+
+        if ($foundPath) {
+            $ext = strtolower(pathinfo($foundPath, PATHINFO_EXTENSION));
+            $mimeTypes = [
+                'pdf'  => 'application/pdf',
+                'jpg'  => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png'  => 'image/png',
+                'webp' => 'image/webp',
+                'gif'  => 'image/gif',
+                'doc'  => 'application/msword',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ];
+            $contentType = $mimeTypes[$ext] ?? (function_exists('mime_content_type') ? mime_content_type($foundPath) : 'application/octet-stream');
+            $disposition = (isset($_GET['download']) && $_GET['download'] === '1') ? 'attachment' : 'inline';
+
+            header('Content-Type: ' . $contentType);
+            header('Content-Disposition: ' . $disposition . '; filename="' . basename($foundPath) . '"');
+            header('Content-Length: ' . filesize($foundPath));
+            header('Cache-Control: public, max-age=3600');
             header('Pragma: public');
-            header('Content-Length: ' . filesize($fullPath));
-            readfile($fullPath);
+            readfile($foundPath);
             exit;
         }
 
-        Response::notFound("Requested file could not be found.");
+        Response::notFound("Requested file could not be found on the server (" . htmlspecialchars(basename($file)) . ").");
     }
 }
