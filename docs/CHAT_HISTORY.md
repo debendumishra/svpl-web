@@ -1,6 +1,6 @@
 # Suryavistaara (SVPL-Web) — Complete AI Pair-Programming Chat History
 
-> Exported on: 2026-09-10 21:57:32
+> Exported on: 2026-09-10 22:03:24
 
 ---
 
@@ -1611,6 +1611,78 @@ The **₹2,700 Advisor Onboarding Fee & Manager/Superadmin Payment Confirmation 
 ### 👤 User
 
 how to update dispatches & kits, commission etc
+
+---
+
+### 👤 Assistant
+
+Here is a step-by-step guide on how to update and manage **Dispatches & Kits**, **Commissions**, and **System Parameters** in Suryavistaara (SVPL):
+
+---
+
+### 1. How to Manage & Update Dispatches & Kits
+
+Navigate to **Admin Portal → Dispatches & Kits** ([`/admin/dispatches`](file:///d:/DKM/SVPL-Web/app/Views/admin/dispatches.php))
+
+#### A. Creating a New Dispatch (Advisor Welcome Kit or Solar Equipment)
+1. Click the green **`+ Create New Dispatch`** button at the top right.
+2. Fill in the modal fields:
+   - **Dispatch Type**:
+     - *Advisor Welcome Induction Kit* (Photo ID Card, Appointment Letter, Canopy/Standee, Doorstep QR code).
+     - *Solar Panels & Inverter Package* (6x Dhwajja 550W Panels, On-Grid Inverter, GI Structure).
+     - *DISCOM Net Meter & BOS Kit*.
+   - **Recipient**: Select the Advisor or Customer Lead from the dropdown.
+   - **Courier Partner**: Select *SVPL Logistics Odisha*, *DTDC*, *Blue Dart*, *Speed Post*, or *Direct Handover*.
+   - **Tracking Number**: Enter consignment number (or leave blank to auto-generate `TRK-SVPL-YYYYMM-XXX`).
+   - **Items Included & Delivery Address**.
+3. Click **"Save & Dispatch"**.
+
+#### B. Updating Delivery Status
+- In the Dispatches table, every row has a live status dropdown:
+  - Select **`Dispatched`**, **`In Transit`**, **`Out for Delivery`**, or **`Delivered`**.
+  - Changing to **`Delivered`** automatically records the delivery timestamp.
+
+---
+
+### 2. How Commissions Work & How to Configure Them
+
+Navigate to **Admin Portal → Commission Ledger** ([`/admin/commissions`](file:///d:/DKM/SVPL-Web/app/Views/admin/commissions.php))
+
+#### A. Automatic 9-Level Distribution
+- Commissions are calculated automatically by the **Commission Engine** ([`CommissionEngine.php`](file:///d:/DKM/SVPL-Web/app/Services/CommissionEngine.php)) whenever a Customer Solar Lead reaches **Stage 7 (`INSTALLATION_COMPLETED`)** or **Stage 10 (`SUBSIDY_RECEIVED`)**.
+- **9-Tier Slabs Structure**:
+  - **Level 1 (Direct Sponsoring Advisor)**: ₹1,000 + ₹500 Direct Customer Bonus = **₹1,500 Gross**
+  - **Level 2 (Mentor Partner)**: **₹500.00**
+  - **Level 3 (Area Supervisor)**: **₹300.00**
+  - **Level 4**: **₹200.00**
+  - **Levels 5 to 9**: **₹100.00 each**
+- **Statutory TDS (5% Section 194H)** is automatically deducted, and the net payout is credited to each advisor’s digital wallet in real time.
+
+#### B. Changing Global Commission Rules & TDS
+Navigate to **Admin Portal → System Settings** ([`/admin/settings`](file:///d:/DKM/SVPL-Web/app/Views/admin/settings.php)):
+1. You can configure:
+   - **Advisor Onboarding Fee (₹)**: Currently ₹2,700.
+   - **Direct Customer Bonus (₹)**: Bonus paid per installed lead (default: ₹500).
+   - **Statutory TDS Deduction (%)**: Default 5.0%.
+   - **Advisor Qualification Target**: Number of customer leads to qualify (default: 3).
+2. Click **"Save System Configuration"** to apply across all future payouts.
+
+---
+
+### 3. Summary of Accessible Admin Links
+| Section | URL Route | Primary Function |
+| :--- | :--- | :--- |
+| **Advisor Payments Desk** | `/admin/payments` | Confirm ₹2,700 UTRs & activate advisor accounts |
+| **Dispatches & Kits** | `/admin/dispatches` | Create new shipments & update courier tracking |
+| **Commission Ledger** | `/admin/commissions` | View 9-level matrix, TDS deducted, and export CSV |
+| **9-Level Tree Visualizer** | `/admin/network-tree` | Explore advisor hierarchy down 9 generations |
+| **System Settings** | `/admin/settings` | Adjust fees, bonus values, and tax percentages |
+
+---
+
+### 👤 User
+
+the dispatches page is messy and not using any css file, no menu nothing. correct it
 
 ---
 

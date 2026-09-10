@@ -621,6 +621,145 @@ main a:not(.btn):not(.badge):not(.nav-link):not(.navbar-brand):hover,
 }
 
 /* ==========================================================================
+   DESKTOP PORTAL APP LAYOUT & SIDEBAR
+   ========================================================================== */
+.app-layout-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #F8FAFC;
+}
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.app-body-container {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 110px);
+}
+
+.portal-sidebar {
+    width: 270px;
+    min-width: 270px;
+    background: linear-gradient(180deg, #061528 0%, #0B2545 100%);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-right: 1px solid rgba(245, 158, 11, 0.25);
+    z-index: 1020;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.portal-sidebar.collapsed {
+    width: 78px;
+    min-width: 78px;
+}
+
+.portal-sidebar.collapsed .sidebar-text,
+.portal-sidebar.collapsed .collapse-arrow,
+.portal-sidebar.collapsed .user-info-text {
+    display: none !important;
+}
+
+.portal-sidebar.collapsed .nav-category-header span {
+    font-size: 0;
+}
+
+.portal-sidebar.collapsed .nav-category-header span i {
+    font-size: 1rem;
+}
+
+.portal-sidebar .nav-category-header {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.75rem 1.25rem 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.portal-sidebar .nav-category-header:hover {
+    color: #FFFFFF;
+}
+
+.portal-sidebar .collapse-arrow {
+    transition: transform 0.2s ease;
+    font-size: 0.65rem;
+}
+
+.portal-sidebar .nav-category-header.collapsed .collapse-arrow {
+    transform: rotate(-90deg);
+}
+
+.portal-sidebar .nav-link {
+    color: #CBD5E1 !important;
+    font-weight: 500;
+    font-size: 0.88rem;
+    padding: 0.55rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    margin: 2px 10px;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+
+.portal-sidebar .nav-link:hover,
+.portal-sidebar .nav-link.active {
+    color: #FFFFFF !important;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.08) 100%);
+    border-left: 3.5px solid var(--svpl-gold);
+    font-weight: 700;
+}
+
+.portal-sidebar .nav-link i {
+    font-size: 1.15rem;
+    color: #94A3B8;
+    flex-shrink: 0;
+}
+
+.portal-sidebar .nav-link.active i,
+.portal-sidebar .nav-link:hover i {
+    color: var(--svpl-gold-bright);
+}
+
+.portal-sidebar .user-profile-tile {
+    padding: 0.85rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(6, 21, 40, 0.6);
+}
+
+.app-main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 1.75rem 2rem;
+    background: #F8FAFC;
+    overflow-y: auto;
+}
+
+.app-footer {
+    padding: 0.75rem 1.5rem;
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+    font-size: 0.8rem;
+    color: #64748B;
+}
+
+/* ==========================================================================
    MOBILE-FIRST BOTTOM NAVIGATION & OFFCANVAS DRAWER
    ========================================================================== */
 .svpl-mobile-bottom-nav {

@@ -40,6 +40,9 @@ Router::get('/privacy', [PublicController::class, 'privacy']);
 Router::get('/disclaimer', [PublicController::class, 'disclaimer']);
 Router::get('/verify', [PublicController::class, 'verifyQr']);
 Router::get('/install', [PublicController::class, 'install']);
+Router::get('/dispatches', function() { \App\Helpers\Response::redirect('/admin/dispatches'); });
+Router::get('/commissions', function() { \App\Helpers\Response::redirect('/admin/commissions'); });
+Router::get('/payments', function() { \App\Helpers\Response::redirect('/admin/payments'); });
 
 // ==========================================
 // 2. AUTHENTICATION & ONBOARDING ROUTES
