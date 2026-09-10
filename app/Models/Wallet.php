@@ -10,11 +10,31 @@ use App\Helpers\Database;
 
 class Wallet
 {
+    public static function create(array $data): int
+    {
+        $existing = Database::fetchOne("SELECT id FROM wallets WHERE user_id = ?", [$data['user_id']]);
+        if ($existing) {
+            return (int) $existing['id'];
+        }
+
+        $sql = "INSERT INTO wallets (user_id, balance, total_earned, total_withdrawn, pending_clearance, created_at)
+                VALUES (?, ?, ?, ?, ?, NOW())";
+        Database::query($sql, [
+            $data['user_id'],
+            $data['balance'] ?? 0.00,
+            $data['total_earned'] ?? 0.00,
+            $data['total_withdrawn'] ?? 0.00,
+            $data['pending_clearance'] ?? 0.00,
+        ]);
+
+        return (int) Database::lastInsertId();
+    }
+
     public static function getByUserId(int $userId): ?array
     {
         $wallet = Database::fetchOne("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
         if (!$wallet) {
-            Database::query("INSERT INTO wallets (user_id, balance, total_earned, total_withdrawn, pending_clearance) VALUES (?, 0, 0, 0, 0)", [$userId]);
+            self::create(['user_id' => $userId]);
             $wallet = Database::fetchOne("SELECT * FROM wallets WHERE user_id = ?", [$userId]);
         }
         return $wallet;
