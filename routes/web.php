@@ -43,6 +43,8 @@ Router::get('/install', [PublicController::class, 'install']);
 Router::get('/dispatches', function() { \App\Helpers\Response::redirect('/admin/dispatches'); });
 Router::get('/commissions', function() { \App\Helpers\Response::redirect('/admin/commissions'); });
 Router::get('/payments', function() { \App\Helpers\Response::redirect('/admin/payments'); });
+Router::get('/ledger', function() { \App\Helpers\Response::redirect('/admin/ledger'); });
+Router::get('/accounts', function() { \App\Helpers\Response::redirect('/admin/ledger'); });
 
 // ==========================================
 // 2. AUTHENTICATION & ONBOARDING ROUTES
@@ -70,13 +72,17 @@ Router::get('/api/locations/blocks', [LocationController::class, 'getBlocks']);
 Router::get('/api/locations/gps', [LocationController::class, 'getGPs']);
 
 // ==========================================
-// 3. ADMIN / OPERATIONS / ACCOUNTS ROUTES
+// 3. ADMIN / MANAGER / ACCOUNTS / OPERATIONS ROUTES
 // ==========================================
-Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER_ADMIN', 'ADMIN', 'ACCOUNTS', 'OPERATIONS')]], function() {
+Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'ACCOUNTS', 'OPERATIONS')]], function() {
     Router::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    Router::get('/manager/dashboard', [AdminController::class, 'dashboard']);
     Router::get('/admin/advisors', [AdminController::class, 'advisors']);
+    Router::get('/manager/advisors', [AdminController::class, 'advisors']);
     Router::get('/admin/customers', [AdminController::class, 'customers']);
+    Router::get('/manager/customers', [AdminController::class, 'customers']);
     Router::get('/admin/leads', [AdminController::class, 'leads']);
+    Router::get('/manager/leads', [AdminController::class, 'leads']);
     Router::get('/admin/leads/{id}', [AdminController::class, 'leadDetail']);
     Router::get('/admin/lead/{id}', [AdminController::class, 'leadDetail']);
     Router::get('/admin/network-tree', [AdminController::class, 'networkTree']);
@@ -84,9 +90,20 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/admin/payments', [AdminController::class, 'payments']);
     Router::post('/admin/payments/confirm', [AdminController::class, 'confirmPayment']);
     Router::post('/admin/payments/reject', [AdminController::class, 'rejectPayment']);
+    
+    // Dispatches & Kits
     Router::get('/admin/dispatches', [AdminController::class, 'dispatches']);
     Router::post('/admin/dispatches/create', [AdminController::class, 'createDispatch']);
     Router::post('/admin/dispatches/update-status', [AdminController::class, 'updateDispatchStatus']);
+
+    // Company Financial Books & Account Ledger
+    Router::get('/admin/ledger', [AdminController::class, 'ledger']);
+    Router::get('/admin/accounts', [AdminController::class, 'ledger']);
+    Router::get('/manager/ledger', [AdminController::class, 'ledger']);
+    Router::get('/manager/accounts', [AdminController::class, 'ledger']);
+    Router::post('/admin/ledger/create', [AdminController::class, 'createLedgerEntry']);
+    Router::get('/admin/ledger/export', [AdminController::class, 'exportLedgerCsv']);
+
     Router::get('/admin/reports', [AdminController::class, 'reports']);
     Router::get('/admin/settings', [AdminController::class, 'settings']);
     Router::post('/admin/settings', [AdminController::class, 'updateSettings']);

@@ -119,7 +119,16 @@ class Payment
             // 3. Activate User login
             Database::execute("UPDATE users SET is_active = 1, updated_at = NOW() WHERE id = ?", [$advisor['user_id']]);
 
-            // 4. Log Audit
+            // 4. Auto-post to Company Account Ledger
+            CompanyLedger::autoPostAdvisorFee(
+                $advisorId,
+                (float) ($payment['amount'] ?? 2700.00),
+                $payment['payment_method'] ?? 'UPI',
+                $payment['transaction_ref'] ?? 'N/A',
+                $adminUserId
+            );
+
+            // 5. Log Audit
             AuditLog::log(
                 $adminUserId,
                 'PAYMENT_CONFIRMED',

@@ -169,6 +169,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/ledger') !== false || strpos($activeUri, '/manager/ledger') !== false) ? 'active' : '' ?>" href="<?= url('/admin/ledger') ?>">
+                                    <i class="bi bi-journal-bookmark-fill"></i> <span>Account Books & Ledger</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
                                     <i class="bi bi-receipt"></i> <span>Payments & Invoices</span>
                                 </a>
@@ -289,6 +294,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/commissions') !== false ? 'active' : '' ?>" href="<?= url('/admin/commissions') ?>">
                                     <i class="bi bi-cash-stack"></i> <span class="sidebar-text">9-Level Commissions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/ledger') !== false || strpos($activeUri, '/manager/ledger') !== false) ? 'active' : '' ?>" href="<?= url('/admin/ledger') ?>">
+                                    <i class="bi bi-journal-bookmark-fill"></i> <span class="sidebar-text">Account Books & Ledger</span>
                                 </a>
                             </li>
                             <li class="nav-item">

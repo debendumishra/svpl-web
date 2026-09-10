@@ -21,6 +21,7 @@ use App\Models\JEReport;
 use App\Models\Loan;
 use App\Models\Subsidy;
 use App\Models\Payment;
+use App\Models\CompanyLedger;
 use App\Services\AuthService;
 
 class AdminController
@@ -297,6 +298,157 @@ class AdminController
             }
         }
         Response::redirect('/admin/settings?saved=1');
+    }
+
+    public function ledger(): void
+    {
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+        $entryType = $_GET['entry_type'] ?? null;
+        $partyType = $_GET['party_type'] ?? null;
+        $accountHead = $_GET['account_head'] ?? null;
+        $paymentMode = $_GET['payment_mode'] ?? null;
+        $search = $_GET['search'] ?? null;
+        $activeTab = $_GET['tab'] ?? 'book'; // 'book', 'party', 'heads'
+
+        $filters = [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'entry_type' => $entryType,
+            'party_type' => $partyType,
+            'account_head' => $accountHead,
+            'payment_mode' => $paymentMode,
+            'search' => $search
+        ];
+
+        $entries = CompanyLedger::getAll($filters, 250);
+        $summary = CompanyLedger::getFinancialSummary();
+        $headSummary = CompanyLedger::getAccountHeadSummary($startDate, $endDate);
+        $distinctParties = CompanyLedger::getDistinctParties();
+        
+        $partyStatement = null;
+        $selectedParty = $_GET['party_name'] ?? null;
+        if (!empty($selectedParty)) {
+            $partyStatement = CompanyLedger::getPartyStatement($selectedParty, $startDate, $endDate);
+        }
+
+        $advisors = Advisor::getAll(100);
+        $customers = Customer::getAll(100);
+
+        Response::view('admin/ledger', [
+            'pageTitle' => 'Company Financial Books & Account Ledger — SVPL',
+            'entries' => $entries,
+            'summary' => $summary,
+            'headSummary' => $headSummary,
+            'distinctParties' => $distinctParties,
+            'partyStatement' => $partyStatement,
+            'selectedParty' => $selectedParty,
+            'advisors' => $advisors,
+            'customers' => $customers,
+            'filters' => $filters,
+            'activeTab' => $activeTab,
+            'accountHeads' => CompanyLedger::ACCOUNT_HEADS,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
+        ]);
+    }
+
+    public function createLedgerEntry(): void
+    {
+        $post = $_POST;
+        $entryType = strtoupper(trim($post['entry_type'] ?? 'RECEIPT'));
+        $entryDate = trim($post['entry_date'] ?? date('Y-m-d'));
+        $accountHead = trim($post['account_head'] ?? '');
+        $partyType = trim($post['party_type'] ?? 'OTHER');
+        $partyName = trim($post['party_name'] ?? '');
+        $partyIdentifier = trim($post['party_identifier'] ?? '');
+        $partyId = !empty($post['party_id']) ? (int)$post['party_id'] : null;
+        $paymentMode = trim($post['payment_mode'] ?? 'UPI');
+        $referenceNo = trim($post['reference_no'] ?? '');
+        $amount = (float)($post['amount'] ?? 0);
+        $narration = trim($post['narration'] ?? '');
+
+        $admin = AuthService::user();
+        $adminId = $admin ? (int)$admin['id'] : 1;
+
+        if (empty($accountHead) || empty($partyName) || $amount <= 0) {
+            Response::redirect('/admin/ledger?error=' . urlencode('Please fill in Account Head, Party Name, and a valid Amount (> 0).'));
+            return;
+        }
+
+        $debit = ($entryType === 'PAYMENT') ? $amount : 0.00;
+        $credit = ($entryType === 'RECEIPT') ? $amount : 0.00;
+
+        $id = CompanyLedger::create([
+            'entry_type' => $entryType,
+            'entry_date' => $entryDate,
+            'account_head' => $accountHead,
+            'party_type' => $partyType,
+            'party_id' => $partyId,
+            'party_name' => $partyName,
+            'party_identifier' => $partyIdentifier,
+            'payment_mode' => $paymentMode,
+            'reference_no' => $referenceNo,
+            'debit_amount' => $debit,
+            'credit_amount' => $credit,
+            'narration' => $narration,
+            'status' => 'CONFIRMED',
+            'created_by_user_id' => $adminId,
+        ]);
+
+        if ($id) {
+            AuditLog::log($adminId, 'LEDGER_ENTRY_RECORDED', 'LEDGER', $id, "Recorded {$entryType} of ₹" . number_format($amount, 2) . " under {$accountHead} for {$partyName}");
+            Response::redirect('/admin/ledger?success=' . urlencode("Voucher entry recorded successfully with updated running balance!"));
+        } else {
+            Response::redirect('/admin/ledger?error=' . urlencode("Failed to record entry. Please try again."));
+        }
+    }
+
+    public function exportLedgerCsv(): void
+    {
+        $startDate = $_GET['start_date'] ?? null;
+        $endDate = $_GET['end_date'] ?? null;
+        $entryType = $_GET['entry_type'] ?? null;
+        $partyType = $_GET['party_type'] ?? null;
+        $search = $_GET['search'] ?? null;
+
+        $filters = [
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'entry_type' => $entryType,
+            'party_type' => $partyType,
+            'search' => $search
+        ];
+
+        $entries = CompanyLedger::getAll($filters, 1000);
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=SVPL_Company_Ledger_' . date('Ymd_His') . '.csv');
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['Voucher No', 'Date', 'Type', 'Account Head', 'Party Type', 'Party Name', 'Party Code / ID', 'Payment Mode', 'Reference / UTR', 'Debit Outflow (Rs)', 'Credit Inflow (Rs)', 'Running Balance (Rs)', 'Narration', 'Recorded By', 'Recorded At']);
+
+        foreach ($entries as $e) {
+            fputcsv($output, [
+                $e['voucher_no'],
+                $e['entry_date'],
+                $e['entry_type'],
+                $e['account_head'],
+                $e['party_type'],
+                $e['party_name'],
+                $e['party_identifier'] ?? '',
+                $e['payment_mode'],
+                $e['reference_no'] ?? '',
+                number_format((float)$e['debit_amount'], 2, '.', ''),
+                number_format((float)$e['credit_amount'], 2, '.', ''),
+                number_format((float)$e['running_balance'], 2, '.', ''),
+                $e['narration'] ?? '',
+                $e['created_by_name'] ?? 'System',
+                $e['created_at']
+            ]);
+        }
+        fclose($output);
+        exit;
     }
 
     public function auditLogs(): void
