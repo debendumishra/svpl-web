@@ -2194,3 +2194,42 @@ a customer is currectly at "Loan Applied" Stage but in customer registry it is s
 <ADDITIONAL_METADATA>
 The current local time is: 2026-09-10T22:32:23+05:30.
 </ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+### Cause of the Issue & Solution
+
+#### 1. **Why It Was Happening (Root Cause)**
+* The database has two related tables: `leads` (which tracks the active 10-stage solar installation workflow like `LOAN_APPLIED`, `FEASIBILITY_APPROVED`, `INSTALLATION_COMPLETED`, etc.) and `customers` (which holds the customer profile).
+* In [customers.php](file:///d:/DKM/SVPL-Web/app/Views/admin/customers.php), the table was outputting `$c['status']` (the static profile registration default `'New'`) instead of reading the active lifecycle stage (`$c['lead_stage']`).
+* In addition, when a lead progressed through stages (such as when applying for or sanctioning a solar loan), the stage was updated in `leads.stage` but was not propagating back to sync `customers.status`.
+
+---
+
+#### 2. **Fixes Implemented**
+1. **Live 10-Stage Display**:
+   * Upgraded [customers.php](file:///d:/DKM/SVPL-Web/app/Views/admin/customers.php) (and [my_customers.php](file:///d:/DKM/SVPL-Web/app/Views/advisor/my_customers.php)) to render a color-coded **Live Project Stage** badge showing the exact human-readable stage (e.g. `4. Bank Loan Applied` with a warning/amber badge, `5. Loan Sanctioned`, etc.).
+   * Added a direct **"Track Lead"** action button in the customer registry that links directly to that customer's 10-stage pipeline tracker (`/admin/leads/{lead_id}`).
+
+2. **Automatic Status Synchronization**:
+   * Updated `Lead::updateStage()` in [Lead.php](file:///d:/DKM/SVPL-Web/app/Models/Lead.php) and `LeadPipelineService::advanceStage()` so whenever any lead advances to a new stage (e.g. `LOAN_APPLIED`), the linked customer record in the `customers` table is automatically updated in real-time.
+   * Ran a database synchronization to update all existing customer records with their respective current active lead stages.
+
+---
+
+### Verification
+* Refresh **`http://localhost/svpl-web/admin/customers`**. 
+* The customer (e.g. `Debasmita Mishra - SVPL-CUST-2003`) now displays **`4. Bank Loan Applied`** along with a **"Track Lead"** button.
+
+---
+
+## User
+
+<USER_REQUEST>
+the identity card design is available at "https://stitch.withgoogle.com/projects/8666082930423354696", (full width header and scalled typography) change the identity card design to the stitch design
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-10T22:44:55+05:30.
+</ADDITIONAL_METADATA>
