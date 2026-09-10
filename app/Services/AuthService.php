@@ -20,12 +20,37 @@ class AuthService
             return ['success' => false, 'message' => 'Invalid mobile number/email or password.'];
         }
 
-        if (!(int)$user['is_active']) {
-            return ['success' => false, 'message' => 'Your account is deactivated. Please contact SVPL administrator.'];
-        }
-
         if (!password_verify($password, $user['password_hash'])) {
             return ['success' => false, 'message' => 'Invalid mobile number/email or password.'];
+        }
+
+        // Check advisor onboarding fee payment & approval status
+        if ($user['role'] === 'ADVISOR') {
+            $adv = Advisor::findByUserId((int) $user['id']);
+            if ($adv) {
+                if ($adv['status'] === 'PENDING_APPROVAL' || empty($adv['joining_fee_paid'])) {
+                    return [
+                        'success' => false, 
+                        'message' => 'Your advisor registration (Fee: ₹2,700) is pending payment confirmation by SVPL Admin/Accounts. You will be able to log in as soon as your payment is verified.'
+                    ];
+                }
+                if ($adv['status'] === 'PAYMENT_REJECTED') {
+                    return [
+                        'success' => false, 
+                        'message' => 'Your onboarding payment verification was rejected. Please contact SVPL Admin support with your valid UTR / transaction receipt.'
+                    ];
+                }
+                if (in_array($adv['status'], ['SUSPENDED', 'INACTIVE'])) {
+                    return [
+                        'success' => false, 
+                        'message' => 'Your advisor account is currently suspended or inactive. Please contact SVPL administrator.'
+                    ];
+                }
+            }
+        }
+
+        if (!(int)$user['is_active']) {
+            return ['success' => false, 'message' => 'Your account is deactivated. Please contact SVPL administrator.'];
         }
 
         // Set session variables

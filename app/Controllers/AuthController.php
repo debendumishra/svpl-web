@@ -18,6 +18,7 @@ use App\Models\Wallet;
 use App\Models\Lead;
 use App\Models\Setting;
 use App\Models\AuditLog;
+use App\Models\Payment;
 use App\Helpers\Database;
 
 class AuthController
@@ -114,12 +115,16 @@ class AuthController
         $password = $post['password'] ?? 'Password@123';
         $refCode = trim($post['referral_code'] ?? '');
         $captcha = trim($post['captcha'] ?? '');
+        $paymentMethod = trim($post['payment_method'] ?? 'UPI');
+        $transactionRef = trim($post['transaction_ref'] ?? '');
+        $paymentDate = trim($post['payment_date'] ?? date('Y-m-d'));
+        $paymentRemarks = trim($post['payment_remarks'] ?? '');
 
         // Validation
-        if (empty($post['first_name']) || empty($post['last_name']) || empty($mobile) || empty($post['district']) || empty($post['block'])) {
+        if (empty($post['first_name']) || empty($post['last_name']) || empty($mobile) || empty($post['district']) || empty($post['block']) || empty($transactionRef)) {
             Response::view('public/register_advisor', [
                 'pageTitle' => 'Join as Solar Advisor — SVPL',
-                'error' => 'Please fill in all mandatory fields (*).',
+                'error' => 'Please fill in all mandatory fields (*) including the ₹2,700 Onboarding Fee Transaction UTR/Ref number.',
                 'post' => $post,
             ]);
             return;
@@ -155,21 +160,21 @@ class AuthController
 
         Database::beginTransaction();
         try {
-            // 1. Create User
+            // 1. Create User (inactive until payment confirmed by admin)
             $userId = User::create([
                 'role' => 'ADVISOR',
                 'email' => !empty($email) ? $email : null,
                 'mobile' => $mobile,
                 'password_hash' => password_hash($password, PASSWORD_BCRYPT),
                 'full_name' => trim($post['first_name'] . ' ' . $post['last_name']),
-                'is_active' => 1,
+                'is_active' => 0,
             ]);
 
             // 2. Generate Advisor Codes
             $advCode = Advisor::generateAdvisorCode();
             $newRefCode = Advisor::generateReferralCode();
 
-            // 3. Create Advisor Profile
+            // 3. Create Advisor Profile (PENDING_APPROVAL status)
             $advId = Advisor::create([
                 'user_id' => $userId,
                 'advisor_code' => $advCode,
@@ -197,14 +202,27 @@ class AuthController
                 'account_holder' => trim($post['account_holder'] ?? ''),
                 'account_number' => trim($post['account_number'] ?? ''),
                 'ifsc_code' => trim($post['ifsc_code'] ?? ''),
-                'status' => 'ACTIVE',
-                'joining_fee_paid' => 1,
+                'status' => 'PENDING_APPROVAL',
+                'joining_fee' => 2700.00,
+                'joining_fee_paid' => 0,
             ]);
 
-            // 4. Update Genealogy Closure Table
+            // 4. Create Payment record for Admin Verification
+            $paymentId = Payment::create([
+                'entity_type' => 'ADVISOR',
+                'entity_id' => $advId,
+                'purpose' => 'JOINING_FEE',
+                'amount' => 2700.00,
+                'payment_method' => $paymentMethod,
+                'transaction_ref' => $transactionRef,
+                'status' => 'PENDING',
+                'payment_date' => $paymentDate,
+            ]);
+
+            // 5. Update Genealogy Closure Table
             Genealogy::addAdvisor($advId, $sponsorId);
 
-            // 5. Initialize Wallet
+            // 6. Initialize Wallet
             Wallet::create([
                 'user_id' => $userId,
                 'balance' => 0.00,
@@ -213,14 +231,21 @@ class AuthController
                 'pending_clearance' => 0.00,
             ]);
 
-            // 6. Log Audit Trail
-            AuditLog::log($userId, 'ADVISOR_REGISTERED', 'ADVISOR', $advId, "Advisor {$advCode} self-registered with sponsor " . ($sponsorId ? "#{$sponsorId}" : "DIRECT"));
+            // 7. Log Audit Trail
+            AuditLog::log($userId, 'ADVISOR_REGISTERED', 'ADVISOR', $advId, "Advisor {$advCode} registered with fee ₹2,700 pending verification (UTR: {$transactionRef})");
 
             Database::commit();
 
-            // Auto-login registered advisor
-            AuthService::attempt($mobile, $password);
-            Response::redirect('/advisor/dashboard?welcome=1');
+            // Render Awaiting Verification screen with details
+            $advData = Advisor::findById($advId);
+            Response::view('public/advisor_registered_pending', [
+                'pageTitle' => 'Registration Submitted — Awaiting Verification — SVPL',
+                'advisor' => $advData,
+                'paymentMethod' => $paymentMethod,
+                'transactionRef' => $transactionRef,
+                'paymentDate' => $paymentDate,
+                'paymentRemarks' => $paymentRemarks,
+            ]);
         } catch (\Throwable $e) {
             Database::rollBack();
             Response::view('public/register_advisor', [

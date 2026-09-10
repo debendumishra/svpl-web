@@ -20,6 +20,8 @@ use App\Models\Quotation;
 use App\Models\JEReport;
 use App\Models\Loan;
 use App\Models\Subsidy;
+use App\Models\Payment;
+use App\Services\AuthService;
 
 class AdminController
 {
@@ -32,6 +34,7 @@ class AdminController
         $activeInstallations = Database::fetchOne("SELECT COUNT(*) as cnt FROM leads WHERE stage IN ('INSTALLATION_COMMENCED', 'INSTALLATION_COMPLETED')")['cnt'] ?? 0;
         $totalCommissions = Database::fetchOne("SELECT COALESCE(SUM(commission_amount), 0) as total FROM commissions")['total'] ?? 0;
         $totalSubsidies = Database::fetchOne("SELECT COALESCE(SUM(subsidy_amount), 0) as total FROM leads WHERE stage = 'SUBSIDY_RECEIVED'")['total'] ?? 0;
+        $pendingPaymentsCount = Payment::countPendingAdvisorPayments();
 
         // Stage breakdown
         $stageStats = Database::fetchAll("SELECT stage, COUNT(*) as count FROM leads GROUP BY stage");
@@ -48,6 +51,7 @@ class AdminController
             'activeInstallations' => (int) $activeInstallations,
             'totalCommissions' => (float) $totalCommissions,
             'totalSubsidies' => (float) $totalSubsidies,
+            'pendingPaymentsCount' => (int) $pendingPaymentsCount,
             'stageStats' => $stageStats,
             'recentLeads' => $recentLeads,
             'recentAdvisors' => $recentAdvisors,
@@ -145,11 +149,57 @@ class AdminController
 
     public function payments(): void
     {
+        $pendingPayments = Payment::getPendingAdvisorPayments();
+        $recentPayments = Payment::getRecentPayments(50);
         $transactions = Database::fetchAll("SELECT wt.*, u.full_name, u.role, u.mobile FROM wallet_transactions wt JOIN users u ON wt.user_id = u.id ORDER BY wt.id DESC LIMIT 100");
+        
         Response::view('admin/payments', [
-            'pageTitle' => 'Wallet Balances & Payments — SVPL Admin',
+            'pageTitle' => 'Payment Verification & Wallet Balances — SVPL Admin',
+            'pendingPayments' => $pendingPayments,
+            'recentPayments' => $recentPayments,
             'transactions' => $transactions,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
         ]);
+    }
+
+    public function confirmPayment(): void
+    {
+        $paymentId = (int) ($_POST['payment_id'] ?? 0);
+        $admin = AuthService::user();
+        $adminId = $admin ? (int) $admin['id'] : 1;
+
+        if ($paymentId <= 0) {
+            Response::redirect('/admin/payments?error=' . urlencode('Invalid payment record specified.'));
+            return;
+        }
+
+        $res = Payment::confirmAdvisorPayment($paymentId, $adminId);
+        if ($res) {
+            Response::redirect('/admin/payments?success=' . urlencode('Payment of ₹2,700 confirmed successfully! Advisor account is now ACTIVE and can log in.'));
+        } else {
+            Response::redirect('/admin/payments?error=' . urlencode('Failed to confirm payment. Please try again.'));
+        }
+    }
+
+    public function rejectPayment(): void
+    {
+        $paymentId = (int) ($_POST['payment_id'] ?? 0);
+        $reason = trim($_POST['reason'] ?? 'Invalid UTR reference / Payment not credited');
+        $admin = AuthService::user();
+        $adminId = $admin ? (int) $admin['id'] : 1;
+
+        if ($paymentId <= 0) {
+            Response::redirect('/admin/payments?error=' . urlencode('Invalid payment record specified.'));
+            return;
+        }
+
+        $res = Payment::rejectAdvisorPayment($paymentId, $adminId, $reason);
+        if ($res) {
+            Response::redirect('/admin/payments?success=' . urlencode('Advisor onboarding payment marked as REJECTED.'));
+        } else {
+            Response::redirect('/admin/payments?error=' . urlencode('Failed to reject payment. Please try again.'));
+        }
     }
 
     public function dispatches(): void

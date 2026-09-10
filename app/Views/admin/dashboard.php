@@ -27,6 +27,25 @@ $title = "Executive Command Center — SVPL Admin";
     </div>
 </div>
 
+<?php if (!empty($pendingPaymentsCount) && $pendingPaymentsCount > 0): ?>
+    <div class="alert alert-warning border border-warning d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 shadow-sm animate-fade-in" role="alert">
+        <div class="d-flex align-items-center gap-3">
+            <div class="p-2 bg-warning rounded-circle text-dark fs-4">
+                <i class="bi bi-shield-exclamation"></i>
+            </div>
+            <div>
+                <h6 class="fw-bold text-navy mb-0">
+                    <?= $pendingPaymentsCount ?> Advisor Onboarding Payment(s) Awaiting Confirmation (₹2,700 each)
+                </h6>
+                <p class="small text-secondary mb-0">Newly registered advisors cannot log in until their UTR payment details are confirmed by Manager/Superadmin.</p>
+            </div>
+        </div>
+        <a href="<?= url('/admin/payments') ?>" class="btn btn-dark btn-sm fw-bold px-3">
+            <i class="bi bi-check2-circle text-warning me-1"></i> Review & Activate
+        </a>
+    </div>
+<?php endif; ?>
+
 <!-- 6 EXECUTIVE KPI METRICS GRID -->
 <div class="row g-3 mb-4 animate-fade-in stagger-1">
     <div class="col-md-4 col-xl-2 col-6">

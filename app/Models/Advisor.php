@@ -47,7 +47,7 @@ class Advisor
                     gram_panchayat, village, pincode, address_line, 
                     aadhaar_number, pan_number, bank_name, bank_branch, 
                     account_holder, account_number, ifsc_code, status, 
-                    joining_fee_paid, created_at
+                    joining_fee, joining_fee_paid, created_at
                 ) VALUES (
                     ?, ?, ?, ?, 
                     ?, ?, ?, ?, ?, 
@@ -55,7 +55,7 @@ class Advisor
                     ?, ?, ?, ?, 
                     ?, ?, ?, ?, 
                     ?, ?, ?, ?, 
-                    ?, NOW()
+                    ?, ?, NOW()
                 )";
 
         Database::query($sql, [
@@ -85,8 +85,9 @@ class Advisor
             $data['account_holder'] ?? null,
             $data['account_number'] ?? null,
             $data['ifsc_code'] ?? null,
-            $data['status'] ?? 'NEW',
-            $data['joining_fee_paid'] ?? 1,
+            $data['status'] ?? 'PENDING_APPROVAL',
+            $data['joining_fee'] ?? 2700.00,
+            $data['joining_fee_paid'] ?? 0,
         ]);
 
         return (int) Database::lastInsertId();

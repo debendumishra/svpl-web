@@ -79,6 +79,8 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/admin/network-tree', [AdminController::class, 'networkTree']);
     Router::get('/admin/commissions', [AdminController::class, 'commissions']);
     Router::get('/admin/payments', [AdminController::class, 'payments']);
+    Router::post('/admin/payments/confirm', [AdminController::class, 'confirmPayment']);
+    Router::post('/admin/payments/reject', [AdminController::class, 'rejectPayment']);
     Router::get('/admin/dispatches', [AdminController::class, 'dispatches']);
     Router::get('/admin/reports', [AdminController::class, 'reports']);
     Router::get('/admin/settings', [AdminController::class, 'settings']);

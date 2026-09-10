@@ -1,6 +1,6 @@
 # Suryavistaara (SVPL-Web) — Complete AI Pair-Programming Chat History
 
-> Exported on: 2026-09-10 21:14:45
+> Exported on: 2026-09-10 21:48:07
 
 ---
 
@@ -1519,6 +1519,61 @@ Clicking the **"View"** button on any customer document (Aadhaar, Electricity Bi
 ### 👤 User
 
 manager dashboard "Recent Customer Solar Leads" not showing required data in the table
+
+---
+
+### 👤 Assistant
+
+The issue with the manager/admin dashboard table **"Recent Customer Solar Leads"** has been resolved.
+
+### Root Cause & Fix Details:
+1. **Column Mapping Alignment**:
+   - Mapped `lead_code` (with fallback to `LEAD-{id}`).
+   - Resolved customer names via `first_name` and `last_name` (with fallback to `customer_name`).
+   - Mapped mobile phone numbers using `mobile` (with fallback to `phone_number`).
+   - Displayed district and Odisha DISCOM badge (`TPCODL`, `TPNODL`, `TPSODL`, `TPWODL`).
+   - Fixed proposed solar system capacity from `proposed_capacity_kw` (with fallback to `proposed_solar_kw`).
+   - Mapped the assigned advisor's full name and badge (`advisor_name`, `advisor_code`).
+
+2. **Visual & Status Upgrades**:
+   - Added full 10-stage color-coded badges matching the scheme lifecycle (`1. Registration` through `🟢 10. Active Customer`).
+   - Added direct quick action link (`/admin/lead/{id}`) for immediate lead management.
+
+3. **Deployment**:
+   - Synced to live XAMPP server: `D:\xampp\htdocs\svpl-web`
+   - Committed and pushed to GitHub: [debendumishra/svpl-web](https://github.com/debendumishra/svpl-web) (commit `39312ec`)
+
+---
+
+### 👤 User
+
+when an advisor joined, amount will be charges i.e. 2700. So in manager/superadmin login the payment will be confirmed then only the advisor could able to login. the payment detail entry will be made by the advisor
+
+---
+
+### 👤 Assistant
+
+I have created the implementation plan to support the **₹2,700 Advisor Onboarding Fee & Admin Verification Workflow**.
+
+### Plan Summary:
+1. **Advisor Registration & Payment Entry**:
+   - Updates `/register-advisor` with the SVPL Official Bank & UPI details.
+   - Requires the advisor to provide Payment Mode, UTR/Transaction Reference, and Payment Date for the **₹2,700** joining fee.
+   - Creates the account with `status = PENDING_APPROVAL` and `joining_fee_paid = 0`.
+2. **Login Protection**:
+   - `AuthService` will block login attempts for pending advisors with a clear notification that payment verification is underway.
+3. **Manager / Superadmin Approval Interface**:
+   - In `/admin/payments`, displays a dedicated **Pending Advisor Payments** list with UTR, amount, and contact details.
+   - Provides a one-click **"Confirm & Activate"** action (and Reject option).
+   - Upon confirmation, activates the account (`status = ACTIVE`, `is_active = 1`, `joining_fee_paid = 1`), enabling the advisor to log in and access their dashboard.
+
+Please review the [implementation plan](file:///C:/Users/DELL/.gemini/antigravity-ide/brain/29c828a8-5230-40c9-b738-98251f7b0c0f/implementation_plan.md) and click **Proceed** or let me know if you would like any adjustments.
+
+---
+
+### 👤 User
+
+
 
 ---
 
