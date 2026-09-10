@@ -144,44 +144,81 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                         </div>
                     </div>
 
-                    <div class="nav-category-header">Advisor Workspace</div>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/advisor/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/advisor/dashboard') ?>">
-                                <i class="bi bi-speedometer2"></i> <span>Command Center</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>" href="<?= url('/advisor/customers') ?>">
-                                <i class="bi bi-people"></i> <span>My Customers</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/advisor/network') !== false ? 'active' : '' ?>" href="<?= url('/advisor/network') ?>">
-                                <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/advisor/wallet') !== false ? 'active' : '' ?>" href="<?= url('/advisor/wallet') ?>">
-                                <i class="bi bi-wallet2"></i> <span>Commission Wallet</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/advisor/id-card') !== false ? 'active' : '' ?>" href="<?= url('/advisor/id-card') ?>">
-                                <i class="bi bi-person-vcard"></i> <span>ID Card & Letter</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/advisor/qr-code') !== false ? 'active' : '' ?>" href="<?= url('/advisor/qr-code') ?>">
-                                <i class="bi bi-qr-code-scan"></i> <span>Doorstep QR Code</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-warning" href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>">
-                                <i class="bi bi-plus-circle-fill text-warning"></i> <span class="fw-bold">+ Register Customer</span>
-                            </a>
-                        </li>
-                    </ul>
+                <div class="py-2">
+                    <div class="p-3 mx-2 mb-2 rounded-3 bg-dark bg-opacity-50 border border-secondary">
+                        <div class="small text-secondary mb-1">Your Referral Code:</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <strong class="text-warning fs-5 font-monospace"><?= htmlspecialchars($referralCode) ?></strong>
+                            <button class="btn btn-warning btn-sm py-0 px-2 fw-bold btn-copy" data-copy="<?= htmlspecialchars($referralCode) ?>">
+                                Copy <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Command & Identity Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#advMobCommand" aria-expanded="true">
+                        <span><i class="bi bi-speedometer2 text-warning me-1"></i> Core Workspace</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="advMobCommand">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/advisor/dashboard') ?>">
+                                    <i class="bi bi-speedometer2"></i> <span>Command Center</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/qr-code') !== false ? 'active' : '' ?>" href="<?= url('/advisor/qr-code') ?>">
+                                    <i class="bi bi-qr-code-scan"></i> <span>Doorstep QR Code</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/id-card') !== false ? 'active' : '' ?>" href="<?= url('/advisor/id-card') ?>">
+                                    <i class="bi bi-person-vcard"></i> <span>ID Card & Letter</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Customer & Downline Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#advMobCustNet" aria-expanded="true">
+                        <span><i class="bi bi-diagram-3-fill text-warning me-1"></i> Customers & Network</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="advMobCustNet">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-warning fw-bold" href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>">
+                                    <i class="bi bi-plus-circle-fill text-warning"></i> <span>+ Register Customer</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>" href="<?= url('/advisor/customers') ?>">
+                                    <i class="bi bi-people"></i> <span>My Direct Customers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/network') !== false ? 'active' : '' ?>" href="<?= url('/advisor/network') ?>">
+                                    <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Finance & Wallet Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#advMobFinance" aria-expanded="true">
+                        <span><i class="bi bi-wallet2 text-warning me-1"></i> Earnings & Wallet</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="advMobFinance">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/wallet') !== false ? 'active' : '' ?>" href="<?= url('/advisor/wallet') ?>">
+                                    <i class="bi bi-cash-stack"></i> <span>Commission Wallet</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Sign Out in Drawer -->

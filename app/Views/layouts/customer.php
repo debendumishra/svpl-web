@@ -51,6 +51,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             <!-- Customer Header Strip -->
             <div class="px-2 px-md-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
                 <div class="d-flex align-items-center gap-2 gap-md-3">
+                    <!-- Mobile Hamburger Button -->
+                    <button class="btn btn-light border btn-sm d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#customerMobileDrawer" aria-label="Open Mobile Menu">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+
                     <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900;">
                         ☀
                     </div>
@@ -60,7 +65,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                         </div>
                         <div class="d-flex align-items-center gap-1">
                             <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.65rem;"><?= htmlspecialchars($customerCode) ?></span>
-                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.62rem;">Dhwajja 3kW Plant</span>
+                            <span class="badge bg-primary-subtle text-primary" style="font-size: 0.62rem;">Dhwajja 3kW</span>
                         </div>
                     </div>
                 </div>
@@ -93,6 +98,80 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
         </header>
 
+        <!-- MOBILE OFFCANVAS DRAWER MENU (BOOTSTRAP 5) -->
+        <div class="offcanvas offcanvas-start offcanvas-svpl" tabindex="-1" id="customerMobileDrawer" aria-labelledby="customerMobileDrawerLabel">
+            <div class="offcanvas-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900;">
+                        ☀
+                    </div>
+                    <div>
+                        <h6 class="offcanvas-title font-heading fw-bold text-white mb-0" id="customerMobileDrawerLabel"><?= htmlspecialchars($customerName) ?></h6>
+                        <small class="text-success fw-semibold" style="font-size: 0.7rem;"><?= htmlspecialchars($customerCode) ?></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            
+            <div class="offcanvas-body p-0 d-flex flex-column justify-content-between">
+                <div class="py-2">
+                    <div class="p-3 mx-2 mb-3 rounded-3 bg-dark bg-opacity-50 border border-secondary">
+                        <div class="small text-secondary mb-1">Consumer Status:</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <strong class="text-success font-monospace">Dhwajja 3kW Plant</strong>
+                            <span class="badge bg-success">₹1,38,000 Subsidy</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Workspace Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#custMobMenu" aria-expanded="true">
+                        <span><i class="bi bi-sun-fill text-warning me-1"></i> Solar Journey</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="custMobMenu">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= $activeUri === url('/customer/dashboard') ? 'active' : '' ?>" href="<?= url('/customer/dashboard') ?>">
+                                    <i class="bi bi-speedometer2"></i> <span>Live Milestone Tracker</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/customer/quotation') !== false ? 'active' : '' ?>" href="<?= url('/customer/quotation') ?>">
+                                    <i class="bi bi-file-earmark-text"></i> <span>Official Proposal & Cost</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/customer/documents') !== false ? 'active' : '' ?>" href="<?= url('/customer/documents') ?>">
+                                    <i class="bi bi-folder-check"></i> <span>KYC & Document Locker</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#custMobSupport" aria-expanded="true">
+                        <span><i class="bi bi-headset text-warning me-1"></i> Helpline & Support</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="custMobSupport">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-success" href="tel:18008897875">
+                                    <i class="bi bi-telephone-fill text-success"></i> <span>Toll-Free: 1800-889-SVPL</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Sign Out in Drawer -->
+                <div class="p-3 border-top border-secondary bg-dark bg-opacity-50">
+                    <a href="<?= url('/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">
+                        <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- INDEPENDENTLY SCROLLABLE MAIN CONTENT AREA -->
         <main class="app-main-content">
             <div class="container-fluid max-w-7xl">
@@ -120,10 +199,10 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                 <i class="bi bi-folder-check"></i>
                 <span>KYC Locker</span>
             </a>
-            <a href="tel:18008897875" class="mob-nav-item">
-                <i class="bi bi-headset"></i>
-                <span>Support</span>
-            </a>
+            <button type="button" class="mob-nav-item" data-bs-toggle="offcanvas" data-bs-target="#customerMobileDrawer" aria-label="Open Menu">
+                <i class="bi bi-grid-fill"></i>
+                <span>Menu</span>
+            </button>
         </nav>
     </div>
 

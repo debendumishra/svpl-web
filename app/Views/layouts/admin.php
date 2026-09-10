@@ -106,80 +106,100 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             
             <div class="offcanvas-body p-0 d-flex flex-column justify-content-between">
                 <div class="py-2">
-                    <!-- Core Command -->
-                    <div class="nav-category-header">Core Command</div>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/admin/dashboard') ?>">
-                                <i class="bi bi-speedometer2"></i> <span>Executive Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/leads') !== false ? 'active' : '' ?>" href="<?= url('/admin/leads') ?>">
-                                <i class="bi bi-kanban"></i> <span>10-Stage Pipeline</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- Core Command Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#mobMenuCore" aria-expanded="true">
+                        <span><i class="bi bi-cpu-fill text-warning me-1"></i> Core Command</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="mobMenuCore">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/admin/dashboard') ?>">
+                                    <i class="bi bi-speedometer2"></i> <span>Executive Dashboard</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/leads') !== false ? 'active' : '' ?>" href="<?= url('/admin/leads') ?>">
+                                    <i class="bi bi-kanban"></i> <span>10-Stage Pipeline</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-                    <!-- Network & Citizens -->
-                    <div class="nav-category-header">Network & Citizens</div>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/advisors') !== false ? 'active' : '' ?>" href="<?= url('/admin/advisors') ?>">
-                                <i class="bi bi-person-badge"></i> <span>Advisor Registry</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/network-tree') !== false ? 'active' : '' ?>" href="<?= url('/admin/network-tree') ?>">
-                                <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/customers') !== false ? 'active' : '' ?>" href="<?= url('/admin/customers') ?>">
-                                <i class="bi bi-people"></i> <span>Customer Registry</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- Network & Citizens Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#mobMenuNetwork" aria-expanded="true">
+                        <span><i class="bi bi-diagram-3-fill text-warning me-1"></i> Network & Citizens</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="mobMenuNetwork">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/advisors') !== false ? 'active' : '' ?>" href="<?= url('/admin/advisors') ?>">
+                                    <i class="bi bi-person-badge"></i> <span>Advisor Registry</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/network-tree') !== false ? 'active' : '' ?>" href="<?= url('/admin/network-tree') ?>">
+                                    <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/customers') !== false ? 'active' : '' ?>" href="<?= url('/admin/customers') ?>">
+                                    <i class="bi bi-people"></i> <span>Customer Registry</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-                    <!-- Operations & Supply -->
-                    <div class="nav-category-header">Operations & Supply</div>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
-                                <i class="bi bi-box-seam"></i> <span>Dispatches & Kits</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/commissions') !== false ? 'active' : '' ?>" href="<?= url('/admin/commissions') ?>">
-                                <i class="bi bi-cash-stack"></i> <span>9-Level Commissions</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
-                                <i class="bi bi-receipt"></i> <span>Payments & Invoices</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- Operations & Supply Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#mobMenuOperations" aria-expanded="true">
+                        <span><i class="bi bi-truck text-warning me-1"></i> Operations & Supply</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="mobMenuOperations">
+                        <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
+                                    <i class="bi bi-box-seam"></i> <span>Dispatches & Kits</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/commissions') !== false ? 'active' : '' ?>" href="<?= url('/admin/commissions') ?>">
+                                    <i class="bi bi-cash-stack"></i> <span>9-Level Commissions</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
+                                    <i class="bi bi-receipt"></i> <span>Payments & Invoices</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
 
-                    <!-- Governance & Reports -->
-                    <div class="nav-category-header">Governance</div>
-                    <ul class="nav flex-column mb-2">
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
-                                <i class="bi bi-graph-up-arrow"></i> <span>MIS Reports</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/settings') !== false ? 'active' : '' ?>" href="<?= url('/admin/settings') ?>">
-                                <i class="bi bi-sliders"></i> <span>System Settings</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?= strpos($activeUri, '/admin/audit-logs') !== false ? 'active' : '' ?>" href="<?= url('/admin/audit-logs') ?>">
-                                <i class="bi bi-shield-lock"></i> <span>Audit & Logs</span>
-                            </a>
-                        </li>
-                    </ul>
+                    <!-- Governance & Security Accordion -->
+                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#mobMenuGovernance" aria-expanded="true">
+                        <span><i class="bi bi-shield-check text-warning me-1"></i> Governance</span>
+                        <i class="bi bi-chevron-down collapse-arrow"></i>
+                    </div>
+                    <div class="collapse show" id="mobMenuGovernance">
+                        <ul class="nav flex-column mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
+                                    <i class="bi bi-graph-up-arrow"></i> <span>MIS Reports</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/settings') !== false ? 'active' : '' ?>" href="<?= url('/admin/settings') ?>">
+                                    <i class="bi bi-sliders"></i> <span>System Settings</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/audit-logs') !== false ? 'active' : '' ?>" href="<?= url('/admin/audit-logs') ?>">
+                                    <i class="bi bi-shield-lock"></i> <span>Audit & Logs</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- User Profile & Sign Out in Drawer -->

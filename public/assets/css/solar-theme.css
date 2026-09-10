@@ -703,6 +703,19 @@ main a:not(.btn):not(.badge):not(.nav-link):not(.navbar-brand):hover,
     cursor: pointer;
 }
 
+.offcanvas-svpl .nav-category-header:hover {
+    color: #FFFFFF;
+}
+
+.offcanvas-svpl .collapse-arrow {
+    transition: transform 0.2s ease;
+    font-size: 0.65rem;
+}
+
+.offcanvas-svpl .nav-category-header.collapsed .collapse-arrow {
+    transform: rotate(-90deg);
+}
+
 .offcanvas-svpl .nav-link {
     color: #CBD5E1 !important;
     font-weight: 500;
