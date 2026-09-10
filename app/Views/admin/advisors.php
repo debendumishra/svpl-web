@@ -102,22 +102,28 @@ $title = "Advisor Network Management — SVPL Admin";
                             </td>
                             <td><strong class="text-success">₹<?= number_format((float)($adv['wallet_balance'] ?? 0), 2) ?></strong></td>
                             <td>
-                                <?php if ($adv['status'] === 'PENDING_APPROVAL'): ?>
-                                    <a href="<?= url('/admin/payments') ?>" class="btn btn-sm btn-warning text-dark fw-bold py-1 px-2 shadow-sm" title="Verify ₹2,700 Onboarding Fee">
-                                        <i class="bi bi-shield-check me-1"></i> Verify Fee
+                                <div class="d-flex align-items-center gap-1">
+                                    <a href="<?= url('/admin/advisors/' . $adv['id'] . '/edit') ?>" class="btn btn-outline-primary btn-sm py-1 px-2 fw-semibold" title="Edit / Modify Advisor Data">
+                                        <i class="bi bi-pencil-square"></i> Edit
                                     </a>
-                                <?php else: ?>
-                                    <div class="dropdown">
-                                        <button class="btn btn-light btn-sm border dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            Options
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
-                                            <li><a class="dropdown-item" href="<?= url('/print/id-card/' . $adv['id']) ?>" target="_blank"><i class="bi bi-person-vcard text-primary me-2"></i> Print Solar ID Card</a></li>
-                                            <li><a class="dropdown-item" href="<?= url('/print/appointment/' . $adv['id']) ?>" target="_blank"><i class="bi bi-file-earmark-text text-warning me-2"></i> Appointment Letter</a></li>
-                                            <li><a class="dropdown-item" href="<?= url('/admin/network-tree?root_id=' . $adv['id']) ?>"><i class="bi bi-diagram-3 text-success me-2"></i> View 9-Level Tree</a></li>
-                                        </ul>
-                                    </div>
-                                <?php endif; ?>
+                                    <?php if ($adv['status'] === 'PENDING_APPROVAL'): ?>
+                                        <a href="<?= url('/admin/payments') ?>" class="btn btn-sm btn-warning text-dark fw-bold py-1 px-2 shadow-sm" title="Verify ₹2,700 Onboarding Fee">
+                                            <i class="bi bi-shield-check"></i>
+                                        </a>
+                                    <?php else: ?>
+                                        <div class="dropdown">
+                                            <button class="btn btn-light btn-sm border dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                                <li><a class="dropdown-item" href="<?= url('/admin/advisors/' . $adv['id'] . '/edit') ?>"><i class="bi bi-pencil-square text-primary me-2"></i> Modify Advisor Data</a></li>
+                                                <li><a class="dropdown-item" href="<?= url('/print/id-card/' . $adv['id']) ?>" target="_blank"><i class="bi bi-person-vcard text-primary me-2"></i> Print Solar ID Card</a></li>
+                                                <li><a class="dropdown-item" href="<?= url('/print/appointment/' . $adv['id']) ?>" target="_blank"><i class="bi bi-file-earmark-text text-warning me-2"></i> Appointment Letter</a></li>
+                                                <li><a class="dropdown-item" href="<?= url('/admin/network-tree?root_id=' . $adv['id']) ?>"><i class="bi bi-diagram-3 text-success me-2"></i> View 9-Level Tree</a></li>
+                                            </ul>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
                             </td>
                         </tr>
                     <?php endforeach; ?>

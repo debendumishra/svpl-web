@@ -105,6 +105,86 @@ class Customer
         return Database::fetchAll($sql, $params);
     }
 
+    public static function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE customers SET 
+                    first_name = ?, last_name = ?, full_name = ?, father_husband_name = ?,
+                    mobile = ?, alt_mobile = ?, email = ?,
+                    state = ?, district = ?, block = ?, gram_panchayat = ?, village = ?, pincode = ?, address_line = ?,
+                    discom_name = ?, discom = ?, consumer_number = ?, electricity_consumer_no = ?,
+                    sanctioned_load_kw = ?, proposed_solar_kw = ?, monthly_avg_bill = ?,
+                    roof_type = ?, roof_area_sqft = ?,
+                    bank_name = ?, bank_branch = ?, account_holder = ?, account_number = ?, ifsc_code = ?,
+                    advisor_id = ?, status = ?,
+                    updated_at = NOW()
+                WHERE id = ?";
+
+        $discom = $data['discom_name'] ?? 'TPCODL';
+        $consumerNo = $data['consumer_number'] ?? null;
+        $fullName = trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''));
+
+        $res = Database::execute($sql, [
+            $data['first_name'],
+            $data['last_name'],
+            $fullName,
+            $data['father_husband_name'] ?? $data['father_spouse_name'] ?? null,
+            $data['mobile'],
+            $data['alt_mobile'] ?? null,
+            $data['email'] ?? null,
+            $data['state'] ?? 'Odisha',
+            $data['district'],
+            $data['block'],
+            $data['gram_panchayat'],
+            $data['village'] ?? null,
+            $data['pincode'],
+            $data['address_line'] ?? null,
+            $discom,
+            $discom,
+            $consumerNo,
+            $consumerNo,
+            !empty($data['sanctioned_load_kw']) ? (float)$data['sanctioned_load_kw'] : 2.0,
+            !empty($data['proposed_solar_kw']) ? (float)$data['proposed_solar_kw'] : 3.0,
+            !empty($data['monthly_avg_bill']) ? (float)$data['monthly_avg_bill'] : null,
+            $data['roof_type'] ?? 'RCC Roof',
+            !empty($data['roof_area_sqft']) ? (float)$data['roof_area_sqft'] : 300,
+            $data['bank_name'] ?? null,
+            $data['bank_branch'] ?? null,
+            $data['account_holder'] ?? null,
+            $data['account_number'] ?? null,
+            $data['ifsc_code'] ?? null,
+            !empty($data['advisor_id']) ? (int)$data['advisor_id'] : null,
+            $data['status'] ?? 'New',
+            $id
+        ]);
+
+        // Sync with linked user account if exists
+        $customer = self::findById($id);
+        if ($customer && !empty($customer['user_id'])) {
+            $fullName = trim($data['first_name'] . ' ' . $data['last_name']);
+            Database::execute("UPDATE users SET full_name = ?, mobile = ?, email = COALESCE(?, email), updated_at = NOW() WHERE id = ?", [
+                $fullName,
+                $data['mobile'],
+                $data['email'] ?? null,
+                (int)$customer['user_id']
+            ]);
+        }
+
+        // Sync with linked lead if exists
+        if (!empty($data['proposed_solar_kw']) || !empty($data['advisor_id'])) {
+            Database::execute("UPDATE leads SET 
+                                proposed_capacity_kw = COALESCE(?, proposed_capacity_kw),
+                                advisor_id = COALESCE(?, advisor_id),
+                                updated_at = NOW()
+                               WHERE customer_id = ?", [
+                !empty($data['proposed_solar_kw']) ? (float)$data['proposed_solar_kw'] : null,
+                !empty($data['advisor_id']) ? (int)$data['advisor_id'] : null,
+                $id
+            ]);
+        }
+
+        return $res;
+    }
+
     public static function generateCustomerCode(): string
     {
         $next = Database::fetchOne("SELECT COUNT(*) as cnt FROM customers");

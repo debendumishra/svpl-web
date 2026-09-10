@@ -67,7 +67,118 @@ class AdminController
             'pageTitle' => 'Advisor Management — SVPL Admin',
             'advisors' => $advisors,
             'search' => $search,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
         ]);
+    }
+
+    public function editAdvisor(string $id): void
+    {
+        $advisorId = (int)$id;
+        $advisor = Advisor::findById($advisorId);
+        if (!$advisor) {
+            Response::notFound("Advisor #{$id} not found.");
+            return;
+        }
+
+        $allAdvisors = Database::fetchAll("SELECT id, advisor_code, first_name, last_name, district FROM advisors WHERE id != ? ORDER BY first_name ASC", [$advisorId]);
+
+        Response::view('admin/edit_advisor', [
+            'pageTitle' => "Edit Advisor: {$advisor['advisor_code']} ({$advisor['first_name']} {$advisor['last_name']}) — SVPL Admin",
+            'advisor' => $advisor,
+            'allAdvisors' => $allAdvisors,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
+        ]);
+    }
+
+    public function updateAdvisor(string $id): void
+    {
+        $advisorId = (int)$id;
+        $advisor = Advisor::findById($advisorId);
+        if (!$advisor) {
+            Response::notFound("Advisor #{$id} not found.");
+            return;
+        }
+
+        $post = $_POST;
+        $photoUrl = null;
+
+        // Process Live Camera Base64 Photo
+        if (!empty($post['advisor_photo_base64']) && strpos($post['advisor_photo_base64'], 'data:image') === 0) {
+            $base64Parts = explode(',', $post['advisor_photo_base64']);
+            if (count($base64Parts) === 2) {
+                $imageData = base64_decode($base64Parts[1]);
+                if ($imageData !== false) {
+                    $uploadDir = dirname(dirname(__DIR__)) . '/public/uploads/advisors/';
+                    if (!is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    $filename = 'adv_photo_' . time() . '_' . rand(1000, 9999) . '.jpg';
+                    $targetPath = $uploadDir . $filename;
+                    if (file_put_contents($targetPath, $imageData)) {
+                        $photoUrl = 'public/uploads/advisors/' . $filename;
+                    }
+                }
+            }
+        }
+        // Process File Upload Photo
+        elseif (isset($_FILES['advisor_photo']) && $_FILES['advisor_photo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['advisor_photo'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+            if (in_array($ext, $allowedExts)) {
+                $uploadDir = dirname(dirname(__DIR__)) . '/public/uploads/advisors/';
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0777, true);
+                }
+                $filename = 'adv_photo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                $targetPath = $uploadDir . $filename;
+                if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                    $photoUrl = 'public/uploads/advisors/' . $filename;
+                }
+            }
+        }
+
+        $updateData = [
+            'first_name' => trim($post['first_name'] ?? $advisor['first_name']),
+            'last_name' => trim($post['last_name'] ?? $advisor['last_name']),
+            'father_spouse_name' => trim($post['father_spouse_name'] ?? ''),
+            'dob' => !empty($post['dob']) ? trim($post['dob']) : null,
+            'gender' => trim($post['gender'] ?? 'Male'),
+            'photo_url' => $photoUrl,
+            'blood_group' => trim($post['blood_group'] ?? 'O+ve'),
+            'mobile' => trim($post['mobile'] ?? $advisor['mobile']),
+            'alt_mobile' => trim($post['alt_mobile'] ?? ''),
+            'email' => trim($post['email'] ?? ''),
+            'state' => trim($post['state'] ?? 'Odisha'),
+            'district' => trim($post['district'] ?? $advisor['district']),
+            'block' => trim($post['block'] ?? $advisor['block']),
+            'gram_panchayat' => trim($post['gram_panchayat'] ?? $advisor['gram_panchayat']),
+            'village' => trim($post['village'] ?? ''),
+            'pincode' => trim($post['pincode'] ?? $advisor['pincode']),
+            'address_line' => trim($post['address_line'] ?? ''),
+            'aadhaar_number' => trim($post['aadhaar_number'] ?? ''),
+            'pan_number' => strtoupper(trim($post['pan_number'] ?? '')),
+            'bank_name' => trim($post['bank_name'] ?? ''),
+            'bank_branch' => trim($post['bank_branch'] ?? ''),
+            'account_holder' => trim($post['account_holder'] ?? ''),
+            'account_number' => trim($post['account_number'] ?? ''),
+            'ifsc_code' => strtoupper(trim($post['ifsc_code'] ?? '')),
+            'status' => trim($post['status'] ?? $advisor['status']),
+            'joining_fee_paid' => isset($post['joining_fee_paid']) ? (int)$post['joining_fee_paid'] : (int)$advisor['joining_fee_paid'],
+            'sponsor_id' => !empty($post['sponsor_id']) ? (int)$post['sponsor_id'] : null,
+        ];
+
+        $res = Advisor::update($advisorId, $updateData);
+
+        if ($res) {
+            $admin = AuthService::user();
+            AuditLog::log($admin ? (int)$admin['id'] : null, 'ADVISOR_UPDATE', "Admin updated advisor record #{$advisorId} ({$advisor['advisor_code']})");
+            Response::redirect('/admin/advisors/' . $advisorId . '/edit?success=' . urlencode("Advisor {$advisor['advisor_code']} profile updated successfully!"));
+        } else {
+            Response::redirect('/admin/advisors/' . $advisorId . '/edit?error=' . urlencode("Failed to update advisor details."));
+        }
     }
 
     public function customers(): void
@@ -78,7 +189,80 @@ class AdminController
             'pageTitle' => 'Customer Registry — SVPL Admin',
             'customers' => $customers,
             'search' => $search,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
         ]);
+    }
+
+    public function editCustomer(string $id): void
+    {
+        $customerId = (int)$id;
+        $customer = Customer::findById($customerId);
+        if (!$customer) {
+            Response::notFound("Customer #{$id} not found.");
+            return;
+        }
+
+        $allAdvisors = Database::fetchAll("SELECT id, advisor_code, first_name, last_name, district FROM advisors ORDER BY first_name ASC");
+
+        Response::view('admin/edit_customer', [
+            'pageTitle' => "Edit Customer: {$customer['customer_code']} ({$customer['first_name']} {$customer['last_name']}) — SVPL Admin",
+            'customer' => $customer,
+            'allAdvisors' => $allAdvisors,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
+        ]);
+    }
+
+    public function updateCustomer(string $id): void
+    {
+        $customerId = (int)$id;
+        $customer = Customer::findById($customerId);
+        if (!$customer) {
+            Response::notFound("Customer #{$id} not found.");
+            return;
+        }
+
+        $post = $_POST;
+        $updateData = [
+            'first_name' => trim($post['first_name'] ?? $customer['first_name']),
+            'last_name' => trim($post['last_name'] ?? $customer['last_name']),
+            'father_spouse_name' => trim($post['father_spouse_name'] ?? ''),
+            'mobile' => trim($post['mobile'] ?? $customer['mobile']),
+            'alt_mobile' => trim($post['alt_mobile'] ?? ''),
+            'email' => trim($post['email'] ?? ''),
+            'state' => trim($post['state'] ?? 'Odisha'),
+            'district' => trim($post['district'] ?? $customer['district']),
+            'block' => trim($post['block'] ?? $customer['block']),
+            'gram_panchayat' => trim($post['gram_panchayat'] ?? $customer['gram_panchayat']),
+            'village' => trim($post['village'] ?? ''),
+            'pincode' => trim($post['pincode'] ?? $customer['pincode']),
+            'address_line' => trim($post['address_line'] ?? ''),
+            'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
+            'consumer_number' => trim($post['consumer_number'] ?? ''),
+            'sanctioned_load_kw' => !empty($post['sanctioned_load_kw']) ? (float)$post['sanctioned_load_kw'] : 2.0,
+            'proposed_solar_kw' => !empty($post['proposed_solar_kw']) ? (float)$post['proposed_solar_kw'] : 3.0,
+            'monthly_avg_bill' => !empty($post['monthly_avg_bill']) ? (float)$post['monthly_avg_bill'] : null,
+            'roof_type' => trim($post['roof_type'] ?? 'RCC Roof'),
+            'roof_area_sqft' => !empty($post['roof_area_sqft']) ? (float)$post['roof_area_sqft'] : 300,
+            'bank_name' => trim($post['bank_name'] ?? ''),
+            'bank_branch' => trim($post['bank_branch'] ?? ''),
+            'account_holder' => trim($post['account_holder'] ?? ''),
+            'account_number' => trim($post['account_number'] ?? ''),
+            'ifsc_code' => strtoupper(trim($post['ifsc_code'] ?? '')),
+            'advisor_id' => !empty($post['advisor_id']) ? (int)$post['advisor_id'] : null,
+            'status' => trim($post['status'] ?? $customer['status']),
+        ];
+
+        $res = Customer::update($customerId, $updateData);
+
+        if ($res) {
+            $admin = AuthService::user();
+            AuditLog::log($admin ? (int)$admin['id'] : null, 'CUSTOMER_UPDATE', "Admin updated customer record #{$customerId} ({$customer['customer_code']})");
+            Response::redirect('/admin/customers/' . $customerId . '/edit?success=' . urlencode("Customer {$customer['customer_code']} profile updated successfully!"));
+        } else {
+            Response::redirect('/admin/customers/' . $customerId . '/edit?error=' . urlencode("Failed to update customer details."));
+        }
     }
 
     public function leads(): void

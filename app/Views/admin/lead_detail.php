@@ -22,6 +22,11 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
         </p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
+        <?php if (!empty($lead['customer_id'])): ?>
+            <a href="<?= url('/admin/customers/' . $lead['customer_id'] . '/edit') ?>" class="btn btn-outline-primary btn-sm shadow-sm">
+                <i class="bi bi-pencil-square me-1"></i> Edit Customer Data
+            </a>
+        <?php endif; ?>
         <button type="button" class="btn btn-success btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#utrDisbursalModal">
             <i class="bi bi-bank2 me-1"></i> Enter UTR / Disbursal
         </button>

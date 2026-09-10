@@ -2288,3 +2288,65 @@ The Advisor Registration and Identity Card systems have been upgraded to support
 * **Local XAMPP Server (`D:\xampp\htdocs\svpl-web`)**: Fully synchronized.
 * **GitHub Repository**: Committed and pushed to `main`.
 
+---
+
+## User
+
+<USER_REQUEST>
+add provision to modify the data of advisor/customer in manager/ admin login
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-10T23:09:34+05:30.
+</ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+Full provision to edit and modify all data of **Advisors** and **Customers** in **Admin and Manager login** has been implemented.
+
+---
+
+### 🛠️ Summary of Implemented Features:
+
+#### 1. **Advisor Profile Editing (`/admin/advisors/{id}/edit` & `/manager/advisors/{id}/edit`)**
+* **Personal & ID Card Photo**:
+  * Modify First Name, Last Name, Father/Spouse Name, DOB, Gender, Blood Group.
+  * Direct Passport Photo upload or Live Camera Selfie re-capture for the official ID Card.
+* **Odisha Location & Contacts**:
+  * Primary Mobile (Login ID), Alternate Mobile, Email Address.
+  * District (30 Odisha districts dropdown), Block/Municipality, Gram Panchayat, Village/Ward, Pincode, Full Postal Address.
+* **Statutory KYC & Direct Bank Account**:
+  * Aadhaar Number, PAN Card Number.
+  * Bank Name, Branch, Account Holder Name, Account Number, IFSC Code.
+* **Operational Status, Fee Reconciliation & Sponsoring Hierarchy**:
+  * Account Status (`ACTIVE`, `PENDING_APPROVAL`, `QUALIFIED`, `PAYMENT_REJECTED`, `SUSPENDED`).
+  * Onboarding Fee Status (₹2,700 Paid & Verified vs Fee Unpaid/Pending).
+  * Sponsoring Mentor / Advisor assignment.
+* **Synchronous Updates**:
+  * Updates `advisors` table and automatically syncs `users` table credentials (`full_name`, `mobile`, `email`).
+
+#### 2. **Customer / Beneficiary Profile Editing (`/admin/customers/{id}/edit` & `/manager/customers/{id}/edit`)**
+* **Beneficiary Profile & Contacts**:
+  * First Name, Last Name, Father/Husband/Spouse Name.
+  * Primary Mobile, Alternate Mobile, Email.
+* **Odisha Location & Installation Site**:
+  * State, District, Block/Municipality, Gram Panchayat, Village/Ward, Pincode, Full Postal Site Address.
+* **DISCOM & Solar Sizing**:
+  * Odisha DISCOM (`TPCODL`, `TPNODL`, `TPSODL`, `TPWODL`).
+  * Consumer / CA Number, Sanctioned Load (kW).
+  * Proposed Solar Capacity (1kW to 20kW), Monthly Average Electricity Bill (₹), Roof Type, Shadow-Free Roof Area (Sq. Ft.).
+* **DBT Subsidy Bank Account**:
+  * Bank Name, Branch, Account Holder Name, Account Number, IFSC Code (for Central & State subsidies ₹78k + ₹60k = ₹1.38L).
+* **Attribution & Project Lifecycle**:
+  * Assisting Advisor selector.
+  * 10-Stage Lifecycle Stage (`1. Registration` through `10. Subsidy Disbursed`).
+* **Synchronous Updates**:
+  * Updates `customers` table and automatically syncs linked `leads` record and `users` table.
+
+#### 3. **UI Integration**:
+* **Advisor Registry (`/admin/advisors`)**: Direct **"Edit"** action button and dropdown menu item on every advisor row.
+* **Customer Registry (`/admin/customers`)**: Direct **"Edit"** action button alongside **"Track Lead"** on every customer row.
+* **Lead Dossier (`/admin/leads/{id}`)**: **"Edit Customer Data"** quick action button in the command header.
+
+

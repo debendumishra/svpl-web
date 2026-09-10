@@ -133,6 +133,65 @@ class Advisor
         return Database::execute("UPDATE advisors SET status = 'QUALIFIED', qualified_at = NOW() WHERE id = ?", [$advisorId]);
     }
 
+    public static function update(int $id, array $data): bool
+    {
+        $sql = "UPDATE advisors SET 
+                    first_name = ?, last_name = ?, father_spouse_name = ?, dob = ?, gender = ?,
+                    photo_url = COALESCE(?, photo_url), blood_group = ?,
+                    mobile = ?, alt_mobile = ?, email = ?,
+                    state = ?, district = ?, block = ?, gram_panchayat = ?, village = ?, pincode = ?, address_line = ?,
+                    aadhaar_number = ?, pan_number = ?,
+                    bank_name = ?, bank_branch = ?, account_holder = ?, account_number = ?, ifsc_code = ?,
+                    status = ?, joining_fee_paid = ?, sponsor_id = ?,
+                    updated_at = NOW()
+                WHERE id = ?";
+
+        $res = Database::execute($sql, [
+            $data['first_name'],
+            $data['last_name'],
+            $data['father_spouse_name'] ?? null,
+            !empty($data['dob']) ? $data['dob'] : null,
+            $data['gender'] ?? 'Male',
+            !empty($data['photo_url']) ? $data['photo_url'] : null,
+            $data['blood_group'] ?? 'O+ve',
+            $data['mobile'],
+            $data['alt_mobile'] ?? null,
+            $data['email'] ?? null,
+            $data['state'] ?? 'Odisha',
+            $data['district'],
+            $data['block'],
+            $data['gram_panchayat'],
+            $data['village'] ?? null,
+            $data['pincode'],
+            $data['address_line'] ?? null,
+            $data['aadhaar_number'] ?? null,
+            $data['pan_number'] ?? null,
+            $data['bank_name'] ?? null,
+            $data['bank_branch'] ?? null,
+            $data['account_holder'] ?? null,
+            $data['account_number'] ?? null,
+            $data['ifsc_code'] ?? null,
+            $data['status'] ?? 'ACTIVE',
+            isset($data['joining_fee_paid']) ? (int)$data['joining_fee_paid'] : 1,
+            !empty($data['sponsor_id']) ? (int)$data['sponsor_id'] : null,
+            $id
+        ]);
+
+        // Sync with linked user account if exists
+        $advisor = self::findById($id);
+        if ($advisor && !empty($advisor['user_id'])) {
+            $fullName = trim($data['first_name'] . ' ' . $data['last_name']);
+            Database::execute("UPDATE users SET full_name = ?, mobile = ?, email = COALESCE(?, email), updated_at = NOW() WHERE id = ?", [
+                $fullName,
+                $data['mobile'],
+                $data['email'] ?? null,
+                (int)$advisor['user_id']
+            ]);
+        }
+
+        return $res;
+    }
+
     public static function generateAdvisorCode(): string
     {
         $next = Database::fetchOne("SELECT COUNT(*) as cnt FROM advisors");

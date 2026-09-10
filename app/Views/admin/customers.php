@@ -152,15 +152,20 @@ $stageMap = [
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <?php if (!empty($c['lead_id'])): ?>
-                                        <a href="<?= url('/admin/leads/' . $c['lead_id']) ?>" class="btn btn-outline-navy btn-sm fw-semibold" title="View 10-Stage Pipeline Tracker">
-                                            <i class="bi bi-arrow-up-right-circle me-1"></i> Track Lead
+                                    <div class="d-flex align-items-center justify-content-end gap-1">
+                                        <a href="<?= url('/admin/customers/' . $c['id'] . '/edit') ?>" class="btn btn-outline-primary btn-sm py-1 px-2 fw-semibold" title="Edit / Modify Beneficiary Data">
+                                            <i class="bi bi-pencil-square"></i> Edit
                                         </a>
-                                    <?php else: ?>
-                                        <a href="<?= url('/admin/leads') ?>" class="btn btn-light border btn-sm text-secondary" title="View Pipeline">
-                                            <i class="bi bi-kanban"></i>
-                                        </a>
-                                    <?php endif; ?>
+                                        <?php if (!empty($c['lead_id'])): ?>
+                                            <a href="<?= url('/admin/leads/' . $c['lead_id']) ?>" class="btn btn-outline-navy btn-sm fw-semibold py-1 px-2" title="View 10-Stage Pipeline Tracker">
+                                                <i class="bi bi-arrow-up-right-circle me-1"></i> Track
+                                            </a>
+                                        <?php else: ?>
+                                            <a href="<?= url('/admin/leads') ?>" class="btn btn-light border btn-sm text-secondary py-1 px-2" title="View Pipeline">
+                                                <i class="bi bi-kanban"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

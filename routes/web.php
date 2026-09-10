@@ -79,8 +79,17 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/manager/dashboard', [AdminController::class, 'dashboard']);
     Router::get('/admin/advisors', [AdminController::class, 'advisors']);
     Router::get('/manager/advisors', [AdminController::class, 'advisors']);
+    Router::get('/admin/advisors/{id}/edit', [AdminController::class, 'editAdvisor']);
+    Router::post('/admin/advisors/{id}/edit', [AdminController::class, 'updateAdvisor']);
+    Router::get('/manager/advisors/{id}/edit', [AdminController::class, 'editAdvisor']);
+    Router::post('/manager/advisors/{id}/edit', [AdminController::class, 'updateAdvisor']);
+
     Router::get('/admin/customers', [AdminController::class, 'customers']);
     Router::get('/manager/customers', [AdminController::class, 'customers']);
+    Router::get('/admin/customers/{id}/edit', [AdminController::class, 'editCustomer']);
+    Router::post('/admin/customers/{id}/edit', [AdminController::class, 'updateCustomer']);
+    Router::get('/manager/customers/{id}/edit', [AdminController::class, 'editCustomer']);
+    Router::post('/manager/customers/{id}/edit', [AdminController::class, 'updateCustomer']);
     Router::get('/admin/leads', [AdminController::class, 'leads']);
     Router::get('/manager/leads', [AdminController::class, 'leads']);
     Router::get('/admin/leads/{id}', [AdminController::class, 'leadDetail']);
