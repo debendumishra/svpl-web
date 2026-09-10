@@ -1,6 +1,6 @@
 # Suryavistaara (SVPL-Web) — Complete AI Pair-Programming Chat History
 
-> Exported on: 2026-09-10 21:48:07
+> Exported on: 2026-09-10 21:57:32
 
 ---
 
@@ -1574,6 +1574,43 @@ Please review the [implementation plan](file:///C:/Users/DELL/.gemini/antigravit
 ### 👤 User
 
 
+
+---
+
+### 👤 Assistant
+
+The **₹2,700 Advisor Onboarding Fee & Manager/Superadmin Payment Confirmation Workflow** has been implemented.
+
+---
+
+### Summary of Changes:
+
+1. **Advisor Payment Entry on Registration (`/register-advisor`)**:
+   - Integrated the official SVPL Corporate Bank Account (`SBI A/C: 42398712345`, `IFSC: SBIN0001234`) and UPI (`suryavistaara@sbi`) payment box.
+   - Added mandatory fields for **Payment Mode** (UPI, Bank Transfer, Cash, etc.), **UTR / Transaction Reference Number**, and **Payment Date**.
+   - Upon submitting, the advisor account is created with `status = PENDING_APPROVAL`, `joining_fee = 2700.00`, and `joining_fee_paid = 0`, displaying a dedicated confirmation summary view ([`advisor_registered_pending.php`](file:///d:/DKM/SVPL-Web/app/Views/public/advisor_registered_pending.php)).
+
+2. **Login Protection Until Verification (`/login`)**:
+   - If an advisor attempts to log in before approval, [`AuthService`](file:///d:/DKM/SVPL-Web/app/Services/AuthService.php) blocks login with the message:
+     > *"Your advisor registration (Fee: ₹2,700) is pending payment confirmation by SVPL Admin/Accounts. You will be able to log in as soon as your payment is verified."*
+
+3. **Admin Payment Confirmation Desk (`/admin/payments`)**:
+   - Added a **"Pending Advisor Onboarding Fees (₹2,700)"** queue showing the applicant's name, mobile number, district, payment mode, and submitted UTR.
+   - Provides a **"✓ Confirm & Activate"** action (and Reject option).
+   - Upon confirmation, the payment is marked `SUCCESS`, advisor status becomes `ACTIVE`, `joining_fee_paid = 1`, and the account is activated for login and ID card issuance.
+   - Added live alert banners on the Executive Dashboard ([`dashboard.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/dashboard.php)) and quick-verification buttons on the Advisor Directory ([`advisors.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/advisors.php)).
+
+---
+
+### Deployment & Sync:
+- **XAMPP Live Server**: Synced all files to `D:\xampp\htdocs\svpl-web`.
+- **GitHub Repository**: Committed and pushed to [debendumishra/svpl-web](https://github.com/debendumishra/svpl-web) (Commit `760157f`).
+
+---
+
+### 👤 User
+
+how to update dispatches & kits, commission etc
 
 ---
 

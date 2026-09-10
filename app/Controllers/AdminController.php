@@ -205,10 +205,72 @@ class AdminController
     public function dispatches(): void
     {
         $dispatches = PackageDispatch::getAll(100);
+        $advisors = Advisor::getAll(100);
+        $leads = Lead::getAll(100);
+
         Response::view('admin/dispatches', [
             'pageTitle' => 'Solar Equipment & Kit Dispatches — SVPL Admin',
             'dispatches' => $dispatches,
+            'advisors' => $advisors,
+            'leads' => $leads,
+            'success' => $_GET['success'] ?? null,
+            'error' => $_GET['error'] ?? null,
         ]);
+    }
+
+    public function createDispatch(): void
+    {
+        $post = $_POST;
+        $dispatchType = trim($post['dispatch_type'] ?? 'ADVISOR_KIT');
+        $advisorId = !empty($post['advisor_id']) ? (int)$post['advisor_id'] : null;
+        $leadId = !empty($post['lead_id']) ? (int)$post['lead_id'] : null;
+        $trackingNumber = trim($post['tracking_number'] ?? '');
+        $courierPartner = trim($post['courier_partner'] ?? 'SVPL Logistics Odisha');
+        $itemsIncluded = trim($post['items_included'] ?? '');
+        $deliveryAddress = trim($post['delivery_address'] ?? '');
+        $status = trim($post['status'] ?? 'Dispatched');
+        $dispatchDate = trim($post['dispatch_date'] ?? date('Y-m-d'));
+
+        if (empty($trackingNumber)) {
+            $trackingNumber = 'TRK-SVPL-' . date('Ymd') . '-' . rand(100, 999);
+        }
+
+        $id = PackageDispatch::create([
+            'advisor_id' => $advisorId,
+            'lead_id' => $leadId,
+            'dispatch_type' => $dispatchType,
+            'tracking_number' => $trackingNumber,
+            'courier_partner' => $courierPartner,
+            'items_included' => $itemsIncluded,
+            'delivery_address' => $deliveryAddress,
+            'status' => $status,
+            'dispatch_date' => $dispatchDate,
+        ]);
+
+        if ($id) {
+            Response::redirect('/admin/dispatches?success=' . urlencode("Dispatch record {$trackingNumber} created successfully!"));
+        } else {
+            Response::redirect('/admin/dispatches?error=' . urlencode("Failed to create dispatch record."));
+        }
+    }
+
+    public function updateDispatchStatus(): void
+    {
+        $dispatchId = (int)($_POST['dispatch_id'] ?? 0);
+        $status = trim($_POST['status'] ?? 'Delivered');
+        $deliveryDate = !empty($_POST['delivery_date']) ? trim($_POST['delivery_date']) : ($status === 'Delivered' ? date('Y-m-d') : null);
+
+        if ($dispatchId <= 0) {
+            Response::redirect('/admin/dispatches?error=' . urlencode("Invalid dispatch record ID."));
+            return;
+        }
+
+        $res = PackageDispatch::updateStatus($dispatchId, $status, $deliveryDate);
+        if ($res) {
+            Response::redirect('/admin/dispatches?success=' . urlencode("Dispatch #{$dispatchId} updated to {$status}."));
+        } else {
+            Response::redirect('/admin/dispatches?error=' . urlencode("Failed to update dispatch status."));
+        }
     }
 
     public function reports(): void

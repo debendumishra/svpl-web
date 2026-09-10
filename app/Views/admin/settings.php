@@ -30,16 +30,20 @@ $title = "System Settings — SVPL Admin";
                 <label class="form-label small fw-semibold">Promoter Entity:</label>
                 <input type="text" name="promoter_entity" class="form-control" value="<?= htmlspecialchars($settings['promoter_entity'] ?? 'Dhwajja Solar India Pvt. Ltd.') ?>">
             </div>
-            <div class="col-md-4">
-                <label class="form-label small fw-semibold">Advisor Qualification Target (Customers):</label>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Advisor Onboarding Fee (₹):</label>
+                <input type="number" step="1" name="advisor_joining_fee" class="form-control font-monospace fw-bold text-navy" value="<?= htmlspecialchars($settings['advisor_joining_fee'] ?? '2700.00') ?>">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Qualification Target (Customers):</label>
                 <input type="number" name="advisor_required_customers" class="form-control" value="<?= htmlspecialchars($settings['advisor_required_customers'] ?? '3') ?>">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <label class="form-label small fw-semibold">Direct Customer Bonus (₹):</label>
                 <input type="number" name="direct_customer_bonus" class="form-control" value="<?= htmlspecialchars($settings['direct_customer_bonus'] ?? '500.00') ?>">
             </div>
-            <div class="col-md-4">
-                <label class="form-label small fw-semibold">Statutory TDS Percentage (%):</label>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold">Statutory TDS Deduction (%):</label>
                 <input type="number" step="0.1" name="tds_percentage" class="form-control" value="<?= htmlspecialchars($settings['tds_percentage'] ?? '5.00') ?>">
             </div>
             <div class="col-md-6">

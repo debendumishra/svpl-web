@@ -82,6 +82,8 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/admin/payments/confirm', [AdminController::class, 'confirmPayment']);
     Router::post('/admin/payments/reject', [AdminController::class, 'rejectPayment']);
     Router::get('/admin/dispatches', [AdminController::class, 'dispatches']);
+    Router::post('/admin/dispatches/create', [AdminController::class, 'createDispatch']);
+    Router::post('/admin/dispatches/update-status', [AdminController::class, 'updateDispatchStatus']);
     Router::get('/admin/reports', [AdminController::class, 'reports']);
     Router::get('/admin/settings', [AdminController::class, 'settings']);
     Router::post('/admin/settings', [AdminController::class, 'updateSettings']);

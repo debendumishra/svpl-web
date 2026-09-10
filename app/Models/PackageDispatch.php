@@ -34,7 +34,12 @@ class PackageDispatch
         return (int) Database::lastInsertId();
     }
 
-    public static function getAll(int $limit = 50): array
+    public static function findById(int $id): ?array
+    {
+        return Database::fetchOne("SELECT * FROM package_dispatches WHERE id = ?", [$id]);
+    }
+
+    public static function getAll(int $limit = 100): array
     {
         $sql = "SELECT pd.*, l.lead_code, a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name
                 FROM package_dispatches pd
@@ -42,5 +47,16 @@ class PackageDispatch
                 LEFT JOIN advisors a ON pd.advisor_id = a.id
                 ORDER BY pd.id DESC LIMIT {$limit}";
         return Database::fetchAll($sql);
+    }
+
+    public static function updateStatus(int $id, string $status, ?string $deliveryDate = null): bool
+    {
+        if ($status === 'Delivered' && empty($deliveryDate)) {
+            $deliveryDate = date('Y-m-d');
+        }
+        return Database::execute(
+            "UPDATE package_dispatches SET status = ?, delivery_date = COALESCE(?, delivery_date) WHERE id = ?",
+            [$status, $deliveryDate, $id]
+        );
     }
 }
