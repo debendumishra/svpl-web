@@ -2233,3 +2233,58 @@ the identity card design is available at "https://stitch.withgoogle.com/projects
 <ADDITIONAL_METADATA>
 The current local time is: 2026-09-10T22:44:55+05:30.
 </ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+The Official Advisor Identity Card design has been updated to match the Stitch Design (Project `8666082930423354696`), featuring a full-width header, scaled typography, and CR80 portrait layout.
+
+---
+
+## User
+
+<USER_REQUEST>
+in the advisor registration a passport photo or live photo should be uploaded for identity card. accordingly the identity card should be modified
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-10T22:56:05+05:30.
+</ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+The Advisor Registration and Identity Card systems have been upgraded to support both **Passport Photo File Upload** and **Direct Live Camera Selfie Capture**, dynamically rendering the photo onto the official CR80 Identity Card.
+
+---
+
+### 📷 Summary of Implemented Features:
+
+#### 1. **Advisor Registration Form Upgrades (`/register-advisor`)**
+* **Dual Photo Input Options**:
+  * **Option A (Passport Photo Upload)**: Supports standard passport photo uploads (`JPG`, `PNG`, `WEBP`) with instant client-side preview in a 3:4 aspect ratio frame.
+  * **Option B (Live Camera ID Capture)**: Built-in webcam/mobile camera modal using standard HTML5 `navigator.mediaDevices.getUserMedia()`. Includes live video viewport, front/rear camera switcher, face centering guides, and snapshot capture directly converting the frame to 3:4 passport proportions.
+* **Blood Group Selector**: Added mandatory blood group selection (`O+ve`, `A+ve`, `B+ve`, `AB+ve`, `O-ve`, etc.) stored directly in the advisor profile and printed on the ID Card.
+* **Form Multipart Encoding**: Enabled `enctype="multipart/form-data"` on the registration form.
+
+#### 2. **Backend Processing & Document Storage**
+* **`AuthController::registerAdvisor()`**:
+  * Automatically decodes base64 snapshots from live camera capture or moves uploaded image files to `public/uploads/advisors/`.
+  * Saves the photo URL into `advisors.photo_url` and `blood_group` into `advisors.blood_group`.
+  * Automatically creates a verified `PASSPORT_PHOTO` document record in the `documents` table.
+* **`Advisor::create()`**:
+  * Updated to persist `photo_url` and `blood_group` in the MySQL database.
+
+#### 3. **Stitch CR80 Identity Card Dynamic Photo Rendering**
+* **Printable ID Card (`/print/id-card/{id}`) & Advisor Portal (`/advisor/id-card`)**:
+  * Front side dynamically embeds the advisor's uploaded/captured photo inside the CR80 portrait frame (96px × 112px).
+  * Automatically includes the selected Blood Group, Advisor Code, Full Name, Designation (*Certified Solar Advisor*), District, and Issue Date.
+  * Back side includes dynamic QR code verification, corporate headquarters contact info, GSTIN, and authorized signatory signature.
+
+---
+
+### 🚀 Synchronization & Deployment:
+* **Local XAMPP Server (`D:\xampp\htdocs\svpl-web`)**: Fully synchronized.
+* **GitHub Repository**: Committed and pushed to `main`.
+

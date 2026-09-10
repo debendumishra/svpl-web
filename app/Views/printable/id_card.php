@@ -9,7 +9,8 @@ $fullName = trim($advisor['first_name'] . ' ' . $advisor['last_name']);
 $mobileNumbers = htmlspecialchars($advisor['mobile']) . (!empty($advisor['alt_mobile']) ? ' / ' . htmlspecialchars($advisor['alt_mobile']) : '');
 $fullAddress = !empty($advisor['address_line']) 
     ? $advisor['address_line'] 
-    : trim(($advisor['village'] ? $advisor['village'] . ', ' : '') . $advisor['block'] . ', ' . $advisor['district'] . ' – ' . $advisor['pincode']);
+    : trim(($advisor['village'] ? $advisor['village'] . ', ' : '') . ($advisor['block'] ?? '') . ', ' . ($advisor['district'] ?? '') . ' – ' . ($advisor['pincode'] ?? ''));
+$qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(function_exists('url') ? url('/verify/advisor/' . ($advisor['advisor_code'] ?? '')) : 'https://suryavistaara.com/verify/' . ($advisor['advisor_code'] ?? ''));
 ?>
 <!DOCTYPE html>
 <html lang="en">

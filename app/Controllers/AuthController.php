@@ -158,6 +158,34 @@ class AuthController
             }
         }
 
+        // Photo Processing (File Upload or Live Camera Capture)
+        $photoUrl = null;
+        $uploadDir = __DIR__ . '/../../public/uploads/advisors/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $base64Photo = trim($post['advisor_photo_base64'] ?? '');
+        if (!empty($base64Photo) && preg_match('#^data:image/(\w+);base64,#i', $base64Photo, $typeMatch)) {
+            $imageType = strtolower($typeMatch[1]);
+            $base64Data = substr($base64Photo, strpos($base64Photo, ',') + 1);
+            $decodedData = base64_decode($base64Data);
+            if ($decodedData !== false) {
+                $photoFileName = 'adv_photo_' . time() . '_' . rand(1000, 9999) . '.' . ($imageType === 'png' ? 'png' : 'jpg');
+                if (file_put_contents($uploadDir . $photoFileName, $decodedData)) {
+                    $photoUrl = 'uploads/advisors/' . $photoFileName;
+                }
+            }
+        } elseif (!empty($_FILES['advisor_photo']['name']) && $_FILES['advisor_photo']['error'] === UPLOAD_ERR_OK) {
+            $ext = strtolower(pathinfo($_FILES['advisor_photo']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) {
+                $photoFileName = 'adv_photo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                if (move_uploaded_file($_FILES['advisor_photo']['tmp_name'], $uploadDir . $photoFileName)) {
+                    $photoUrl = 'uploads/advisors/' . $photoFileName;
+                }
+            }
+        }
+
         Database::beginTransaction();
         try {
             // 1. Create User (inactive until payment confirmed by admin)
@@ -185,6 +213,8 @@ class AuthController
                 'father_spouse_name' => trim($post['father_spouse_name'] ?? ''),
                 'dob' => $post['dob'] ?? null,
                 'gender' => $post['gender'] ?? 'Male',
+                'photo_url' => $photoUrl,
+                'blood_group' => trim($post['blood_group'] ?? 'O+ve'),
                 'mobile' => $mobile,
                 'alt_mobile' => trim($post['alt_mobile'] ?? ''),
                 'email' => !empty($email) ? $email : null,
@@ -206,6 +236,19 @@ class AuthController
                 'joining_fee' => 2700.00,
                 'joining_fee_paid' => 0,
             ]);
+
+            // 4. Save Document Record if photo uploaded
+            if ($photoUrl) {
+                \App\Models\Document::create([
+                    'entity_type' => 'ADVISOR',
+                    'entity_id' => $advId,
+                    'document_type' => 'PASSPORT_PHOTO',
+                    'document_title' => 'Official Advisor ID Card Photo',
+                    'file_path' => $photoUrl,
+                    'mime_type' => 'image/jpeg',
+                    'status' => 'Uploaded',
+                ]);
+            }
 
             // 4. Create Payment record for Admin Verification
             $paymentId = Payment::create([

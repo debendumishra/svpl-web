@@ -22,7 +22,7 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= url('/register-advisor') ?>" method="POST" id="formRegisterAdvisor">
+                <form action="<?= url('/register-advisor') ?>" method="POST" id="formRegisterAdvisor" enctype="multipart/form-data">
                     
                     <!-- 1. Sponsor / Referral Information -->
                     <div class="p-4 bg-light rounded-3 mb-4 border">
@@ -90,9 +90,73 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                         </div>
                     </div>
 
+                    <!-- 2B. Official ID Card Photograph (Passport Upload or Live Selfie) -->
+                    <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
+                        2. Official ID Card Photograph (Passport / Live Camera)
+                    </h5>
+                    <div class="row g-3 mb-4 align-items-center">
+                        <!-- Photo Preview Box -->
+                        <div class="col-sm-4 col-md-3 text-center">
+                            <div class="d-inline-block position-relative border-2 border-dashed border-primary rounded-3 p-1 bg-light shadow-sm" style="width: 110px; height: 135px; overflow: hidden;" id="photoPreviewContainer">
+                                <img id="imgPhotoPreview" src="" alt="Photo Preview" class="w-100 h-100 rounded-2" style="object-fit: cover; display: none;">
+                                <div id="placeholderPhotoText" class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted small">
+                                    <i class="bi bi-person-bounding-box fs-1 text-secondary mb-1"></i>
+                                    <span style="font-size: 0.72rem;" class="fw-bold">ID PHOTO</span>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.68rem;">CR80 3:4 Ratio</span>
+                            </div>
+                        </div>
+
+                        <!-- Upload / Live Camera Actions -->
+                        <div class="col-sm-8 col-md-9">
+                            <div class="card p-3 bg-light border-0 rounded-3">
+                                <div class="row g-2">
+                                    <div class="col-12 col-lg-6">
+                                        <label class="form-label small fw-semibold text-navy"><i class="bi bi-upload text-primary me-1"></i> Option A: Upload Passport Photo</label>
+                                        <input type="file" name="advisor_photo" id="inputPhotoFile" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" onchange="previewUploadedPhoto(this)">
+                                        <small class="text-muted" style="font-size: 0.72rem;">JPG, PNG, or WEBP (Passport format).</small>
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <label class="form-label small fw-semibold text-navy"><i class="bi bi-camera-fill text-success me-1"></i> Option B: Live Camera Capture</label>
+                                        <div>
+                                            <button type="button" class="btn btn-outline-success btn-sm w-100 fw-bold" data-bs-toggle="modal" data-bs-target="#modalLiveCamera" onclick="startLiveCamera()">
+                                                <i class="bi bi-camera-video me-1"></i> Take Live Selfie / Photo
+                                            </button>
+                                        </div>
+                                        <small class="text-muted" style="font-size: 0.72rem;">Capture directly using your device webcam.</small>
+                                    </div>
+                                </div>
+                                
+                                <input type="hidden" name="advisor_photo_base64" id="inputPhotoBase64" value="">
+
+                                <div class="row g-2 mt-2 pt-2 border-top">
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-navy"><i class="bi bi-droplet-fill text-danger me-1"></i> Blood Group *</label>
+                                        <select name="blood_group" class="form-select form-select-sm fw-semibold" required>
+                                            <option value="O+ve" selected>O +ve</option>
+                                            <option value="A+ve">A +ve</option>
+                                            <option value="B+ve">B +ve</option>
+                                            <option value="AB+ve">AB +ve</option>
+                                            <option value="O-ve">O -ve</option>
+                                            <option value="A-ve">A -ve</option>
+                                            <option value="B-ve">B -ve</option>
+                                            <option value="AB-ve">AB -ve</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small fw-semibold text-navy">Assigned Designation</label>
+                                        <input type="text" class="form-control form-control-sm bg-white fw-bold text-success" value="Certified Solar Advisor" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 3. Contact & Location Details -->
                     <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
-                        2. Contact & Odisha Location
+                        3. Contact & Odisha Location
                     </h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
@@ -307,7 +371,198 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
     </div>
 </div>
 
+<!-- Modal: Live Camera Capture -->
+<div class="modal fade" id="modalLiveCamera" tabindex="-1" aria-labelledby="modalLiveCameraLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow-lg border-0 overflow-hidden">
+            <div class="modal-header bg-navy text-white px-4 py-3" style="background: #0B2545;">
+                <h5 class="modal-title font-heading fw-bold d-flex align-items-center gap-2" id="modalLiveCameraLabel">
+                    <i class="bi bi-camera-video-fill text-warning"></i> Live Camera ID Capture
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="stopLiveCamera()"></button>
+            </div>
+            <div class="modal-body p-4 text-center bg-light">
+                <p class="small text-muted mb-3">
+                    Position your face straight within the frame with good lighting for your official SVPL Identity Card.
+                </p>
+
+                <!-- Camera Stream Viewport -->
+                <div class="position-relative mx-auto rounded-3 overflow-hidden shadow border border-2 border-primary" style="width: 260px; height: 320px; background: #000;">
+                    <video id="liveCameraVideo" autoplay playsinline class="w-100 h-100" style="object-fit: cover; transform: scaleX(-1);"></video>
+                    <canvas id="liveCameraCanvas" style="display: none;"></canvas>
+                    
+                    <!-- Portrait Guide Overlay -->
+                    <div class="position-absolute top-0 start-0 w-100 h-100 pointer-events-none d-flex flex-column align-items-center justify-content-between p-3" style="border: 2px dashed rgba(255,255,255,0.6); border-radius: 8px;">
+                        <span class="badge bg-dark bg-opacity-75 text-white small">Face Area</span>
+                        <span class="badge bg-dark bg-opacity-75 text-warning small">Passport CR80 Crop</span>
+                    </div>
+                </div>
+
+                <div id="cameraStatusMsg" class="mt-2 text-primary small fw-semibold" style="min-height: 20px;"></div>
+
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnSwitchCamera" onclick="switchLiveCamera()">
+                        <i class="bi bi-arrow-repeat me-1"></i> Switch Camera
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer bg-white px-4 py-3 d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary px-3" data-bs-dismiss="modal" onclick="stopLiveCamera()">Cancel</button>
+                <button type="button" class="btn btn-success fw-bold px-4" id="btnCapturePhoto" onclick="captureLiveSnapshot()">
+                    <i class="bi bi-camera-fill me-1"></i> Capture Snapshot
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+let cameraStream = null;
+let currentFacingMode = 'user';
+
+function startLiveCamera() {
+    const video = document.getElementById('liveCameraVideo');
+    const statusMsg = document.getElementById('cameraStatusMsg');
+    statusMsg.innerText = 'Initializing camera feed...';
+
+    if (cameraStream) {
+        stopLiveCamera();
+    }
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        statusMsg.innerText = 'Camera access is not supported by your browser. Please upload a photo instead.';
+        statusMsg.className = 'mt-2 text-danger small fw-semibold';
+        return;
+    }
+
+    const constraints = {
+        video: {
+            facingMode: currentFacingMode,
+            width: { ideal: 640 },
+            height: { ideal: 800 }
+        },
+        audio: false
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(stream => {
+            cameraStream = stream;
+            video.srcObject = stream;
+            video.play();
+            statusMsg.innerText = 'Camera active. Align and click Capture Snapshot.';
+            statusMsg.className = 'mt-2 text-success small fw-semibold';
+        })
+        .catch(err => {
+            console.error('Camera access error:', err);
+            statusMsg.innerText = 'Permission denied or no camera found. Please allow camera permissions or upload a photo.';
+            statusMsg.className = 'mt-2 text-danger small fw-semibold';
+        });
+}
+
+function stopLiveCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+}
+
+function switchLiveCamera() {
+    currentFacingMode = (currentFacingMode === 'user') ? 'environment' : 'user';
+    const video = document.getElementById('liveCameraVideo');
+    if (currentFacingMode === 'environment') {
+        video.style.transform = 'scaleX(1)';
+    } else {
+        video.style.transform = 'scaleX(-1)';
+    }
+    startLiveCamera();
+}
+
+function captureLiveSnapshot() {
+    const video = document.getElementById('liveCameraVideo');
+    const canvas = document.getElementById('liveCameraCanvas');
+    if (!video || !video.videoWidth) {
+        alert('Camera stream is not ready yet. Please wait a moment.');
+        return;
+    }
+
+    // Set canvas dimensions to 3:4 aspect ratio (passport portrait)
+    const targetWidth = 480;
+    const targetHeight = 640;
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+
+    const ctx = canvas.getContext('2d');
+    
+    // Mirror if front camera
+    if (currentFacingMode === 'user') {
+        ctx.translate(targetWidth, 0);
+        ctx.scale(-1, 1);
+    }
+
+    // Calculate crop for 3:4
+    const vWidth = video.videoWidth;
+    const vHeight = video.videoHeight;
+    const vAspect = vWidth / vHeight;
+    const targetAspect = targetWidth / targetHeight;
+
+    let sx = 0, sy = 0, sWidth = vWidth, sHeight = vHeight;
+    if (vAspect > targetAspect) {
+        // Video is wider than target
+        sWidth = vHeight * targetAspect;
+        sx = (vWidth - sWidth) / 2;
+    } else {
+        // Video is taller than target
+        sHeight = vWidth / targetAspect;
+        sy = (vHeight - sHeight) / 2;
+    }
+
+    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+
+    const base64Data = canvas.toDataURL('image/jpeg', 0.90);
+    
+    // Set to hidden input and update preview
+    document.getElementById('inputPhotoBase64').value = base64Data;
+    
+    // Clear file input so base64 takes precedence
+    const fileInput = document.getElementById('inputPhotoFile');
+    if (fileInput) fileInput.value = '';
+
+    const imgPreview = document.getElementById('imgPhotoPreview');
+    const placeholderText = document.getElementById('placeholderPhotoText');
+    imgPreview.src = base64Data;
+    imgPreview.style.display = 'block';
+    if (placeholderText) placeholderText.style.display = 'none';
+
+    stopLiveCamera();
+
+    // Close modal via Bootstrap
+    const modalEl = document.getElementById('modalLiveCamera');
+    const modalObj = bootstrap.Modal.getInstance(modalEl);
+    if (modalObj) {
+        modalObj.hide();
+    } else {
+        const bsModal = new bootstrap.Modal(modalEl);
+        bsModal.hide();
+    }
+}
+
+function previewUploadedPhoto(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const imgPreview = document.getElementById('imgPhotoPreview');
+            const placeholderText = document.getElementById('placeholderPhotoText');
+            imgPreview.src = e.target.result;
+            imgPreview.style.display = 'block';
+            if (placeholderText) placeholderText.style.display = 'none';
+
+            // Clear live camera base64 so file input is prioritized
+            document.getElementById('inputPhotoBase64').value = '';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const inputRef = document.getElementById('inputReferralCode');
     const feedback = document.getElementById('referralFeedback');

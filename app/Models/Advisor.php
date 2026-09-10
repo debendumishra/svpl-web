@@ -42,7 +42,7 @@ class Advisor
     {
         $sql = "INSERT INTO advisors (
                     user_id, advisor_code, referral_code, sponsor_id, 
-                    first_name, last_name, father_spouse_name, dob, gender, 
+                    first_name, last_name, father_spouse_name, dob, gender, photo_url, blood_group,
                     mobile, alt_mobile, email, state, district, block, 
                     gram_panchayat, village, pincode, address_line, 
                     aadhaar_number, pan_number, bank_name, bank_branch, 
@@ -50,7 +50,7 @@ class Advisor
                     joining_fee, joining_fee_paid, created_at
                 ) VALUES (
                     ?, ?, ?, ?, 
-                    ?, ?, ?, ?, ?, 
+                    ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, 
                     ?, ?, ?, ?, 
                     ?, ?, ?, ?, 
@@ -68,6 +68,8 @@ class Advisor
             $data['father_spouse_name'] ?? null,
             $data['dob'] ?? null,
             $data['gender'] ?? 'Male',
+            $data['photo_url'] ?? null,
+            $data['blood_group'] ?? 'O+ve',
             $data['mobile'],
             $data['alt_mobile'] ?? null,
             $data['email'] ?? null,
