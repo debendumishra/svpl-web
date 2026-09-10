@@ -87,6 +87,12 @@ class Lead
         $sql = "UPDATE leads SET stage = ?, status = ?, updated_at = NOW() WHERE id = ?";
         $res = Database::execute($sql, [$stage, $status, $leadId]);
 
+        // Sync customer record status if customer is linked
+        $lead = self::findById($leadId);
+        if ($lead && !empty($lead['customer_id'])) {
+            Database::execute("UPDATE customers SET status = ?, updated_at = NOW() WHERE id = ?", [$stage, (int)$lead['customer_id']]);
+        }
+
         // Insert into history
         Database::query(
             "INSERT INTO lead_stage_history (lead_id, stage, status_notes, created_at) VALUES (?, ?, ?, NOW())",

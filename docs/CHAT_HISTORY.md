@@ -2122,3 +2122,75 @@ Account ledger should be maintained in the company. the ledger must show the dai
 <ADDITIONAL_METADATA>
 The current local time is: 2026-09-10T22:23:46+05:30.
 </ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+### Company Account Books & Financial Ledger Module Implementation
+
+A **Company Account Ledger & Financial Books** system has been built for both **Admin** and **Manager** roles (`/admin/ledger`, `/manager/ledger`, `/accounts`, and `/ledger`).
+
+---
+
+### Key Features Implemented
+
+#### 1. **Double-Entry Financial Ledger Database** ([schema](file:///d:/DKM/SVPL-Web/database/setup_company_ledger.php))
+* Created table `company_ledger` supporting:
+  * **Voucher Numbers**: Auto-generated sequential vouchers (`RCPT-YYYYMM-XXXX`, `PMT-YYYYMM-XXXX`, `CTR-YYYYMM-XXXX`).
+  * **Entry Types**: `RECEIPT` (Money Inflow / Revenue), `PAYMENT` (Money Outflow / Expense), `CONTRA` (Internal transfers).
+  * **Party Management**: Date-wise, Party-wise tracking (`ADVISOR`, `CUSTOMER`, `VENDOR`, `INTERNAL`, `BANK`).
+  * **Account Heads**: Configured categories (Advisor Joining Fee ₹2,700, Customer Project Payments, Commission Payouts, Hardware Procurement, Canopy & Promotional Kits, Logistics Charges, TDS Remittances, Office Expenses).
+  * **Payment Modes & UTRs**: UPI, NEFT, IMPS, RTGS, Cash, Cheque, Bank Deposit.
+  * **Immutable Running Balance**: Continuously computed running treasury balance with every debit and credit.
+
+---
+
+#### 2. **3 Comprehensive Financial Views** ([ledger.php](file:///d:/DKM/SVPL-Web/app/Views/admin/ledger.php))
+1. **Daily Cash & Bank Register**:
+   * Chronological date-wise journal with color-coded Debits (Red) and Credits (Green).
+   * Displays Voucher No, Account Head, Party details, UTR, and continuous running treasury balance.
+2. **Party-wise Ledger Statement**:
+   * Filter and generate individual account statements for any specific Advisor, Customer, or Vendor.
+   * Calculates Total Inflows received, Total Payments disbursed, and Net Closing Balance for the selected party.
+3. **Account Head & Category Summary**:
+   * Aggregate breakdown of all Inflow revenue heads versus Outflow expense heads with transaction counts and totals.
+
+---
+
+#### 3. **Top Financial Executive KPI Cards**
+* **Total Receipts (Inflow)**: Real-time sum with today's receipts indicator.
+* **Total Payments (Outflow)**: Real-time sum with today's payments indicator.
+* **Net Treasury Balance**: Live reconciled balance.
+* **Recorded Vouchers**: Total transactions recorded with month-to-date volume.
+
+---
+
+#### 4. **Automated & Manual Transaction Posting**
+* **Auto-Posting on Payment Confirmation**: When Admin/Manager confirms an Advisor's ₹2,700 joining fee in [Payment.php](file:///d:/DKM/SVPL-Web/app/Models/Payment.php), it automatically creates a verified `RECEIPT` entry into the `company_ledger`.
+* **Manual Voucher Entry Modal**: Interactive modal with Quick Pick from registered Advisors/Customers, account head selector, UTR field, and narration.
+* **CSV Export**: One-click download of filtered account statements via `/admin/ledger/export`.
+
+---
+
+#### 5. **Navigation & Access Control**
+* Added **Account Books & Ledger** to both the desktop sidebar and mobile offcanvas drawer under **Operations & Supply** in [admin.php](file:///d:/DKM/SVPL-Web/app/Views/layouts/admin.php).
+* Accessible by Super Admin, Admin, Manager, and Accounts roles.
+
+---
+
+### How to Access & Verify
+1. Open **`http://localhost/svpl-web/admin/ledger`** (or **`http://localhost/svpl-web/manager/ledger`**).
+2. Switch between **Daily Cash & Bank Register**, **Party-wise Ledger Statement**, and **Account Head Summary** tabs.
+3. Click **"+ Record Transaction"** to log new receipts/expenses or filter by date range, party type, or search term.
+
+---
+
+## User
+
+<USER_REQUEST>
+a customer is currectly at "Loan Applied" Stage but in customer registry it is showing "New". where is the issue
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-10T22:32:23+05:30.
+</ADDITIONAL_METADATA>
