@@ -1,11 +1,31 @@
 /**
- * Surya Vistaara Pvt. Ltd. (SVPL)
- * Global Interactive JS Helper (Cascading Locations, Solar Calculator, Live Referral Validation)
+ * Surya Vistaara Pvt. Ltd. (SVPL) - Dhwajja Solar India
+ * Global Interactive JS Helper (Auto-cycling Carousel, Solar Calculator, Live Referral Validation)
  */
 
 $(document).ready(function () {
     // Dynamic Base Path Resolver for AJAX
     window.SVPL_BASE = $('meta[name="base-url"]').attr('content') || '';
+
+    // Automated Hero Carousel Initialization & Continuous Auto-Play
+    const heroCarouselEl = document.querySelector('#heroSolarCarousel');
+    if (heroCarouselEl && typeof bootstrap !== 'undefined') {
+        const carouselInstance = new bootstrap.Carousel(heroCarouselEl, {
+            interval: 4000,
+            ride: 'carousel',
+            wrap: true,
+            pause: false,
+            keyboard: true
+        });
+        carouselInstance.cycle();
+
+        // Fallback auto-timer in case browser tab visibility delays Bootstrap cycle
+        let autoSlideTimer = setInterval(function() {
+            if (document.visibilityState === 'visible') {
+                carouselInstance.next();
+            }
+        }, 4000);
+    }
 
     // Solar Cost & Subsidy Calculator (Official Dhwajja Solar PM Surya Ghar + Odisha State Subsidy)
     const solarPlans = {
@@ -54,7 +74,6 @@ $(document).ready(function () {
     function calculateSolar() {
         const capacity = parseInt($('#calcCapacity').val(), 10) || 3;
         const plan = solarPlans[capacity] || solarPlans[3];
-
         const totalSubsidy = plan.centralSubsidy + plan.stateSubsidy;
 
         $('#calcTotalCost').text('₹' + plan.cost.toLocaleString('en-IN') + '/-');
@@ -104,21 +123,23 @@ $(document).ready(function () {
         }
     });
 
-    // Real-Time Referral Code Validation
-    $('#inputReferralCode').on('blur change', function () {
-        const code = $(this).val().trim();
-        const feedback = $('#referralFeedback');
-        if (code.length >= 4) {
-            feedback.html('<span class="text-muted"><i class="bi bi-arrow-repeat spin"></i> Verifying...</span>');
-            $.getJSON(window.SVPL_BASE + '/api/validate-referral?code=' + encodeURIComponent(code), function (res) {
-                if (res.valid) {
-                    feedback.html('<span class="text-success"><i class="bi bi-check-circle-fill"></i> Verified: <strong>' + res.advisor.name + '</strong> (' + res.advisor.district + ')</span>');
-                } else {
-                    feedback.html('<span class="text-danger"><i class="bi bi-x-circle-fill"></i> ' + res.message + '</span>');
-                }
+    // Copy to Clipboard Utility
+    $(document).on('click', '.btn-copy', function () {
+        const text = $(this).data('copy') || $(this).text().trim();
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function () {
+                alert('Copied to clipboard: ' + text);
             });
         } else {
-            feedback.empty();
+            const input = $('<input>').val(text).appendTo('body').select();
+            document.execCommand('copy');
+            input.remove();
+            alert('Copied: ' + text);
         }
+    });
+
+    // Sidebar Toggle
+    $('#sidebarToggleBtn').on('click', function () {
+        $('#appSidebar').toggleClass('collapsed');
     });
 });

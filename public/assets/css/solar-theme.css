@@ -1,13 +1,13 @@
 /**
  * Surya Vistaara Pvt. Ltd. (SVPL) - Dhwajja Solar India
- * Solar Luminary Design System v3.0 (Fixed Layout, Independent Scrolling & Expandable Sidebar)
+ * Solar Luminary Design System v3.1 (High-Contrast, Modern Hyperlinks & Auto-Scrolling Carousel)
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
 
 :root {
     --svpl-navy-950: #040B15;
-    --svpl-navy-900: #071426;
+    --svpl-navy-900: #061528;
     --svpl-navy-800: #0B2545;
     --svpl-navy-700: #133E6E;
     
@@ -59,6 +59,41 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .text-navy { color: var(--svpl-navy-800) !important; }
 .text-gold { color: var(--svpl-gold) !important; }
 .text-emerald { color: var(--svpl-green-dark) !important; }
+
+/* ==========================================================================
+   HYPERLINKS & INTERACTIVE LINKS (MODERN & ELEGANT)
+   ========================================================================== */
+a {
+    color: var(--svpl-navy-700);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a:hover {
+    color: var(--svpl-gold-dark);
+    text-decoration: none;
+}
+
+/* Clean Contextual Link Pill */
+.link-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 50px;
+    background: rgba(11, 37, 69, 0.05);
+    color: var(--svpl-navy-800);
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.link-pill:hover {
+    background: var(--svpl-navy-800);
+    color: var(--svpl-gold-bright) !important;
+    transform: translateY(-1px);
+}
 
 /* Custom Scrollbar for independent scroll areas */
 ::-webkit-scrollbar {
@@ -239,7 +274,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 /* ==========================================================================
-   HERO CAROUSEL & HOMEPAGE VISUALS
+   HERO CAROUSEL & AUTO-ADVANCING VISUALS
    ========================================================================== */
 .hero-carousel {
     position: relative;
@@ -258,7 +293,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .hero-carousel .carousel-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, rgba(4, 11, 21, 0.92) 0%, rgba(7, 20, 38, 0.82) 50%, rgba(11, 37, 69, 0.65) 100%);
+    background: linear-gradient(90deg, rgba(4, 11, 21, 0.94) 0%, rgba(7, 20, 38, 0.85) 50%, rgba(11, 37, 69, 0.70) 100%);
     display: flex;
     align-items: center;
 }
@@ -279,14 +314,14 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .carousel-control-prev, .carousel-control-next {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(4, 11, 21, 0.6);
+    background: rgba(4, 11, 21, 0.7);
     border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    opacity: 0.85;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    opacity: 0.9;
     transition: all 0.2s ease;
     margin: 0 16px;
 }
@@ -298,7 +333,52 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 /* ==========================================================================
-   ANIMATIONS
+   CORPORATE FOOTER (DEEP NAVY, HIGH CONTRAST)
+   ========================================================================== */
+.footer-svpl {
+    background: #061528 !important;
+    color: #94A3B8 !important;
+    border-top: 3px solid var(--svpl-gold);
+    padding: 4rem 0 2rem;
+}
+
+.footer-svpl h5, 
+.footer-svpl h6,
+.footer-svpl .footer-brand-title {
+    color: #FFFFFF !important;
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 1.25rem;
+}
+
+.footer-svpl a {
+    color: #CBD5E1 !important;
+    text-decoration: none;
+    display: block;
+    padding: 5px 0;
+    font-size: 0.9rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.footer-svpl a:hover {
+    color: var(--svpl-gold-bright) !important;
+    transform: translateX(4px);
+}
+
+.footer-svpl .footer-legal-link {
+    color: #94A3B8 !important;
+    display: inline-block;
+    padding: 0 8px;
+}
+
+.footer-svpl .footer-legal-link:hover {
+    color: #FFFFFF !important;
+    transform: none;
+}
+
+/* ==========================================================================
+   ANIMATIONS & BUTTONS
    ========================================================================== */
 @keyframes fadeInUp {
     from {
@@ -311,64 +391,10 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     }
 }
 
-@keyframes pulse-glow {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-}
-
 .animate-fade-in {
     animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.1s; }
-.stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.2s; }
-
-/* ==========================================================================
-   CARDS & STATS
-   ========================================================================== */
-.card-svpl {
-    background: #FFFFFF;
-    border: 1px solid var(--svpl-border);
-    border-radius: 14px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-svpl:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px -4px rgba(11, 37, 69, 0.08);
-}
-
-.stat-card-modern {
-    background: #FFFFFF;
-    border: 1px solid var(--svpl-border);
-    border-radius: 14px;
-    padding: 1.25rem;
-    transition: all 0.2s ease;
-}
-
-.stat-card-modern:hover {
-    border-color: rgba(245, 158, 11, 0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.12);
-}
-
-.stat-icon-modern {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-}
-
-/* ==========================================================================
-   BUTTONS
-   ========================================================================== */
 .btn-svpl-solar {
     background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
     color: #FFFFFF !important;
@@ -404,107 +430,4 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     color: var(--svpl-gold-bright) !important;
     border-color: rgba(245, 158, 11, 0.3);
     transform: translateY(-1px);
-}
-
-.btn-svpl-green {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-    color: #FFFFFF !important;
-    font-weight: 600;
-    font-family: var(--font-heading);
-    border: none;
-    border-radius: 8px;
-    padding: 0.6rem 1.4rem;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-    transition: all 0.2s ease;
-}
-
-.btn-svpl-green:hover {
-    background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
-    color: #FFFFFF !important;
-    transform: translateY(-1px);
-}
-
-/* ==========================================================================
-   NAVBAR & TICKER
-   ========================================================================== */
-.navbar-svpl {
-    background: linear-gradient(180deg, #071426 0%, #0B2545 100%);
-    box-shadow: 0 4px 20px rgba(4, 11, 21, 0.25);
-    border-bottom: 1px solid rgba(245, 158, 11, 0.15);
-    padding: 0.75rem 0;
-}
-
-.navbar-svpl .nav-link {
-    color: #E2E8F0 !important;
-    font-weight: 500;
-    font-size: 0.95rem;
-    padding: 0.5rem 0.9rem !important;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.navbar-svpl .nav-link:hover,
-.navbar-svpl .nav-link.active {
-    color: #FFFFFF !important;
-    background: rgba(245, 158, 11, 0.15);
-}
-
-.live-ticker-bar {
-    background: #040B15;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.82rem;
-    color: #CBD5E1;
-    padding: 6px 0;
-}
-
-/* ==========================================================================
-   10-STAGE PIPELINE STEPPER
-   ========================================================================== */
-.stepper-node {
-    position: relative;
-    text-align: center;
-    flex: 1;
-    min-width: 85px;
-}
-
-.stepper-circle {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    border: 2px solid #CBD5E1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 6px;
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: #64748B;
-    transition: all 0.3s ease;
-}
-
-.stepper-node.completed .stepper-circle {
-    background: var(--svpl-green);
-    border-color: var(--svpl-green);
-    color: #FFFFFF;
-    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
-}
-
-.stepper-node.active .stepper-circle {
-    background: var(--svpl-gold);
-    border-color: var(--svpl-gold);
-    color: #061528;
-    animation: pulse-glow 2s infinite;
-}
-
-.stepper-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #64748B;
-}
-
-.stepper-node.completed .stepper-label,
-.stepper-node.active .stepper-label {
-    color: var(--svpl-navy-800);
-    font-weight: 700;
 }
