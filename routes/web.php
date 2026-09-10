@@ -24,7 +24,12 @@ use App\Controllers\LocationController;
 Router::get('/', [PublicController::class, 'home']);
 Router::get('/about', [PublicController::class, 'about']);
 Router::get('/pm-surya-ghar', [PublicController::class, 'pmSuryaGhar']);
+Router::get('/solar-solutions', [PublicController::class, 'solarSolutions']);
+Router::get('/solar-calculator', [PublicController::class, 'solarSolutions']);
 Router::get('/how-it-works', [PublicController::class, 'howItWorks']);
+Router::get('/become-advisor', [PublicController::class, 'becomeAdvisor']);
+Router::get('/business-opportunity', [PublicController::class, 'becomeAdvisor']);
+Router::get('/benefits', [PublicController::class, 'becomeAdvisor']);
 Router::get('/faq', [PublicController::class, 'faq']);
 Router::get('/contact', [PublicController::class, 'contact']);
 Router::post('/contact', [PublicController::class, 'contactSubmit']);
@@ -45,9 +50,13 @@ Router::get('/logout', [AuthController::class, 'logout']);
 
 Router::get('/register-advisor', [AuthController::class, 'showRegisterAdvisor']);
 Router::post('/register-advisor', [AuthController::class, 'registerAdvisor']);
+Router::get('/register/advisor', [AuthController::class, 'showRegisterAdvisor']);
+Router::post('/register/advisor', [AuthController::class, 'registerAdvisor']);
 
 Router::get('/register-customer', [AuthController::class, 'showRegisterCustomer']);
 Router::post('/register-customer', [AuthController::class, 'registerCustomer']);
+Router::get('/register/customer', [AuthController::class, 'showRegisterCustomer']);
+Router::post('/register/customer', [AuthController::class, 'registerCustomer']);
 
 Router::get('/api/validate-referral', [AuthController::class, 'validateReferralCode']);
 Router::post('/api/convert-customer', [AuthController::class, 'convertCustomer'], [AuthMiddleware::class]);

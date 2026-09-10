@@ -45,6 +45,20 @@ class PublicController
         ]);
     }
 
+    public function solarSolutions(): void
+    {
+        Response::view('public/solar_solutions', [
+            'pageTitle' => 'Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)',
+        ]);
+    }
+
+    public function becomeAdvisor(): void
+    {
+        Response::view('public/become_advisor', [
+            'pageTitle' => 'Become a Solar Advisor — Business Opportunity & Rewards | SVPL',
+        ]);
+    }
+
     public function faq(): void
     {
         Response::view('public/faq', [

@@ -61,7 +61,9 @@
                     <li class="nav-item"><a class="nav-link <?= $_SERVER['REQUEST_URI'] === url('/') ? 'active' : '' ?>" href="<?= url('/') ?>">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/about') ?>">About SVPL</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/pm-surya-ghar') ?>">PM Surya Ghar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= url('/solar-solutions') ?>">Solar Solutions</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/how-it-works') ?>">How It Works</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= url('/become-advisor') ?>">Business Opportunity</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/faq') ?>">FAQ</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/contact') ?>">Contact</a></li>
                 </ul>
@@ -108,7 +110,9 @@
                     <a href="<?= url('/') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> Home</a>
                     <a href="<?= url('/about') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> About SVPL</a>
                     <a href="<?= url('/pm-surya-ghar') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> PM Surya Ghar</a>
+                    <a href="<?= url('/solar-solutions') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> Solar Solutions</a>
                     <a href="<?= url('/how-it-works') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> How It Works</a>
+                    <a href="<?= url('/become-advisor') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> Business Opportunity</a>
                     <a href="<?= url('/faq') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> FAQ</a>
                     <a href="<?= url('/contact') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> Contact</a>
                 </div>

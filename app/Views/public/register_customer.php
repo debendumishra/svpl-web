@@ -45,12 +45,16 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                     </h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">First Name *</label>
+                            <label class="form-label fw-semibold">Customer First Name *</label>
                             <input type="text" name="first_name" class="form-control" value="<?= htmlspecialchars($post['first_name'] ?? '') ?>" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Last Name *</label>
+                            <label class="form-label fw-semibold">Customer Last Name *</label>
                             <input type="text" name="last_name" class="form-control" value="<?= htmlspecialchars($post['last_name'] ?? '') ?>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Father's / Husband's Name *</label>
+                            <input type="text" name="father_husband_name" class="form-control" placeholder="Father's or Husband's Full Name" value="<?= htmlspecialchars($post['father_husband_name'] ?? '') ?>" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Mobile Number *</label>
@@ -70,8 +74,20 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">DISCOM Consumer Number (from bill) *</label>
+                            <label class="form-label fw-semibold">DISCOM Consumer / CA Number (from bill) *</label>
                             <input type="text" name="consumer_number" class="form-control" placeholder="e.g. TPC-7890124" value="<?= htmlspecialchars($post['consumer_number'] ?? '') ?>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Electricity Bill Holder Name *</label>
+                            <input type="text" name="bill_holder_name" class="form-control" placeholder="Name as printed on DISCOM electricity bill" value="<?= htmlspecialchars($post['bill_holder_name'] ?? '') ?>" required>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check p-2 bg-light rounded border">
+                                <input class="form-check-input ms-1" type="checkbox" id="billHolderMatch" required checked>
+                                <label class="form-check-label small text-secondary ms-2" for="billHolderMatch">
+                                    <strong class="text-navy">Mandatory Verification:</strong> I confirm that the electricity bill holder name matches the solar subsidy applicant.
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -110,10 +126,10 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
 
                     <!-- Location -->
                     <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
-                        3. Installation Address (Odisha)
+                        3. Installation Address & Land Ownership (Odisha)
                     </h5>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">District *</label>
                             <select name="district" id="selectDistrict" class="form-select" required>
                                 <option value="Khordha" selected>Khordha</option>
@@ -124,7 +140,7 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                                 <option value="Balasore">Balasore</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Block *</label>
                             <select name="block" id="selectBlock" class="form-select" required>
                                 <option value="Bhubaneswar" selected>Bhubaneswar</option>
@@ -132,9 +148,29 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                                 <option value="Balianta">Balianta</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Gram Panchayat</label>
+                            <input type="text" name="gram_panchayat" class="form-control" placeholder="e.g. Mendhasala" value="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Village / Locality</label>
+                            <input type="text" name="village" class="form-control" placeholder="Village name" value="<?= htmlspecialchars($post['village'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Pincode *</label>
                             <input type="text" name="pincode" class="form-control" value="751024" required>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label fw-semibold">Full House / Plot Address</label>
+                            <input type="text" name="address_line" class="form-control" placeholder="House No, Street, Landmark" value="<?= htmlspecialchars($post['address_line'] ?? '') ?>">
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check p-2 bg-light rounded border">
+                                <input class="form-check-input ms-1" type="checkbox" id="landPattaCheck" required checked>
+                                <label class="form-check-label small text-secondary ms-2" for="landPattaCheck">
+                                    <strong class="text-navy">Rooftop / Land Ownership:</strong> I confirm that I have legal ownership / land patta for the proposed solar rooftop premises.
+                                </label>
+                            </div>
                         </div>
                     </div>
 

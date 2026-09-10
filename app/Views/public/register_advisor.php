@@ -85,11 +85,11 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                             <label class="form-label fw-semibold">Email Address</label>
                             <input type="email" name="email" class="form-control" placeholder="name@example.com" value="<?= htmlspecialchars($post['email'] ?? '') ?>">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">District *</label>
                             <select name="district" id="selectDistrict" class="form-select" required>
                                 <option value="">Select District</option>
-                                <option value="Khordha">Khordha</option>
+                                <option value="Khordha" selected>Khordha</option>
                                 <option value="Cuttack">Cuttack</option>
                                 <option value="Puri">Puri</option>
                                 <option value="Ganjam">Ganjam</option>
@@ -102,11 +102,11 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                                 <option value="Dhenkanal">Dhenkanal</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Block *</label>
                             <select name="block" id="selectBlock" class="form-select" required>
                                 <option value="">Select Block</option>
-                                <option value="Bhubaneswar">Bhubaneswar</option>
+                                <option value="Bhubaneswar" selected>Bhubaneswar</option>
                                 <option value="Jatni">Jatni</option>
                                 <option value="Balianta">Balianta</option>
                                 <option value="Baranga">Baranga</option>
@@ -114,29 +114,83 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                                 <option value="Pipili">Pipili</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Gram Panchayat</label>
-                            <select name="gram_panchayat" id="selectGP" class="form-select">
-                                <option value="">Select GP</option>
-                                <option value="Chandaka">Chandaka</option>
-                                <option value="Mendhasala">Mendhasala</option>
-                                <option value="Naranpur">Naranpur</option>
-                                <option value="Dandamakundapur">Dandamakundapur</option>
-                            </select>
+                            <input type="text" name="gram_panchayat" class="form-control" placeholder="e.g. Mendhasala" value="<?= htmlspecialchars($post['gram_panchayat'] ?? 'Mendhasala') ?>">
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Village</label>
+                            <input type="text" name="village" class="form-control" placeholder="Village name" value="<?= htmlspecialchars($post['village'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label fw-semibold">Pincode *</label>
                             <input type="text" name="pincode" class="form-control" value="<?= htmlspecialchars($post['pincode'] ?? '751024') ?>" required>
                         </div>
-                        <div class="col-md-8">
-                            <label class="form-label fw-semibold">Full Address</label>
-                            <input type="text" name="address_line" class="form-control" placeholder="House/Plot No, Landmark" value="<?= htmlspecialchars($post['address_line'] ?? '') ?>">
+                        <div class="col-md-9">
+                            <label class="form-label fw-semibold">Full Postal Address</label>
+                            <input type="text" name="address_line" class="form-control" placeholder="Plot No, Street, Landmark" value="<?= htmlspecialchars($post['address_line'] ?? '') ?>">
                         </div>
                     </div>
 
-                    <!-- 4. Security Password & CAPTCHA -->
+                    <!-- 3. Statutory KYC & Bank Details -->
                     <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
-                        3. Portal Security & CAPTCHA
+                        3. Statutory KYC & Bank Account Details
+                    </h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Aadhaar Number (12 Digits) *</label>
+                            <input type="text" name="aadhaar_number" class="form-control font-monospace" placeholder="12-digit Aadhaar" maxlength="14" value="<?= htmlspecialchars($post['aadhaar_number'] ?? '') ?>">
+                            <small class="text-muted" style="font-size: 0.72rem;">Encrypted & protected under SVPL Privacy Policy.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">PAN Card Number (10 Characters) *</label>
+                            <input type="text" name="pan_number" class="form-control text-uppercase font-monospace" placeholder="e.g. ABCDE1234F" maxlength="10" value="<?= htmlspecialchars($post['pan_number'] ?? '') ?>">
+                            <small class="text-muted" style="font-size: 0.72rem;">Required for 5% statutory TDS credit & Form 16.</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Bank Name *</label>
+                            <input type="text" name="bank_name" class="form-control" placeholder="e.g. State Bank of India" value="<?= htmlspecialchars($post['bank_name'] ?? 'State Bank of India') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Account Number *</label>
+                            <input type="text" name="account_number" class="form-control font-monospace" placeholder="Bank Account Number" value="<?= htmlspecialchars($post['account_number'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">IFSC Code *</label>
+                            <input type="text" name="ifsc_code" class="form-control text-uppercase font-monospace" placeholder="e.g. SBIN0001234" value="<?= htmlspecialchars($post['ifsc_code'] ?? 'SBIN0001234') ?>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nominee Full Name</label>
+                            <input type="text" name="nominee_name" class="form-control" placeholder="Full name of nominee" value="<?= htmlspecialchars($post['nominee_name'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Nominee Relationship</label>
+                            <select name="nominee_relationship" class="form-select">
+                                <option value="Spouse">Spouse</option>
+                                <option value="Father">Father</option>
+                                <option value="Mother">Mother</option>
+                                <option value="Son">Son</option>
+                                <option value="Daughter">Daughter</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 4. Registration Fee Confirmation & Security -->
+                    <div class="p-3 bg-warning-subtle rounded-3 mb-4 border border-warning-subtle">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="badge bg-warning text-dark fw-bold">ONBOARDING FEE</span>
+                                <h6 class="font-heading fw-bold text-navy mb-0 mt-1">Advisor Registration & ID License: ₹2,700</h6>
+                                <small class="text-secondary">Includes digital business license, printable photo ID card, doorstep QR code, and 9-level commission access.</small>
+                            </div>
+                            <span class="badge bg-success fs-6"><i class="bi bi-patch-check-fill me-1"></i> Instant Active</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Security Password & CAPTCHA -->
+                    <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
+                        4. Portal Security & CAPTCHA
                     </h5>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
@@ -162,8 +216,8 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                         </label>
                     </div>
 
-                    <button type="submit" class="btn btn-svpl-gold btn-lg w-100 py-3 fw-bold">
-                        <i class="bi bi-shield-lock-fill me-2"></i> Complete Advisor Registration & Generate ID
+                    <button type="submit" class="btn btn-svpl-solar btn-lg w-100 py-3 fw-bold">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Complete Advisor Registration & Generate ID Card
                     </button>
                 </form>
             </div>

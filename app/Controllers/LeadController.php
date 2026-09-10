@@ -89,22 +89,54 @@ class LeadController
         $post = $_POST;
         $leadId = (int) ($post['lead_id'] ?? 0);
 
-        Subsidy::createOrUpdate([
-            'lead_id' => $leadId,
-            'application_number' => $post['app_number'] ?? null,
-            'claimed_amount' => (float) ($post['claimed_amount'] ?? 0),
-            'approved_amount' => (float) ($post['approved_amount'] ?? 0),
-            'disbursed_amount' => (float) ($post['disbursed_amount'] ?? 0),
-            'dbt_reference_number' => $post['dbt_ref'] ?? null,
-            'disbursement_date' => $post['disbursed_date'] ?? date('Y-m-d'),
-            'status' => $post['status'] ?? 'Disbursed',
-            'remarks' => $post['remarks'] ?? null,
-        ]);
-
-        if (($post['status'] ?? '') === 'Disbursed') {
-            LeadPipelineService::advanceStage($leadId, 'SUBSIDY_RECEIVED', 'Subsidy Received', 'Subsidy received in customer account.');
+        if (!$leadId) {
+            Response::json(['status' => false, 'message' => 'Invalid Lead ID']);
+            return;
         }
 
-        Response::json(['status' => true, 'message' => 'Subsidy record updated successfully.']);
+        $utrNumber = trim($post['utr_number'] ?? $post['dbt_ref'] ?? '');
+        $bankName = trim($post['bank_name'] ?? 'State Bank of India');
+        $paymentType = trim($post['payment_type'] ?? 'Subsidy DBT Disbursal');
+        $remarks = trim($post['remarks'] ?? '');
+        $combinedRemarks = "Bank: {$bankName} | Type: {$paymentType}" . ($remarks ? " | Notes: {$remarks}" : "");
+
+        Subsidy::createOrUpdate([
+            'lead_id' => $leadId,
+            'application_number' => $post['app_number'] ?? ('PMSG-OD-' . $leadId),
+            'claimed_amount' => (float) ($post['claimed_amount'] ?? $post['transaction_amount'] ?? 138000),
+            'approved_amount' => (float) ($post['approved_amount'] ?? $post['transaction_amount'] ?? 138000),
+            'disbursed_amount' => (float) ($post['disbursed_amount'] ?? $post['transaction_amount'] ?? 138000),
+            'dbt_reference_number' => $utrNumber,
+            'disbursement_date' => $post['disbursed_date'] ?? $post['transaction_date'] ?? date('Y-m-d'),
+            'status' => $post['status'] ?? 'Disbursed',
+            'remarks' => $combinedRemarks,
+        ]);
+
+        // If file proof is uploaded, save as a lead document
+        if (!empty($_FILES['payment_proof']['name']) && $_FILES['payment_proof']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../public/uploads/documents/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $ext = strtolower(pathinfo($_FILES['payment_proof']['name'], PATHINFO_EXTENSION));
+            $fileName = 'utr_proof_' . $leadId . '_' . time() . '.' . $ext;
+            if (move_uploaded_file($_FILES['payment_proof']['tmp_name'], $uploadDir . $fileName)) {
+                \App\Models\Document::create([
+                    'lead_id' => $leadId,
+                    'document_type' => 'PAYMENT_RECEIPT',
+                    'document_title' => 'UTR Disbursal Payment Proof (' . $utrNumber . ')',
+                    'file_path' => 'uploads/documents/' . $fileName,
+                    'file_size' => $_FILES['payment_proof']['size'],
+                    'mime_type' => $_FILES['payment_proof']['type'],
+                    'verification_status' => 'VERIFIED',
+                ]);
+            }
+        }
+
+        if (($post['status'] ?? '') === 'Disbursed' || !empty($utrNumber)) {
+            LeadPipelineService::advanceStage($leadId, 'SUBSIDY_RECEIVED', 'Subsidy Received & Disbursed (UTR: ' . $utrNumber . ')', 'Payment confirmed via UTR: ' . $utrNumber . ' [' . $bankName . ']');
+        }
+
+        Response::json(['status' => true, 'message' => 'UTR Disbursal recorded successfully. Customer marked as ACTIVE (Green).']);
     }
 }
