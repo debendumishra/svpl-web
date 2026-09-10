@@ -1,11 +1,6 @@
 /**
  * Surya Vistaara Pvt. Ltd. (SVPL) - Dhwajja Solar India
- * Solar Luminary Design System v2.0 (High-Contrast, Animated, Stitch-Compliant)
- * Colors:
- *   - Dark Ocean Navy: #040B15, #071426, #0B2545
- *   - Radiant Solar Gold: #F59E0B, #FBBF24, #D97706
- *   - Eco Emerald Green: #10B981, #059669, #34D399
- *   - Light Ice Slate: #F8FAFC, #FFFFFF, #E2E8F0, #EAEDFF
+ * Solar Luminary Design System v3.0 (Fixed Layout, Independent Scrolling & Expandable Sidebar)
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap');
@@ -19,17 +14,17 @@
     --svpl-gold: #F59E0B;
     --svpl-gold-bright: #FBBF24;
     --svpl-gold-dark: #D97706;
-    --svpl-gold-subtle: rgba(245, 158, 11, 0.12);
+    --svpl-gold-subtle: rgba(245, 158, 11, 0.15);
     
     --svpl-green: #10B981;
     --svpl-green-dark: #059669;
     --svpl-green-light: #34D399;
-    --svpl-green-subtle: rgba(16, 185, 129, 0.12);
+    --svpl-green-subtle: rgba(16, 185, 129, 0.15);
     
     --svpl-bg: #F8FAFC;
     --svpl-card: #FFFFFF;
     --svpl-border: #E2E8F0;
-    --svpl-border-dark: rgba(255, 255, 255, 0.1);
+    --svpl-border-dark: rgba(255, 255, 255, 0.12);
     
     --svpl-text-primary: #0F172A;
     --svpl-text-secondary: #475569;
@@ -42,11 +37,16 @@
 /* ==========================================================================
    GLOBAL RESET & TYPOGRAPHY
    ========================================================================== */
-body {
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
     font-family: var(--font-body);
     color: var(--svpl-text-primary);
     background-color: var(--svpl-bg);
-    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -56,98 +56,113 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     color: var(--svpl-navy-800);
 }
 
-.text-navy {
-    color: var(--svpl-navy-800) !important;
-}
+.text-navy { color: var(--svpl-navy-800) !important; }
+.text-gold { color: var(--svpl-gold) !important; }
+.text-emerald { color: var(--svpl-green-dark) !important; }
 
-.text-gold {
-    color: var(--svpl-gold) !important;
+/* Custom Scrollbar for independent scroll areas */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
-
-.text-emerald {
-    color: var(--svpl-green-dark) !important;
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.3);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.6);
 }
 
 /* ==========================================================================
-   ANIMATIONS & MICRO-INTERACTIONS
+   FIXED APP LAYOUT SYSTEM (HEADER & FOOTER CONSTANT, INDEPENDENT SCROLL)
    ========================================================================== */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(16px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.app-layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden; /* Locks outer body from scrolling */
 }
 
-@keyframes pulse-glow {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+.app-header {
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-@keyframes pulse-green {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+.app-body-container {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden; /* Contains sidebar & main view independently */
+    height: calc(100vh - 95px); /* Header + Ticker offset */
 }
 
-.animate-fade-in {
-    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.app-main-content {
+    flex-grow: 1;
+    height: 100%;
+    overflow-y: auto; /* Body scrolls independently */
+    background-color: #F8FAFC;
+    padding: 1.5rem;
+    scroll-behavior: smooth;
 }
 
-.stagger-1 { animation-delay: 0.05s; }
-.stagger-2 { animation-delay: 0.1s; }
-.stagger-3 { animation-delay: 0.15s; }
-.stagger-4 { animation-delay: 0.2s; }
-
-/* ==========================================================================
-   NAVBARS & APP BARS
-   ========================================================================== */
-.navbar-svpl {
-    background: linear-gradient(180deg, #071426 0%, #0B2545 100%);
-    box-shadow: 0 4px 20px rgba(4, 11, 21, 0.25);
-    border-bottom: 1px solid rgba(245, 158, 11, 0.15);
-    padding: 0.75rem 0;
-}
-
-.navbar-svpl .nav-link {
-    color: #E2E8F0 !important;
-    font-weight: 500;
-    font-size: 0.95rem;
-    padding: 0.5rem 0.9rem !important;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.navbar-svpl .nav-link:hover,
-.navbar-svpl .nav-link.active {
-    color: #FFFFFF !important;
-    background: rgba(245, 158, 11, 0.15);
-}
-
-.live-ticker-bar {
-    background: #040B15;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    font-size: 0.82rem;
-    color: #CBD5E1;
-    padding: 6px 0;
+.app-footer {
+    flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 1020;
+    background: #FFFFFF;
+    border-top: 1px solid #E2E8F0;
+    padding: 8px 16px;
+    font-size: 0.8rem;
 }
 
 /* ==========================================================================
-   SIDEBAR NAVIGATION (ENTERPRISE ADMIN & ADVISOR)
+   EXPANDABLE SIDEBAR NAVIGATION
    ========================================================================== */
 .portal-sidebar {
-    width: 270px;
-    min-width: 270px;
+    width: 280px;
+    min-width: 280px;
+    height: 100%;
+    overflow-y: auto; /* Sidebar scrolls independently */
+    flex-shrink: 0;
     background: linear-gradient(180deg, #061528 0%, #0B2545 100%);
     color: #E2E8F0;
     border-right: 1px solid rgba(245, 158, 11, 0.15);
-    z-index: 1020;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1025;
 }
 
+/* Collapsed Sidebar State */
+.portal-sidebar.collapsed {
+    width: 76px;
+    min-width: 76px;
+}
+.portal-sidebar.collapsed .nav-category-header,
+.portal-sidebar.collapsed .sidebar-text,
+.portal-sidebar.collapsed .badge-tag,
+.portal-sidebar.collapsed .user-info-text,
+.portal-sidebar.collapsed .collapse-arrow {
+    display: none !important;
+}
+.portal-sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 0.75rem 0;
+    margin: 4px 8px;
+}
+.portal-sidebar.collapsed .nav-link i {
+    font-size: 1.3rem;
+}
+
+/* Category Headers & Accordion Toggle */
 .portal-sidebar .nav-category-header {
     font-family: var(--font-heading);
     font-size: 0.72rem;
@@ -155,14 +170,33 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     color: #94A3B8;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    padding: 1rem 1.25rem 0.35rem;
+    padding: 0.85rem 1.25rem 0.3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
 }
 
+.portal-sidebar .nav-category-header:hover {
+    color: #FFFFFF;
+}
+
+.portal-sidebar .nav-category-header .collapse-arrow {
+    transition: transform 0.2s ease;
+    font-size: 0.65rem;
+}
+
+.portal-sidebar .nav-category-header.collapsed .collapse-arrow {
+    transform: rotate(-90deg);
+}
+
+/* Nav Links */
 .portal-sidebar .nav-link {
     color: #CBD5E1 !important;
     font-weight: 500;
     font-size: 0.88rem;
-    padding: 0.6rem 1.15rem;
+    padding: 0.55rem 1.15rem;
     display: flex;
     align-items: center;
     gap: 12px;
@@ -200,42 +234,114 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .portal-sidebar .user-profile-tile {
     background: rgba(0, 0, 0, 0.35);
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 0.9rem 1.15rem;
+    padding: 0.85rem 1.15rem;
+    margin-top: auto;
 }
 
 /* ==========================================================================
-   CARDS, STATS & CONTAINERS
+   HERO CAROUSEL & HOMEPAGE VISUALS
+   ========================================================================== */
+.hero-carousel {
+    position: relative;
+    background-color: #040B15;
+    overflow: hidden;
+}
+
+.hero-carousel .carousel-item {
+    height: 560px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+
+.hero-carousel .carousel-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(4, 11, 21, 0.92) 0%, rgba(7, 20, 38, 0.82) 50%, rgba(11, 37, 69, 0.65) 100%);
+    display: flex;
+    align-items: center;
+}
+
+.hero-carousel .carousel-indicators [data-bs-target] {
+    width: 32px;
+    height: 6px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.hero-carousel .carousel-indicators .active {
+    width: 50px;
+    background-color: var(--svpl-gold);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
+}
+
+.carousel-control-prev, .carousel-control-next {
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(4, 11, 21, 0.6);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    opacity: 0.85;
+    transition: all 0.2s ease;
+    margin: 0 16px;
+}
+
+.carousel-control-prev:hover, .carousel-control-next:hover {
+    background: var(--svpl-navy-800);
+    border-color: var(--svpl-gold);
+    opacity: 1;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse-glow {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.5); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+
+/* ==========================================================================
+   CARDS & STATS
    ========================================================================== */
 .card-svpl {
     background: #FFFFFF;
     border: 1px solid var(--svpl-border);
     border-radius: 14px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-svpl:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 24px -4px rgba(11, 37, 69, 0.08), 0 4px 8px -2px rgba(11, 37, 69, 0.04);
+    box-shadow: 0 12px 24px -4px rgba(11, 37, 69, 0.08);
 }
 
-.card-svpl-dark {
-    background: linear-gradient(135deg, #071426 0%, #0B2545 100%);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    border-radius: 14px;
-    color: #FFFFFF !important;
-    box-shadow: 0 10px 30px rgba(6, 21, 40, 0.3);
-}
-
-.card-svpl-dark h1, .card-svpl-dark h2, .card-svpl-dark h3, .card-svpl-dark h4, .card-svpl-dark h5, .card-svpl-dark h6 {
-    color: #FFFFFF !important;
-}
-
-.card-svpl-dark .text-muted, .card-svpl-dark .text-light-subtle {
-    color: #CBD5E1 !important;
-}
-
-/* Stat Cards */
 .stat-card-modern {
     background: #FFFFFF;
     border: 1px solid var(--svpl-border);
@@ -270,7 +376,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     font-family: var(--font-heading);
     border: none;
     border-radius: 8px;
-    padding: 0.55rem 1.3rem;
+    padding: 0.6rem 1.4rem;
     box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
     transition: all 0.2s ease;
 }
@@ -289,7 +395,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     font-family: var(--font-heading);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    padding: 0.55rem 1.3rem;
+    padding: 0.6rem 1.4rem;
     transition: all 0.2s ease;
 }
 
@@ -307,7 +413,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     font-family: var(--font-heading);
     border: none;
     border-radius: 8px;
-    padding: 0.55rem 1.3rem;
+    padding: 0.6rem 1.4rem;
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
     transition: all 0.2s ease;
 }
@@ -316,6 +422,39 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     background: linear-gradient(135deg, #34D399 0%, #10B981 100%);
     color: #FFFFFF !important;
     transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   NAVBAR & TICKER
+   ========================================================================== */
+.navbar-svpl {
+    background: linear-gradient(180deg, #071426 0%, #0B2545 100%);
+    box-shadow: 0 4px 20px rgba(4, 11, 21, 0.25);
+    border-bottom: 1px solid rgba(245, 158, 11, 0.15);
+    padding: 0.75rem 0;
+}
+
+.navbar-svpl .nav-link {
+    color: #E2E8F0 !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 0.9rem !important;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar-svpl .nav-link:hover,
+.navbar-svpl .nav-link.active {
+    color: #FFFFFF !important;
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.live-ticker-bar {
+    background: #040B15;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 0.82rem;
+    color: #CBD5E1;
+    padding: 6px 0;
 }
 
 /* ==========================================================================
@@ -368,79 +507,4 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .stepper-node.active .stepper-label {
     color: var(--svpl-navy-800);
     font-weight: 700;
-}
-
-/* ==========================================================================
-   CUSTOM DATA TABLES
-   ========================================================================== */
-.table-svpl {
-    border-collapse: separate;
-    border-spacing: 0;
-    width: 100%;
-}
-
-.table-svpl thead th {
-    background: #0B2545;
-    color: #FFFFFF;
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 12px 16px;
-    border: none;
-}
-
-.table-svpl tbody td {
-    padding: 12px 16px;
-    vertical-align: middle;
-    border-bottom: 1px solid #F1F5F9;
-    color: var(--svpl-text-primary);
-    font-size: 0.9rem;
-}
-
-.table-svpl tbody tr:hover td {
-    background-color: #F8FAFC;
-}
-
-/* ==========================================================================
-   MOBILE BOTTOM NAV
-   ========================================================================== */
-.mobile-bottom-nav {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #0B2545;
-    border-top: 1px solid rgba(255, 255, 255, 0.12);
-    z-index: 1030;
-    padding: 8px 0;
-    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 991.98px) {
-    .mobile-bottom-nav {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-    }
-    .portal-sidebar {
-        display: none !important;
-    }
-}
-
-.mobile-bottom-nav a {
-    color: #CBD5E1;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.72rem;
-    gap: 2px;
-}
-
-.mobile-bottom-nav a.active,
-.mobile-bottom-nav a:hover {
-    color: var(--svpl-gold-bright);
 }

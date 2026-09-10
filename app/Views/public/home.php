@@ -1,357 +1,359 @@
 <?php
 /**
- * Surya Vistaara Pvt. Ltd. (SVPL)
- * Public Homepage - PM Surya Ghar Odisha Hub & Solar Calculator
+ * Surya Vistaara Pvt. Ltd. (SVPL) - Dhwajja Solar India
+ * Redesigned Public Homepage with Hero Image Carousel & Interactive Solar Calculator
  */
-$title = "Surya Vistaara Pvt. Ltd. | PM Surya Ghar Muft Bijli Yojana Odisha";
+$title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
 ?>
 
-<!-- HERO SECTION -->
-<section class="hero-svpl text-white">
-    <div class="container py-5">
-        <div class="row align-items-center">
-            <div class="col-lg-7">
-                <div class="hero-badge">
-                    <i class="bi bi-sun-fill text-warning"></i> Odisha's Dedicated Solar Promoter Network
-                </div>
-                <h1 class="display-4 fw-extrabold mb-3" style="font-weight: 800; letter-spacing: -1px;">
-                    Empowering Odisha with <span style="color: #F59E0B;">Zero Electricity Bills</span> Under PM Surya Ghar
-                </h1>
-                <p class="lead text-light opacity-90 mb-4" style="font-size: 1.15rem; line-height: 1.6;">
-                    Surya Vistaara Pvt. Ltd. (SVPL) is the authorized corporate promoter for <strong>Dhwajja Solar India Pvt. Ltd.</strong>, building the largest grassroots network of certified Solar Advisors across all 30 districts of Odisha.
-                </p>
-                <div class="d-flex flex-wrap gap-3 mb-4">
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-gold btn-lg shadow-sm">
-                        <i class="bi bi-house-door-fill me-2"></i> Apply for Solar Rooftop
-                    </a>
-                    <a href="<?= url('/register-advisor') ?>" class="btn btn-outline-light btn-lg">
-                        <i class="bi bi-person-badge-fill me-2"></i> Join as Solar Advisor
-                    </a>
-                </div>
-                <div class="d-flex align-items-center gap-4 text-light opacity-75 pt-2">
-                    <div><i class="bi bi-check-circle-fill text-warning me-1"></i> Up to ₹1,38,000 Total Subsidy</div>
-                    <div><i class="bi bi-check-circle-fill text-warning me-1"></i> 5.6% p.a. Solar Loan (EMIs from ₹545/mo)</div>
-                    <div><i class="bi bi-check-circle-fill text-warning me-1"></i> 25-Year Warranty</div>
+<!-- HERO IMAGE CAROUSEL SECTION -->
+<section class="hero-carousel">
+    <div id="heroSolarCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <!-- Numbered / Bar Indicators -->
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroSolarCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#heroSolarCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#heroSolarCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+
+        <!-- Carousel Slides -->
+        <div class="carousel-inner">
+            <!-- Slide 1: Modern Rooftop Plant -->
+            <div class="carousel-item active" style="background-image: url('<?= asset('assets/images/carousel-1.jpg') ?>');">
+                <div class="carousel-overlay">
+                    <div class="container py-4">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8 animate-fade-in">
+                                <div class="badge bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-3 shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                                    <i class="bi bi-patch-check-fill text-dark me-1"></i> PM Surya Ghar Odisha Official Channel Partner
+                                </div>
+                                <h1 class="display-4 fw-extrabold text-white font-heading mb-3" style="font-weight: 800; line-height: 1.15; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                                    Empowering Odisha with <span style="color: #FBBF24;">Zero Electricity Bills</span>
+                                </h1>
+                                <p class="lead text-light mb-4" style="font-size: 1.2rem; max-width: 680px; text-shadow: 0 1px 4px rgba(0,0,0,0.6);">
+                                    Get up to <strong>₹78,000 Central DBT</strong> + <strong>₹60,000 Odisha State Subsidy</strong> = <span class="badge bg-success fs-6 fw-bold">₹1,38,000 Total Govt. Grant</span> with easy solar bank loans at just <strong>5.6% p.a.</strong>
+                                </p>
+                                <div class="d-flex flex-wrap gap-3 mb-4">
+                                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow">
+                                        <i class="bi bi-house-door-fill me-2"></i> Apply for Solar Rooftop
+                                    </a>
+                                    <a href="#solar-calculator-section" class="btn btn-outline-light btn-lg">
+                                        <i class="bi bi-calculator me-2"></i> Calculate Savings
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-4 text-light flex-wrap small">
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> Tier-1 Dhwajja Mono PERC</span>
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> 25-Year Linear Power Warranty</span>
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> Net-Metering by TPCODL/TPNODL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Interactive Solar Calculator Card -->
-            <div class="col-lg-5 mt-4 mt-lg-0">
-                <div class="card card-svpl p-4 text-dark shadow-lg border-0" style="border-radius: 16px;">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h4 class="fw-bold mb-0 text-navy" style="color: #0B2545;">
-                            <i class="bi bi-calculator-fill text-warning me-2"></i> Solar Savings Calculator
-                        </h4>
-                        <span class="badge bg-warning text-dark border border-warning">5.6% p.a. Solar Loan</span>
+            <!-- Slide 2: Happy Family Savings -->
+            <div class="carousel-item" style="background-image: url('<?= asset('assets/images/carousel-2.jpg') ?>');">
+                <div class="carousel-overlay">
+                    <div class="container py-4">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8 animate-fade-in">
+                                <div class="badge bg-success text-white px-3 py-2 fw-bold text-uppercase mb-3 shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Zero Down Payment & Easy EMIs
+                                </div>
+                                <h1 class="display-4 fw-extrabold text-white font-heading mb-3" style="font-weight: 800; line-height: 1.15; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                                    Save <span style="color: #34D399;">₹3,000+ Every Month</span> on Grid Power
+                                </h1>
+                                <p class="lead text-light mb-4" style="font-size: 1.2rem; max-width: 680px; text-shadow: 0 1px 4px rgba(0,0,0,0.6);">
+                                    Pay off your concessional 5.6% solar loan EMI (starting at <strong>₹545/mo</strong>) using your monthly electricity savings and enjoy 25 years of virtually free solar power!
+                                </p>
+                                <div class="d-flex flex-wrap gap-3 mb-4">
+                                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow">
+                                        <i class="bi bi-shield-fill-check me-2"></i> Book Free Rooftop Survey
+                                    </a>
+                                    <a href="<?= url('/register-advisor') ?>" class="btn btn-outline-light btn-lg">
+                                        <i class="bi bi-person-badge-fill me-2"></i> Join as Solar Mitra
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-4 text-light flex-wrap small">
+                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Zero Maintenance Hassles</span>
+                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> Bi-directional Net Meter</span>
+                                    <span><i class="bi bi-check-circle-fill text-success me-1"></i> 14-Day Fast-Track Delivery</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-muted small mb-3">Official PM Surya Ghar rooftop pricing & state subsidy for Odisha households by <strong>Dhwajja Solar</strong>.</p>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Select Solar Plant Capacity:</label>
-                        <select class="form-select form-select-lg" id="calcCapacity">
-                            <option value="2">2 KW (120 sq.ft. | ₹1,10,000 Subsidy | Net: ₹50,000)</option>
-                            <option value="3" selected>3 KW (180 sq.ft. | ₹1,38,000 Subsidy | Net: ₹72,000)</option>
-                            <option value="4">4 KW (210 sq.ft. | ₹1,38,000 Subsidy | Net: ₹1,22,000)</option>
-                            <option value="5">5 KW (270 sq.ft. | ₹1,38,000 Subsidy | Net: ₹1,92,000)</option>
-                        </select>
-                    </div>
+                </div>
+            </div>
 
-                    <div class="bg-light p-3 rounded-3 mb-3">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted">Project Cost (Approx.):</span>
-                            <strong id="calcTotalCost" class="text-dark">₹2,10,000/-</strong>
-                        </div>
-                        <div class="d-flex justify-content-between mb-1 text-success small">
-                            <span><i class="bi bi-check2-circle me-1"></i> Total Central Subsidy (DBT):</span>
-                            <strong id="calcCentralSubsidy">- ₹78,000/-</strong>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 text-success small">
-                            <span><i class="bi bi-patch-check-fill text-warning me-1"></i> Odisha State Subsidy:</span>
-                            <strong id="calcStateSubsidy">- ₹60,000/-</strong>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2 py-1 px-2 rounded bg-success-subtle text-success fw-bold">
-                            <span>Total Govt. Subsidy Benefit:</span>
-                            <strong id="calcTotalSubsidyDisplay">- ₹1,38,000/-</strong>
-                        </div>
-                        <hr class="my-2">
-                        <div class="d-flex justify-content-between fs-5 fw-bold" style="color: #0B2545;">
-                            <span>Net Investment (Approx.):</span>
-                            <span id="calcNetCost" class="text-primary">₹72,000/-</span>
-                        </div>
-                        <div class="d-flex justify-content-between pt-2 border-top mt-2 small text-muted">
-                            <span><i class="bi bi-rulers me-1"></i> Approx. Rooftop Area: <strong id="calcArea" class="text-dark">180 sq.ft.</strong></span>
-                            <span><i class="bi bi-bank text-warning me-1"></i> Easy EMI: <strong id="calcEmi" class="text-success">₹785 / month</strong></span>
+            <!-- Slide 3: Engineering Team & Cyclone Resistant Structure -->
+            <div class="carousel-item" style="background-image: url('<?= asset('assets/images/carousel-3.jpg') ?>');">
+                <div class="carousel-overlay">
+                    <div class="container py-4">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8 animate-fade-in">
+                                <div class="badge bg-primary text-white px-3 py-2 fw-bold text-uppercase mb-3 shadow-sm" style="font-size: 0.8rem; letter-spacing: 0.05em;">
+                                    <i class="bi bi-tools me-1"></i> Certified Solar Engineering Excellence
+                                </div>
+                                <h1 class="display-4 fw-extrabold text-white font-heading mb-3" style="font-weight: 800; line-height: 1.15; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+                                    180 km/h Cyclone Resilient <span style="color: #FBBF24;">Dhwajja Technology</span>
+                                </h1>
+                                <p class="lead text-light mb-4" style="font-size: 1.2rem; max-width: 680px; text-shadow: 0 1px 4px rgba(0,0,0,0.6);">
+                                    Engineered specifically for Odisha's coastal climate with hot-dip galvanized mounting structures, dual-MPPT smart Wi-Fi inverters, and high-density Mono PERC cells.
+                                </p>
+                                <div class="d-flex flex-wrap gap-3 mb-4">
+                                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow">
+                                        <i class="bi bi-check-lg me-2"></i> Check My Eligibility
+                                    </a>
+                                    <a href="<?= url('/pm-surya-ghar') ?>" class="btn btn-outline-light btn-lg">
+                                        <i class="bi bi-info-circle me-2"></i> Scheme Guidelines
+                                    </a>
+                                </div>
+                                <div class="d-flex align-items-center gap-4 text-light flex-wrap small">
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> DCR Compliant Modules</span>
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> TPCODL / TPNODL Certified</span>
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> IoT Real-time Generation App</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="alert alert-warning-subtle text-dark border-warning-subtle py-2 px-3 mb-3 small d-flex justify-content-between align-items-center">
-                        <span><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Monthly Generation Savings:</span>
-                        <strong id="calcMonthlySavings" class="text-success fs-6">₹2,340 / month</strong>
-                    </div>
-
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-navy w-100 py-2">
-                        Check Solar Eligibility & Apply Now <i class="bi bi-arrow-right ms-1"></i>
-                    </a>
                 </div>
             </div>
         </div>
+
+        <!-- Controls -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroSolarCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroSolarCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
     </div>
 </section>
 
-<!-- FINANCIAL COMPARISON & BENEFITS (FROM DHWAJJA SOLAR BROCHURE) -->
-<section class="py-5 bg-white">
-    <div class="container">
-        <div class="text-center mb-4">
-            <span class="badge bg-primary px-3 py-2 text-white fw-bold mb-2">DHWAJJA SOLAR INDIA PVT. LTD.</span>
-            <h2 class="fw-bold" style="color: #0B2545;">Financial Comparison & Benefits (Indicative)</h2>
-            <p class="text-muted">Government subsidy support subject to applicable eligibility and DISCOM guidelines in Odisha</p>
+<!-- INTERACTIVE DHWAJJA SOLAR SUBSIDY CALCULATOR -->
+<section class="py-5 bg-white" id="solar-calculator-section">
+    <div class="container py-2">
+        <div class="text-center mb-5 animate-fade-in">
+            <span class="badge bg-warning text-dark fw-bold px-3 py-2 mb-2" style="font-size: 0.8rem;">
+                <i class="bi bi-calculator-fill text-dark me-1"></i> OFFICIAL ODIA SUBSIDY ESTIMATOR
+            </span>
+            <h2 class="font-heading fw-bold text-navy display-6">Dhwajja Solar Savings & Subsidy Calculator</h2>
+            <p class="text-secondary" style="max-width: 650px; margin: 0 auto;">
+                Accurate pricing, Central DBT subsidy, Odisha State Government grants, and 5.6% bank loan EMIs tailored for Odisha households.
+            </p>
         </div>
 
-        <div class="card card-svpl border-0 shadow-sm mb-4">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0 text-center">
-                    <thead class="table-dark" style="background-color: #0B2545;">
-                        <tr>
-                            <th class="py-3">SOLAR PLANT</th>
-                            <th>APPROX. ROOFTOP AREA</th>
-                            <th>PROJECT COST (Approx.)</th>
-                            <th>TOTAL SUBSIDY (Central)</th>
-                            <th>STATE SUBSIDY (Odisha)</th>
-                            <th>NET INVESTMENT (Approx.)</th>
-                            <th>EASY MONTHLY EMI (5.6% p.a., 10 Yrs)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong class="text-navy">2 KW</strong></td>
-                            <td>120 sq.ft.</td>
-                            <td><strong>₹1,60,000/-</strong></td>
-                            <td class="text-success fw-semibold">₹60,000/-</td>
-                            <td class="text-warning fw-semibold">₹50,000/-</td>
-                            <td><span class="badge bg-success fs-6 px-3 py-2">₹50,000/-</span></td>
-                            <td class="text-primary fw-bold">₹545 / mo</td>
-                        </tr>
-                        <tr class="table-warning">
-                            <td><strong class="text-navy">3 KW</strong> <span class="badge bg-warning text-dark ms-1">Recommended</span></td>
-                            <td>180 sq.ft.</td>
-                            <td><strong>₹2,10,000/-</strong></td>
-                            <td class="text-success fw-bold">₹78,000/-</td>
-                            <td class="text-warning fw-bold">₹60,000/-</td>
-                            <td><span class="badge bg-success fs-6 px-3 py-2">₹72,000/-</span></td>
-                            <td class="text-primary fw-bold">₹785 / mo</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="text-navy">4 KW</strong></td>
-                            <td>210 sq.ft.</td>
-                            <td><strong>₹2,60,000/-</strong></td>
-                            <td class="text-success fw-semibold">₹78,000/-</td>
-                            <td class="text-warning fw-semibold">₹60,000/-</td>
-                            <td><span class="badge bg-primary fs-6 px-3 py-2">₹1,22,000/-</span></td>
-                            <td class="text-primary fw-bold">₹1,333 / mo</td>
-                        </tr>
-                        <tr>
-                            <td><strong class="text-navy">5 KW</strong></td>
-                            <td>270 sq.ft.</td>
-                            <td><strong>₹3,30,000/-</strong></td>
-                            <td class="text-success fw-semibold">₹78,000/-</td>
-                            <td class="text-warning fw-semibold">₹60,000/-</td>
-                            <td><span class="badge bg-primary fs-6 px-3 py-2">₹1,92,000/-</span></td>
-                            <td class="text-primary fw-bold">₹2,098 / mo</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-footer bg-light p-3 small text-muted">
-                <i class="bi bi-info-circle me-1"></i> Project cost, subsidy eligibility, and net investment may vary according to applicable government guidelines, site conditions, DISCOM requirements, and final quotation.
-            </div>
-        </div>
+        <div class="row g-4 align-items-center">
+            <!-- Left Column: Interactive Capacity Selector -->
+            <div class="col-lg-5 animate-fade-in stagger-1">
+                <div class="card card-svpl p-4 border shadow-sm">
+                    <h5 class="font-heading fw-bold mb-3 text-navy">Select Proposed Solar Plant Size:</h5>
 
-        <!-- SOLAR LOAN & EMI ILLUSTRATION -->
-        <div class="row g-4 mt-2">
-            <div class="col-lg-6">
-                <div class="card card-svpl p-4 h-100 border-0 shadow-sm">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <div class="rounded-circle bg-success-subtle text-success p-2 fs-4">
-                            <i class="bi bi-bank2"></i>
-                        </div>
-                        <h4 class="fw-bold mb-0 text-navy" style="color: #0B2545;">Solar Loan & Easy EMI Available</h4>
-                    </div>
-                    <p class="text-muted small">Eligible customers can finance the applicable balance net investment amount through low-interest solar-loan facilities at concessional bank rates.</p>
-                    
-                    <div class="p-3 bg-light rounded-3 mb-3 border">
-                        <h6 class="fw-bold text-navy mb-2"><i class="bi bi-check-circle-fill text-success me-1"></i> Illustrative Calculation at 5.6% p.a. (3 KW Solar Plant):</h6>
-                        <div class="d-flex justify-content-between small py-1 border-bottom"><span>Loan Amount:</span><strong>₹72,000</strong></div>
-                        <div class="d-flex justify-content-between small py-1 border-bottom"><span>Illustrative Interest Rate:</span><strong>5.6% p.a.</strong></div>
-                        <div class="d-flex justify-content-between small py-1 border-bottom"><span>Tenure:</span><strong>10 Years / 120 Months</strong></div>
-                        <div class="d-flex justify-content-between small py-1 border-bottom text-success fw-bold"><span>Approx. Monthly EMI:</span><strong>₹785 per month</strong></div>
-                        <div class="d-flex justify-content-between small py-1 border-bottom"><span>Approx. Total Repayment:</span><strong>₹94,195</strong></div>
-                        <div class="d-flex justify-content-between small py-1"><span>Approx. Total Interest:</span><strong>₹22,195</strong></div>
+                    <!-- Capacity Option Buttons -->
+                    <div class="d-grid gap-2 mb-4">
+                        <button type="button" class="btn btn-outline-primary text-start p-3 calc-capacity-btn" data-kw="2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="fs-6 d-block text-navy">2 kW Rooftop Plant</strong>
+                                    <small class="text-secondary">~120 sq.ft. | 240-280 Units/month</small>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">₹90,000 Subsidy</span>
+                            </div>
+                        </button>
+
+                        <button type="button" class="btn btn-primary text-start p-3 calc-capacity-btn active" data-kw="3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <strong class="fs-6 text-white">3 kW Rooftop Plant</strong>
+                                        <span class="badge bg-warning text-dark" style="font-size: 0.68rem;">RECOMMENDED</span>
+                                    </div>
+                                    <small class="text-white-50">~180 sq.ft. | 360-420 Units/month</small>
+                                </div>
+                                <span class="badge bg-warning text-dark fw-bold">₹1,38,000 MAX SUBSIDY</span>
+                            </div>
+                        </button>
+
+                        <button type="button" class="btn btn-outline-primary text-start p-3 calc-capacity-btn" data-kw="4">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="fs-6 d-block text-navy">4 kW Rooftop Plant</strong>
+                                    <small class="text-secondary">~210 sq.ft. | 480-550 Units/month</small>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">₹1,38,000 Subsidy</span>
+                            </div>
+                        </button>
+
+                        <button type="button" class="btn btn-outline-primary text-start p-3 calc-capacity-btn" data-kw="5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="fs-6 d-block text-navy">5 kW Rooftop Plant</strong>
+                                    <small class="text-secondary">~270 sq.ft. | 600-700 Units/month</small>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">₹1,38,000 Subsidy</span>
+                            </div>
+                        </button>
                     </div>
 
-                    <div class="small text-muted">
-                        * EMI example calculated on a reducing-balance basis for illustration only. Actual EMI, interest rate, tenure, processing charges, and eligibility are subject to the lender's current terms and sanction.
-                    </div>
+                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar w-100 py-3 shadow">
+                        <i class="bi bi-shield-check me-1"></i> Apply Now & Lock ₹1,38,000 Subsidy
+                    </a>
                 </div>
             </div>
 
-            <div class="col-lg-6">
-                <div class="card card-svpl p-4 h-100 border-0 shadow-sm">
-                    <h5 class="fw-bold mb-3 text-navy" style="color: #0B2545;"><i class="bi bi-table text-warning me-2"></i> EMI Illustration — 5.6% p.a., 10 Years</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-striped">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th>Loan Amount</th>
-                                    <th>Approx. Monthly EMI (10 Years)</th>
-                                </tr>
-                            </thead>
+            <!-- Right Column: Dynamic Financial Breakdown Ledger -->
+            <div class="col-lg-7 animate-fade-in stagger-2">
+                <div class="card card-svpl p-4 border-0 shadow-lg" style="background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="font-heading fw-bold mb-0 text-navy">
+                            <span id="displaySelectedKw">3</span> kW Turnkey Financial Statement
+                        </h5>
+                        <span class="badge bg-success text-white fw-bold px-3 py-1">Direct Bank DBT</span>
+                    </div>
+
+                    <div class="table-responsive mb-3">
+                        <table class="table table-bordered align-middle mb-0">
                             <tbody>
-                                <tr><td>₹50,000</td><td class="text-success fw-bold">₹545</td></tr>
-                                <tr class="table-warning"><td><strong>₹72,000 (3 kW Net)</strong></td><td class="text-success fw-bold">₹785</td></tr>
-                                <tr><td>₹1,00,000</td><td class="text-success fw-bold">₹1,093</td></tr>
-                                <tr><td>₹1,25,000</td><td class="text-success fw-bold">₹1,366</td></tr>
-                                <tr><td>₹1,50,000</td><td class="text-success fw-bold">₹1,639</td></tr>
-                                <tr><td>₹2,00,000</td><td class="text-success fw-bold">₹2,185</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="alert alert-success-subtle text-success p-3 rounded-3 mt-auto mb-0 small">
-                        <strong><i class="bi bi-telephone-fill me-1"></i> Check Your Solar Eligibility & EMI Today:</strong><br>
-                        Call our helpline: <strong><a href="tel:9040999899" class="text-success text-decoration-none">9040999899</a></strong> for a FREE consultation, site assessment, and quotation.
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- HIGHLIGHTS & KEY STATS -->
-<section class="py-5" style="background-color: #F8FAFC;">
-    <div class="container">
-        <div class="row g-4 text-center">
-            <div class="col-md-3 col-6">
-                <div class="stat-card">
-                    <h2 class="fw-bold mb-1" style="color: #0B2545;">30</h2>
-                    <p class="text-muted mb-0 small">Districts Covered in Odisha</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-card">
-                    <h2 class="fw-bold mb-1 text-success">₹1,38,000</h2>
-                    <p class="text-muted mb-0 small">Max Combined Subsidy</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-card">
-                    <h2 class="fw-bold mb-1 text-warning">5.6% p.a.</h2>
-                    <p class="text-muted mb-0 small">Concessional Solar Loan</p>
-                </div>
-            </div>
-            <div class="col-md-3 col-6">
-                <div class="stat-card">
-                    <h2 class="fw-bold mb-1" style="color: #10B981;">300 Units</h2>
-                    <p class="text-muted mb-0 small">Free Monthly Electricity</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ADVISOR BUSINESS NETWORK OPPORTUNITY -->
-<section class="py-5" style="background-color: #F8FAFC;">
-    <div class="container py-4">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <span class="badge bg-warning text-dark px-3 py-2 mb-2 fw-bold">ENTREPRENEURSHIP IN SOLAR</span>
-                <h2 class="fw-bold mb-3" style="color: #0B2545;">Build a Rewarding Career as an SVPL Solar Advisor</h2>
-                <p class="text-muted mb-4">
-                    Join Odisha's fastest growing clean energy movement. As an SVPL Solar Advisor, you guide households to adopt PM Surya Ghar, earn attractive direct customer commissions, unlock 9-level upline network overrides, and qualify for executive leadership milestones.
-                </p>
-                <div class="d-flex flex-column gap-3 mb-4">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="stat-icon bg-warning-subtle text-warning">
-                            <i class="bi bi-cash-stack"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1" style="color: #0B2545;">Direct Customer Commission & Bonus</h5>
-                            <p class="text-muted small mb-0">Earn ₹1,000+ commission and an extra ₹500 direct customer bonus per successful installation.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="stat-icon bg-success-subtle text-success">
-                            <i class="bi bi-diagram-3-fill"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1" style="color: #0B2545;">9-Level Downline Network Income</h5>
-                            <p class="text-muted small mb-0">Build your team of advisors across blocks and gram panchayats to earn multi-tier team overrides.</p>
-                        </div>
-                    </div>
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="stat-icon bg-primary-subtle text-primary">
-                            <i class="bi bi-award-fill"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1" style="color: #0B2545;">3-Customer Qualification Rule</h5>
-                            <p class="text-muted small mb-0">Complete just 3 direct customer installations to automatically upgrade your rank to QUALIFIED status.</p>
-                        </div>
-                    </div>
-                </div>
-                <a href="<?= url('/register-advisor') ?>" class="btn btn-svpl-gold btn-lg">
-                    Join as Solar Advisor Now <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-            <div class="col-lg-6 mt-4 mt-lg-0 text-center">
-                <div class="card card-svpl p-4 bg-white border-0 shadow">
-                    <h5 class="fw-bold mb-3" style="color: #0B2545;">9-Level Commission Distribution Plan</h5>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-striped text-start">
-                            <thead>
-                                <tr class="table-dark">
-                                    <th>Level</th>
-                                    <th>Hierarchy Role</th>
-                                    <th>Commission</th>
-                                    <th>Bonus</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="table-warning fw-bold">
-                                    <td>Level 1</td>
-                                    <td>Direct Sponsor</td>
-                                    <td>₹1,000</td>
-                                    <td>₹500</td>
-                                </tr>
                                 <tr>
-                                    <td>Level 2</td>
-                                    <td>2nd Generation Upline</td>
-                                    <td>₹400</td>
-                                    <td>-</td>
+                                    <td class="text-secondary" style="width: 50%;">Gross Dhwajja Turnkey Project Cost:</td>
+                                    <td class="text-end fw-bold text-navy" id="displayGrossCost">₹2,10,000/-</td>
                                 </tr>
-                                <tr>
-                                    <td>Level 3</td>
-                                    <td>3rd Generation Upline</td>
-                                    <td>₹250</td>
-                                    <td>-</td>
+                                <tr class="table-light">
+                                    <td class="text-success"><i class="bi bi-check-circle-fill text-success me-1"></i> Central Govt. Subsidy (PM Surya Ghar DBT):</td>
+                                    <td class="text-end text-success fw-bold" id="displayCentralSubsidy">- ₹78,000/-</td>
                                 </tr>
-                                <tr>
-                                    <td>Level 4</td>
-                                    <td>4th Generation Upline</td>
-                                    <td>₹150</td>
-                                    <td>-</td>
+                                <tr class="table-light">
+                                    <td class="text-warning-emphasis"><i class="bi bi-patch-check-fill text-warning me-1"></i> Odisha State Govt. Subsidy (OREDA):</td>
+                                    <td class="text-end text-success fw-bold" id="displayStateSubsidy">- ₹60,000/-</td>
                                 </tr>
-                                <tr>
-                                    <td>Level 5 to 9</td>
-                                    <td>5th to 9th Generation</td>
-                                    <td>₹100 to ₹35</td>
-                                    <td>-</td>
+                                <tr class="table-success">
+                                    <td class="fw-bold text-success"><i class="bi bi-gift-fill text-success me-1"></i> Total Combined Govt. Grant:</td>
+                                    <td class="text-end text-success fw-bold fs-6" id="displayTotalSubsidy">- ₹1,38,000/-</td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td class="fw-bold text-navy fs-6">Effective Net Investment Payable:</td>
+                                    <td class="text-end text-primary fw-bold fs-4" id="displayNetCost">₹72,000/-</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <div class="small text-muted text-start mt-2">
-                        * All payouts are subject to 5% statutory TDS deduction and credited directly to the registered advisor bank account.
+
+                    <!-- EMI & Solar Savings Comparison Strip -->
+                    <div class="p-3 bg-light rounded-3 border">
+                        <div class="row g-2 text-center">
+                            <div class="col-sm-4 border-end">
+                                <div class="text-secondary small fw-semibold">Easy Bank EMI (5.6%)</div>
+                                <div class="font-heading fw-bold text-success fs-5" id="displayEmi">₹785 / mo</div>
+                                <small class="text-muted">10-Year Loan</small>
+                            </div>
+                            <div class="col-sm-4 border-end">
+                                <div class="text-secondary small fw-semibold">Monthly Bill Savings</div>
+                                <div class="font-heading fw-bold text-primary fs-5" id="displaySavings">₹3,400 / mo</div>
+                                <small class="text-muted">Grid Offset</small>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="text-secondary small fw-semibold">25-Yr Net Gain</div>
+                                <div class="font-heading fw-bold text-navy fs-5">₹8.4 Lakhs+</div>
+                                <small class="text-muted">Lifecycle ROI</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<!-- 4 ODISHA DISCOMS & WHY DHWAJJA SOLAR -->
+<section class="py-5" style="background-color: #F1F5F9;">
+    <div class="container">
+        <div class="text-center mb-5 animate-fade-in">
+            <span class="badge bg-primary text-white fw-bold px-3 py-2 mb-2" style="font-size: 0.8rem;">
+                APPROVED UTILITY PARTNERSHIPS
+            </span>
+            <h2 class="font-heading fw-bold text-navy">Approved Across All 4 Odisha DISCOMs</h2>
+            <p class="text-secondary">Surya Vistaara handles end-to-end net-metering approvals, DISCOM site feasibility, and official grid sync.</p>
+        </div>
+
+        <div class="row g-3 mb-5 text-center">
+            <div class="col-md-3 col-6">
+                <div class="card card-svpl p-3 border-0 shadow-sm h-100">
+                    <div class="font-heading fw-bold text-navy fs-5 mb-1">TPCODL</div>
+                    <span class="text-secondary small">Central Odisha (Bhubaneswar, Cuttack, Puri)</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card card-svpl p-3 border-0 shadow-sm h-100">
+                    <div class="font-heading fw-bold text-navy fs-5 mb-1">TPNODL</div>
+                    <span class="text-secondary small">Northern Odisha (Balasore, Bhadrak, Mayurbhanj)</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card card-svpl p-3 border-0 shadow-sm h-100">
+                    <div class="font-heading fw-bold text-navy fs-5 mb-1">TPSODL</div>
+                    <span class="text-secondary small">Southern Odisha (Berhampur, Ganjam, Koraput)</span>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="card card-svpl p-3 border-0 shadow-sm h-100">
+                    <div class="font-heading fw-bold text-navy fs-5 mb-1">TPWODL</div>
+                    <span class="text-secondary small">Western Odisha (Sambalpur, Rourkela, Jharsuguda)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CALCULATOR INTERACTIVE JAVASCRIPT -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const pricingData = {
+        '2': { gross: 160000, central: 60000, state: 50000, totalSub: 110000, net: 50000, emi: 545, savings: 2400 },
+        '3': { gross: 210000, central: 78000, state: 60000, totalSub: 138000, net: 72000, emi: 785, savings: 3400 },
+        '4': { gross: 260000, central: 78000, state: 60000, totalSub: 138000, net: 122000, emi: 1333, savings: 4500 },
+        '5': { gross: 330000, central: 78000, state: 60000, totalSub: 138000, net: 192000, emi: 2098, savings: 5800 }
+    };
+
+    const buttons = document.querySelectorAll('.calc-capacity-btn');
+    const displaySelectedKw = document.getElementById('displaySelectedKw');
+    const displayGrossCost = document.getElementById('displayGrossCost');
+    const displayCentralSubsidy = document.getElementById('displayCentralSubsidy');
+    const displayStateSubsidy = document.getElementById('displayStateSubsidy');
+    const displayTotalSubsidy = document.getElementById('displayTotalSubsidy');
+    const displayNetCost = document.getElementById('displayNetCost');
+    const displayEmi = document.getElementById('displayEmi');
+    const displaySavings = document.getElementById('displaySavings');
+
+    buttons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            buttons.forEach(b => {
+                b.classList.remove('btn-primary', 'active');
+                b.classList.add('btn-outline-primary');
+                const title = b.querySelector('strong');
+                if (title) { title.classList.remove('text-white'); title.classList.add('text-navy'); }
+            });
+
+            this.classList.remove('btn-outline-primary');
+            this.classList.add('btn-primary', 'active');
+            const thisTitle = this.querySelector('strong');
+            if (thisTitle) { thisTitle.classList.remove('text-navy'); thisTitle.classList.add('text-white'); }
+
+            const kw = this.getAttribute('data-kw');
+            const data = pricingData[kw];
+            if (data) {
+                if (displaySelectedKw) displaySelectedKw.textContent = kw;
+                if (displayGrossCost) displayGrossCost.textContent = '₹' + data.gross.toLocaleString('en-IN') + '/-';
+                if (displayCentralSubsidy) displayCentralSubsidy.textContent = '- ₹' + data.central.toLocaleString('en-IN') + '/-';
+                if (displayStateSubsidy) displayStateSubsidy.textContent = '- ₹' + data.state.toLocaleString('en-IN') + '/-';
+                if (displayTotalSubsidy) displayTotalSubsidy.textContent = '- ₹' + data.totalSub.toLocaleString('en-IN') + '/-';
+                if (displayNetCost) displayNetCost.textContent = '₹' + data.net.toLocaleString('en-IN') + '/-';
+                if (displayEmi) displayEmi.textContent = '₹' + data.emi.toLocaleString('en-IN') + ' / mo';
+                if (displaySavings) displaySavings.textContent = '₹' + data.savings.toLocaleString('en-IN') + ' / mo';
+            }
+        });
+    });
+});
+</script>
