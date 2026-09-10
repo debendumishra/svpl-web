@@ -112,46 +112,78 @@ $title = "Executive Command Center — SVPL Admin";
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+                <table class="table table-hover align-middle mb-0 small">
                     <thead class="table-light">
-                        <tr class="small text-uppercase text-secondary">
-                            <th>Lead ID</th>
-                            <th>Customer & Location</th>
+                        <tr class="text-uppercase text-secondary">
+                            <th>Lead Code</th>
+                            <th>Customer & Contact</th>
+                            <th>Location / DISCOM</th>
                             <th>Capacity</th>
-                            <th>Stage</th>
-                            <th>Advisor</th>
-                            <th>Action</th>
+                            <th>Pipeline Stage</th>
+                            <th>Assigned Advisor</th>
+                            <th class="text-end">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($recentLeads)): ?>
                             <tr>
-                                <td colspan="6" class="text-center py-4 text-muted">No recent solar leads registered yet.</td>
+                                <td colspan="7" class="text-center py-4 text-muted">No recent solar leads registered yet.</td>
                             </tr>
                         <?php else: ?>
-                            <?php foreach ($recentLeads as $lead): ?>
+                            <?php 
+                            $stageBadgeMap = [
+                                'REGISTRATION'           => ['class' => 'bg-secondary text-white', 'text' => '1. Registration'],
+                                'DOCUMENTS'              => ['class' => 'bg-info text-dark', 'text' => '2. Documents'],
+                                'GOVT_PORTAL'            => ['class' => 'bg-primary text-white', 'text' => '3. Govt Portal'],
+                                'LOAN_APPLIED'           => ['class' => 'bg-warning text-dark', 'text' => '4. Loan Applied'],
+                                'LOAN_SANCTIONED'        => ['class' => 'bg-primary-subtle text-primary border', 'text' => '5. Loan Approved'],
+                                'INSTALLATION_COMMENCED' => ['class' => 'bg-info-subtle text-info-emphasis border', 'text' => '6. Installing'],
+                                'INSTALLATION_COMPLETED' => ['class' => 'bg-primary text-white', 'text' => '7. Installed'],
+                                'JE_REPORT'              => ['class' => 'bg-dark text-white', 'text' => '8. JE Inspected'],
+                                'SUBSIDY_APPLIED'        => ['class' => 'bg-warning-subtle text-warning-emphasis border', 'text' => '9. Subsidy Applied'],
+                                'SUBSIDY_RECEIVED'       => ['class' => 'bg-success text-white', 'text' => '🟢 10. Active Customer'],
+                            ];
+                            foreach ($recentLeads as $lead): 
+                                $custName = trim(($lead['first_name'] ?? '') . ' ' . ($lead['last_name'] ?? ''));
+                                if (empty($custName)) {
+                                    $custName = $lead['customer_name'] ?? 'Customer #' . $lead['id'];
+                                }
+                                $custPhone = $lead['mobile'] ?? $lead['phone_number'] ?? 'N/A';
+                                $leadCode = $lead['lead_code'] ?? 'LEAD-' . $lead['id'];
+                                $capacity = $lead['proposed_capacity_kw'] ?? $lead['proposed_solar_kw'] ?? '3.0';
+                                $stInfo = $stageBadgeMap[$lead['stage'] ?? ''] ?? ['class' => 'bg-light text-dark border', 'text' => $lead['stage'] ?? 'SUBMITTED'];
+                            ?>
                                 <tr>
                                     <td>
-                                        <span class="badge bg-light text-dark border font-monospace"><?= htmlspecialchars($lead['lead_number']) ?></span>
+                                        <span class="badge bg-light text-dark border font-monospace fw-bold"><?= htmlspecialchars($leadCode) ?></span>
                                     </td>
                                     <td>
-                                        <div class="fw-bold text-navy"><?= htmlspecialchars($lead['customer_name']) ?></div>
-                                        <div class="text-secondary small"><?= htmlspecialchars($lead['phone_number'] ?? 'N/A') ?> | <span class="badge bg-light text-dark border"><?= htmlspecialchars($lead['discom_name'] ?? 'TPCODL') ?></span></div>
+                                        <div class="fw-bold text-navy"><?= htmlspecialchars($custName) ?></div>
+                                        <div class="text-secondary" style="font-size: 0.78rem;">
+                                            <i class="bi bi-telephone-fill text-success me-1"></i><?= htmlspecialchars($custPhone) ?>
+                                        </div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-primary-subtle text-primary fw-bold"><?= $lead['proposed_solar_kw'] ?> kW</span>
+                                        <div class="text-navy fw-semibold"><?= htmlspecialchars($lead['district'] ?? 'Khordha') ?></div>
+                                        <span class="badge bg-light text-dark border" style="font-size: 0.68rem;"><?= htmlspecialchars($lead['discom_name'] ?? 'TPCODL') ?></span>
                                     </td>
                                     <td>
-                                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
-                                            <?= htmlspecialchars($lead['stage']) ?>
+                                        <span class="badge bg-primary-subtle text-primary fw-bold"><?= $capacity ?> kW</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge <?= $stInfo['class'] ?> px-2 py-1">
+                                            <?= htmlspecialchars($stInfo['text']) ?>
                                         </span>
                                     </td>
                                     <td>
-                                        <small class="text-secondary"><?= htmlspecialchars($lead['advisor_name'] ?? 'Direct SVPL') ?></small>
+                                        <div class="text-navy fw-semibold small"><?= htmlspecialchars($lead['advisor_name'] ?? 'Direct SVPL') ?></div>
+                                        <?php if (!empty($lead['advisor_code'])): ?>
+                                            <span class="badge bg-light text-secondary border font-monospace" style="font-size: 0.65rem;"><?= htmlspecialchars($lead['advisor_code']) ?></span>
+                                        <?php endif; ?>
                                     </td>
-                                    <td>
-                                        <a href="<?= url('/admin/lead/' . $lead['id']) ?>" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-eye"></i>
+                                    <td class="text-end">
+                                        <a href="<?= url('/admin/lead/' . $lead['id']) ?>" class="btn btn-sm btn-svpl-navy py-1 px-2">
+                                            <i class="bi bi-eye-fill me-1"></i> Manage
                                         </a>
                                     </td>
                                 </tr>
