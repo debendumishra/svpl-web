@@ -100,6 +100,8 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
 // ==========================================
 Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ADVISOR')]], function() {
     Router::get('/advisor/dashboard', [AdvisorController::class, 'dashboard']);
+    Router::get('/advisor/register-customer', [AdvisorController::class, 'showRegisterCustomer']);
+    Router::post('/advisor/register-customer', [AdvisorController::class, 'registerCustomer']);
     Router::get('/advisor/network', [AdvisorController::class, 'myNetwork']);
     Router::get('/advisor/customers', [AdvisorController::class, 'myCustomers']);
     Router::get('/advisor/leads', [AdvisorController::class, 'leads']);

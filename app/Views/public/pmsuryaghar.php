@@ -192,9 +192,12 @@ $title = "PM Surya Ghar & Odisha State Subsidy Scheme Guide — Dhwajja Solar & 
     </div>
 
     <!-- CALL TO ACTION -->
-    <div class="text-center">
-        <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-gold btn-lg shadow-sm">
-            Apply for Rooftop Solar in Odisha <i class="bi bi-arrow-right ms-1"></i>
+    <div class="text-center d-flex justify-content-center gap-3 flex-wrap">
+        <a href="<?= url('/solar-solutions') ?>" class="btn btn-svpl-solar btn-lg shadow-sm">
+            Explore Solar Packages & Pricing <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+        <a href="<?= url('/contact') ?>" class="btn btn-outline-dark btn-lg">
+            <i class="bi bi-headset me-1"></i> Contact Solar Advisor Desk
         </a>
     </div>
 </div>

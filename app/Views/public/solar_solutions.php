@@ -21,8 +21,8 @@ $title = "Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)";
                     MNRE & OREDA approved DCR Mono PERC solar systems backed by a 25-Year Performance Warranty, Smart Wi-Fi Inverters, and up to ₹1,38,000 in Combined Government Subsidies.
                 </p>
                 <div class="d-flex gap-2 flex-wrap">
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow-sm">
-                        <i class="bi bi-file-earmark-check-fill me-1"></i> Apply for PM Surya Ghar
+                    <a href="<?= url('/contact') ?>" class="btn btn-svpl-solar btn-lg shadow-sm">
+                        <i class="bi bi-headset me-2"></i> Get Free Quote via Advisor
                     </a>
                     <a href="<?= url('/become-advisor') ?>" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-person-plus-fill me-1"></i> Business Opportunity
@@ -81,7 +81,7 @@ $title = "Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)";
                         <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 5.6% Bank EMI: <strong>₹545/mo</strong></li>
                     </ul>
 
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-outline-primary w-100">
+                    <a href="<?= url('/contact') ?>" class="btn btn-outline-primary w-100">
                         Select 2 kW Plant
                     </a>
                 </div>
@@ -116,8 +116,8 @@ $title = "Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)";
                         <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 5.6% Bank EMI: <strong>₹785/mo</strong></li>
                     </ul>
 
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar w-100 fw-bold shadow-sm">
-                        Apply for 3 kW Plant
+                    <a href="<?= url('/contact') ?>" class="btn btn-svpl-solar w-100 fw-bold shadow-sm">
+                        Inquire for 3 kW Plant
                     </a>
                 </div>
             </div>
@@ -148,7 +148,7 @@ $title = "Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)";
                         <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> 5.6% Bank EMI: <strong>₹2,098/mo</strong></li>
                     </ul>
 
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-outline-primary w-100">
+                    <a href="<?= url('/contact') ?>" class="btn btn-outline-primary w-100">
                         Select 5 kW Plant
                     </a>
                 </div>
@@ -272,8 +272,8 @@ $title = "Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)";
                         </div>
                     </div>
 
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar w-100 py-2 fw-bold shadow-sm">
-                        <i class="bi bi-send-fill me-1"></i> Apply for This Package
+                    <a href="<?= url('/contact') ?>" class="btn btn-svpl-solar w-100 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-headset me-1"></i> Inquire for This Package via Advisor
                     </a>
                 </div>
             </div>

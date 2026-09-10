@@ -71,12 +71,12 @@ $title = "Login — Surya Vistaara Pvt. Ltd.";
 
                 <div class="border-top pt-3 text-center">
                     <p class="small text-muted mb-2">Don't have an account?</p>
-                    <div class="d-flex justify-content-center gap-2">
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
                         <a href="<?= url('/register-advisor') ?>" class="btn btn-outline-warning btn-sm text-dark fw-semibold">
-                            Register as Advisor
+                            <i class="bi bi-person-plus-fill me-1"></i> Become an Advisor
                         </a>
-                        <a href="<?= url('/register-customer') ?>" class="btn btn-outline-success btn-sm fw-semibold">
-                            Apply for Solar
+                        <a href="<?= url('/contact') ?>" class="btn btn-outline-secondary btn-sm fw-semibold">
+                            <i class="bi bi-headset me-1"></i> Customer Inquiry
                         </a>
                     </div>
                 </div>

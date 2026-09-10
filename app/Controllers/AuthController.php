@@ -233,130 +233,27 @@ class AuthController
 
     public function showRegisterCustomer(): void
     {
-        $ref = trim($_GET['ref'] ?? '');
-        $advisor = null;
-        if (!empty($ref)) {
-            $advisor = Advisor::findByReferralCode($ref);
+        $user = AuthService::user();
+        if ($user && ($user['role'] ?? '') === 'ADVISOR') {
+            Response::redirect('/advisor/register-customer');
+            return;
         }
 
-        Response::view('public/register_customer', [
-            'pageTitle' => 'Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha',
-            'advisor' => $advisor,
-            'ref' => $ref,
+        Response::view('public/login', [
+            'pageTitle' => 'Advisor Login Required — SVPL',
+            'error' => 'Customer registration is conducted exclusively through authorized SVPL Advisors. Please log in to your Advisor account to submit customer applications.',
         ]);
     }
 
     public function registerCustomer(): void
     {
-        $post = $_POST;
-        $mobile = trim($post['mobile'] ?? '');
-        $refCode = trim($post['advisor_code'] ?? '');
-        $captcha = trim($post['captcha'] ?? '');
-
-        if (empty($post['first_name']) || empty($post['last_name']) || empty($mobile) || empty($post['consumer_number'])) {
-            Response::view('public/register_customer', [
-                'pageTitle' => 'Apply for PM Surya Ghar Solar — SVPL',
-                'error' => 'Please provide Name, Mobile, and DISCOM Consumer Number.',
-                'post' => $post,
-            ]);
+        $user = AuthService::user();
+        if ($user && ($user['role'] ?? '') === 'ADVISOR') {
+            (new AdvisorController())->registerCustomer();
             return;
         }
 
-        // CAPTCHA verification
-        if (!Captcha::verify($captcha)) {
-            Response::view('public/register_customer', [
-                'pageTitle' => 'Apply for PM Surya Ghar Solar — SVPL',
-                'error' => 'Invalid or expired Security CAPTCHA code. Please enter the characters shown in the image.',
-                'post' => $post,
-            ]);
-            return;
-        }
-
-        $advisorId = null;
-        if (!empty($refCode)) {
-            $adv = Advisor::findByReferralCode($refCode);
-            if ($adv) {
-                $advisorId = (int) $adv['id'];
-            }
-        }
-
-        Database::beginTransaction();
-        try {
-            $password = 'Solar@123';
-            $userId = null;
-            $existingUser = User::findByMobile($mobile);
-            if ($existingUser) {
-                $userId = (int) $existingUser['id'];
-            } else {
-                $userId = User::create([
-                    'role' => 'CUSTOMER',
-                    'email' => !empty($post['email']) ? trim($post['email']) : null,
-                    'mobile' => $mobile,
-                    'password_hash' => password_hash($password, PASSWORD_BCRYPT),
-                    'full_name' => trim($post['first_name'] . ' ' . $post['last_name']),
-                    'is_active' => 1,
-                ]);
-            }
-
-            $custCode = Customer::generateCustomerCode();
-            $custId = Customer::create([
-                'user_id' => $userId,
-                'customer_code' => $custCode,
-                'advisor_id' => $advisorId,
-                'first_name' => trim($post['first_name']),
-                'last_name' => trim($post['last_name']),
-                'mobile' => $mobile,
-                'email' => !empty($post['email']) ? trim($post['email']) : null,
-                'state' => 'Odisha',
-                'district' => trim($post['district'] ?? 'Khordha'),
-                'block' => trim($post['block'] ?? 'Bhubaneswar'),
-                'gram_panchayat' => trim($post['gram_panchayat'] ?? ''),
-                'village' => trim($post['village'] ?? ''),
-                'pincode' => trim($post['pincode'] ?? '751024'),
-                'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
-                'consumer_number' => trim($post['consumer_number']),
-                'sanctioned_load_kw' => (float) ($post['sanctioned_load_kw'] ?? 2.0),
-                'proposed_solar_kw' => (float) ($post['proposed_solar_kw'] ?? 2.0),
-                'monthly_avg_bill' => (float) ($post['monthly_avg_bill'] ?? 1500),
-                'status' => 'New',
-            ]);
-
-            // Create Lead in Pipeline
-            $leadCode = Lead::generateLeadCode();
-            $leadId = Lead::create([
-                'lead_code' => $leadCode,
-                'customer_id' => $custId,
-                'advisor_id' => $advisorId,
-                'lead_source' => $advisorId ? 'Advisor Referral' : 'Direct Portal Application',
-                'first_name' => trim($post['first_name']),
-                'last_name' => trim($post['last_name']),
-                'mobile' => $mobile,
-                'email' => !empty($post['email']) ? trim($post['email']) : null,
-                'state' => 'Odisha',
-                'district' => trim($post['district'] ?? 'Khordha'),
-                'block' => trim($post['block'] ?? 'Bhubaneswar'),
-                'gram_panchayat' => trim($post['gram_panchayat'] ?? ''),
-                'pincode' => trim($post['pincode'] ?? '751024'),
-                'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
-                'consumer_number' => trim($post['consumer_number']),
-                'proposed_capacity_kw' => (float) ($post['proposed_solar_kw'] ?? 2.0),
-                'package_id' => (int) ($post['package_id'] ?? 2),
-                'stage' => 'REGISTRATION',
-                'status' => 'New Application Received',
-            ]);
-
-            Database::commit();
-
-            AuthService::attempt($mobile, $password);
-            Response::redirect('/customer/dashboard?welcome=1');
-        } catch (\Throwable $t) {
-            Database::rollBack();
-            Response::view('public/register_customer', [
-                'pageTitle' => 'Apply for PM Surya Ghar Solar — SVPL',
-                'error' => 'Application submission failed: ' . $t->getMessage(),
-                'post' => $post,
-            ]);
-        }
+        Response::redirect('/login');
     }
 
     public function validateReferralCode(): void

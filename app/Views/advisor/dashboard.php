@@ -108,17 +108,22 @@ $title = "Advisor Command Center — Surya Vistaara";
     <!-- Direct Leads Table -->
     <div class="col-lg-7">
         <div class="card card-svpl p-4 bg-white border-0 shadow-sm h-100">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <h5 class="font-heading fw-bold mb-0 text-navy">My Direct Customer Leads</h5>
-                <a href="<?= url('/advisor/customers') ?>" class="btn btn-outline-primary btn-sm">
-                    View All <i class="bi bi-arrow-right ms-1"></i>
-                </a>
+                <div class="d-flex gap-2">
+                    <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-svpl-solar btn-sm fw-bold">
+                        <i class="bi bi-person-plus-fill me-1"></i> + Register Customer
+                    </a>
+                    <a href="<?= url('/advisor/customers') ?>" class="btn btn-outline-primary btn-sm">
+                        View All <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
             </div>
             <?php if (empty($leads)): ?>
                 <div class="text-center py-5 text-secondary">
                     <i class="bi bi-sun fs-1 text-warning mb-2 d-block"></i>
                     <p class="mb-2">No customer leads captured yet.</p>
-                    <a href="<?= url('/register-customer?ref=' . urlencode($advisor['referral_code'])) ?>" class="btn btn-svpl-solar btn-sm">
+                    <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-svpl-solar btn-sm">
                         + Register First Customer
                     </a>
                 </div>

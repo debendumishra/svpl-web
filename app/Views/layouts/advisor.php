@@ -82,8 +82,8 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             <?= htmlspecialchars($referralCode) ?> <i class="bi bi-clipboard ms-1"></i>
                         </span>
                     </div>
-                    <a href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-md-inline-flex">
-                        <i class="bi bi-plus-circle-fill me-1"></i> + Register
+                    <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-md-inline-flex">
+                        <i class="bi bi-plus-circle-fill me-1"></i> + Register Customer
                     </a>
                     <a href="<?= url('/advisor/qr-code') ?>" class="btn btn-outline-dark btn-sm" title="Doorstep QR Code">
                         <i class="bi bi-qr-code"></i>
@@ -98,6 +98,9 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             <div class="bg-light px-3 py-1 border-bottom d-none d-lg-flex gap-1 overflow-x-auto">
                 <a href="<?= url('/advisor/dashboard') ?>" class="btn btn-sm <?= $activeUri === url('/advisor/dashboard') ? 'btn-primary' : 'btn-light border' ?>">
                     <i class="bi bi-speedometer2 me-1"></i> Command Center
+                </a>
+                <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/register-customer') !== false ? 'btn-svpl-solar' : 'btn-outline-warning text-dark border' ?> fw-bold">
+                    <i class="bi bi-person-plus-fill me-1"></i> + Register Customer
                 </a>
                 <a href="<?= url('/advisor/customers') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/customers') !== false ? 'btn-primary' : 'btn-light border' ?>">
                     <i class="bi bi-people me-1"></i> My Customers
@@ -144,17 +147,6 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                         </div>
                     </div>
 
-                <div class="py-2">
-                    <div class="p-3 mx-2 mb-2 rounded-3 bg-dark bg-opacity-50 border border-secondary">
-                        <div class="small text-secondary mb-1">Your Referral Code:</div>
-                        <div class="d-flex align-items-center justify-content-between">
-                            <strong class="text-warning fs-5 font-monospace"><?= htmlspecialchars($referralCode) ?></strong>
-                            <button class="btn btn-warning btn-sm py-0 px-2 fw-bold btn-copy" data-copy="<?= htmlspecialchars($referralCode) ?>">
-                                Copy <i class="bi bi-clipboard"></i>
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- Command & Identity Accordion -->
                     <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#advMobCommand" aria-expanded="true">
                         <span><i class="bi bi-speedometer2 text-warning me-1"></i> Core Workspace</span>
@@ -165,6 +157,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/advisor/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/advisor/dashboard') ?>">
                                     <i class="bi bi-speedometer2"></i> <span>Command Center</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/register-customer') !== false ? 'active text-warning fw-bold' : 'text-warning fw-bold' ?>" href="<?= url('/advisor/register-customer') ?>">
+                                    <i class="bi bi-person-plus-fill text-warning"></i> <span>+ Register Customer</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -188,7 +185,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     <div class="collapse show" id="advMobCustNet">
                         <ul class="nav flex-column mb-1">
                             <li class="nav-item">
-                                <a class="nav-link text-warning fw-bold" href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>">
+                                <a class="nav-link text-warning fw-bold" href="<?= url('/advisor/register-customer') ?>">
                                     <i class="bi bi-plus-circle-fill text-warning"></i> <span>+ Register Customer</span>
                                 </a>
                             </li>

@@ -34,8 +34,8 @@ $title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
                                     Get up to <strong>₹78,000 Central DBT</strong> + <strong>₹60,000 Odisha State Subsidy</strong> = <span class="badge bg-success fs-6 fw-bold">₹1,38,000 Total Govt. Grant</span> with easy solar bank loans at just <strong>5.6% p.a.</strong>
                                 </p>
                                 <div class="d-flex flex-wrap gap-3 mb-4">
-                                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow">
-                                        <i class="bi bi-house-door-fill me-2"></i> Apply for Solar Rooftop
+                                    <a href="<?= url('/solar-solutions') ?>" class="btn btn-svpl-solar btn-lg shadow">
+                                        <i class="bi bi-sun-fill me-2"></i> Explore Solar Packages
                                     </a>
                                     <a href="#solar-calculator-section" class="btn btn-outline-light btn-lg">
                                         <i class="bi bi-calculator me-2"></i> Calculate Savings
@@ -43,8 +43,8 @@ $title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
                                 </div>
                                 <div class="d-flex align-items-center gap-4 text-light flex-wrap small">
                                     <span><i class="bi bi-check-circle-fill text-warning me-1"></i> Tier-1 Dhwajja Mono PERC</span>
-                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> 25-Year Linear Power Warranty</span>
-                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> Net-Metering by TPCODL/TPNODL</span>
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> Dual Subsidy DBT Enabled</span>
+                                    <span><i class="bi bi-check-circle-fill text-warning me-1"></i> 25 Years Linear Warranty</span>
                                 </div>
                             </div>
                         </div>
@@ -68,11 +68,11 @@ $title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
                                     Pay off your concessional 5.6% solar loan EMI (starting at <strong>₹545/mo</strong>) using your monthly electricity savings and enjoy 25 years of virtually free solar power!
                                 </p>
                                 <div class="d-flex flex-wrap gap-3 mb-4">
-                                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow">
-                                        <i class="bi bi-shield-fill-check me-2"></i> Book Free Rooftop Survey
+                                    <a href="<?= url('/become-advisor') ?>" class="btn btn-svpl-solar btn-lg shadow">
+                                        <i class="bi bi-person-badge-fill me-2"></i> Join as Solar Advisor
                                     </a>
-                                    <a href="<?= url('/register-advisor') ?>" class="btn btn-outline-light btn-lg">
-                                        <i class="bi bi-person-badge-fill me-2"></i> Join as Solar Mitra
+                                    <a href="<?= url('/contact') ?>" class="btn btn-outline-light btn-lg">
+                                        <i class="bi bi-headset me-2"></i> Contact Advisor Desk
                                     </a>
                                 </div>
                                 <div class="d-flex align-items-center gap-4 text-light flex-wrap small">
@@ -102,8 +102,8 @@ $title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
                                     Engineered specifically for Odisha's coastal climate with hot-dip galvanized mounting structures, dual-MPPT smart Wi-Fi inverters, and high-density Mono PERC cells.
                                 </p>
                                 <div class="d-flex flex-wrap gap-3 mb-4">
-                                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-lg shadow">
-                                        <i class="bi bi-check-lg me-2"></i> Check My Eligibility
+                                    <a href="<?= url('/solar-solutions') ?>" class="btn btn-svpl-solar btn-lg shadow">
+                                        <i class="bi bi-shield-check me-2"></i> View Solar Packages
                                     </a>
                                     <a href="<?= url('/pm-surya-ghar') ?>" class="btn btn-outline-light btn-lg">
                                         <i class="bi bi-info-circle me-2"></i> Scheme Guidelines
@@ -133,57 +133,75 @@ $title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
     </div>
 </section>
 
-<!-- INTERACTIVE DHWAJJA SOLAR SUBSIDY CALCULATOR -->
-<section class="py-5 bg-white" id="solar-calculator-section">
-    <div class="container py-2">
-        <div class="text-center mb-5 animate-fade-in">
-            <span class="badge bg-warning text-dark fw-bold px-3 py-2 mb-2" style="font-size: 0.8rem;">
-                <i class="bi bi-calculator-fill text-dark me-1"></i> OFFICIAL ODIA SUBSIDY ESTIMATOR
-            </span>
-            <h2 class="font-heading fw-bold text-navy display-6">Dhwajja Solar Savings & Subsidy Calculator</h2>
-            <p class="text-secondary" style="max-width: 650px; margin: 0 auto;">
-                Accurate pricing, Central DBT subsidy, Odisha State Government grants, and 5.6% bank loan EMIs tailored for Odisha households.
-            </p>
+    <!-- QUICK HIGHLIGHT METRIC STRIP -->
+    <div class="bg-navy py-3 border-bottom border-secondary text-white" style="background: #061528;">
+        <div class="container">
+            <div class="row g-3 text-center">
+                <div class="col-6 col-md-3">
+                    <div class="fs-4 fw-bold text-warning font-heading">₹1,38,000</div>
+                    <div class="small text-light" style="font-size: 0.8rem;">Max Odisha Dual Subsidy</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fs-4 fw-bold text-success font-heading">5.6% p.a.</div>
+                    <div class="small text-light" style="font-size: 0.8rem;">Concessional Bank Loan</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fs-4 fw-bold text-info font-heading">300 Units</div>
+                    <div class="small text-light" style="font-size: 0.8rem;">Free Power Every Month</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="fs-4 fw-bold text-warning font-heading">25 Years</div>
+                    <div class="small text-light" style="font-size: 0.8rem;">Module Performance Life</div>
+                </div>
+            </div>
         </div>
+    </div>
 
-        <div class="row g-4 align-items-center">
-            <!-- Left Column: Interactive Capacity Selector -->
-            <div class="col-lg-5 animate-fade-in stagger-1">
-                <div class="card card-svpl p-4 border shadow-sm">
-                    <h5 class="font-heading fw-bold mb-3 text-navy">Select Proposed Solar Plant Size:</h5>
+    <!-- PM SURYA GHAR ODISHA SAVINGS CALCULATOR -->
+    <section class="py-5 bg-light border-bottom" id="solar-calculator-section">
+        <div class="container">
+            <div class="text-center max-w-2xl mx-auto mb-5 animate-fade-in">
+                <div class="badge bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2">
+                    <i class="bi bi-calculator-fill me-1"></i> Interactive PM Surya Ghar Estimator
+                </div>
+                <h2 class="font-heading fw-bold text-navy">Calculate Your Solar Rooftop Subsidy & Savings</h2>
+                <p class="text-secondary small">
+                    Select your proposed capacity to see exact Central DBT subsidy, Odisha state incentive, net customer investment, and 5.6% concessional bank EMI.
+                </p>
+            </div>
 
-                    <!-- Capacity Option Buttons -->
+            <div class="row g-4 align-items-center">
+                <!-- Left Column: Capacity Selector Buttons -->
+                <div class="col-lg-5 animate-fade-in stagger-1">
+                    <label class="form-label fw-bold text-navy mb-2">Select Solar Plant Capacity:</label>
                     <div class="d-grid gap-2 mb-4">
+                        <button type="button" class="btn btn-outline-primary text-start p-3 calc-capacity-btn" data-kw="1">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="fs-6 d-block text-navy">1 kW Rooftop Plant</strong>
+                                    <small class="text-secondary">~60 sq.ft. | 120-140 Units/month</small>
+                                </div>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle">₹45,000 Subsidy</span>
+                            </div>
+                        </button>
+                        
                         <button type="button" class="btn btn-outline-primary text-start p-3 calc-capacity-btn" data-kw="2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <strong class="fs-6 d-block text-navy">2 kW Rooftop Plant</strong>
-                                    <small class="text-secondary">~120 sq.ft. | 240-280 Units/month</small>
+                                    <small class="text-secondary">~110 sq.ft. | 240-280 Units/month</small>
                                 </div>
                                 <span class="badge bg-success-subtle text-success border border-success-subtle">₹90,000 Subsidy</span>
                             </div>
                         </button>
-
-                        <button type="button" class="btn btn-primary text-start p-3 calc-capacity-btn active" data-kw="3">
+                        
+                        <button type="button" class="btn btn-primary text-start p-3 calc-capacity-btn active-calc shadow-sm" data-kw="3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <strong class="fs-6 text-white">3 kW Rooftop Plant</strong>
-                                        <span class="badge bg-warning text-dark" style="font-size: 0.68rem;">RECOMMENDED</span>
-                                    </div>
-                                    <small class="text-white-50">~180 sq.ft. | 360-420 Units/month</small>
+                                    <strong class="fs-6 d-block text-white">3 kW Rooftop Plant (Most Popular)</strong>
+                                    <small class="text-white-50">~160 sq.ft. | 360-420 Units/month</small>
                                 </div>
-                                <span class="badge bg-warning text-dark fw-bold">₹1,38,000 MAX SUBSIDY</span>
-                            </div>
-                        </button>
-
-                        <button type="button" class="btn btn-outline-primary text-start p-3 calc-capacity-btn" data-kw="4">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong class="fs-6 d-block text-navy">4 kW Rooftop Plant</strong>
-                                    <small class="text-secondary">~210 sq.ft. | 480-550 Units/month</small>
-                                </div>
-                                <span class="badge bg-success-subtle text-success border border-success-subtle">₹1,38,000 Subsidy</span>
+                                <span class="badge bg-warning text-dark fw-bold">₹1,38,000 Subsidy</span>
                             </div>
                         </button>
 
@@ -198,11 +216,10 @@ $title = "Surya Vistaara | PM Surya Ghar Odisha Rooftop Solar Scheme";
                         </button>
                     </div>
 
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar w-100 py-3 shadow">
-                        <i class="bi bi-shield-check me-1"></i> Apply Now & Lock ₹1,38,000 Subsidy
+                    <a href="<?= url('/contact') ?>" class="btn btn-svpl-solar w-100 py-3 shadow">
+                        <i class="bi bi-headset me-2"></i> Inquire Solar Installation via Local Advisor
                     </a>
                 </div>
-            </div>
 
             <!-- Right Column: Dynamic Financial Breakdown Ledger -->
             <div class="col-lg-7 animate-fade-in stagger-2">
