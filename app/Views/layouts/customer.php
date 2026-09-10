@@ -35,8 +35,8 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         
         <!-- CONSTANT TOP HEADER (STICKY) -->
         <header class="app-header">
-            <!-- Ticker -->
-            <div class="live-ticker-bar px-3">
+            <!-- Ticker (Desktop) -->
+            <div class="live-ticker-bar px-3 d-none d-lg-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
                         <span class="text-white"><i class="bi bi-patch-check-fill text-warning me-1"></i> PM Surya Ghar: Muft Bijli Yojana Odisha</span>
@@ -49,23 +49,24 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
 
             <!-- Customer Header Strip -->
-            <div class="px-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
-                <div class="d-flex align-items-center gap-3">
+            <div class="px-2 px-md-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
+                <div class="d-flex align-items-center gap-2 gap-md-3">
                     <div style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900;">
                         ☀
                     </div>
                     <div>
-                        <div class="fw-bold font-heading text-navy" style="font-size: 1.05rem; line-height: 1.2;">
+                        <div class="fw-bold font-heading text-navy" style="font-size: 0.95rem; line-height: 1.2;">
                             <?= htmlspecialchars($customerName) ?>
                         </div>
                         <div class="d-flex align-items-center gap-1">
-                            <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.68rem;"><?= htmlspecialchars($customerCode) ?></span>
+                            <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.65rem;"><?= htmlspecialchars($customerCode) ?></span>
                             <span class="badge bg-primary-subtle text-primary" style="font-size: 0.62rem;">Dhwajja 3kW Plant</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
+                <!-- Desktop / Tablet Navigation Strip -->
+                <div class="d-none d-md-flex align-items-center gap-2">
                     <a href="<?= url('/customer/dashboard') ?>" class="btn btn-sm <?= $activeUri === url('/customer/dashboard') ? 'btn-primary' : 'btn-light border' ?>">
                         <i class="bi bi-speedometer2 me-1"></i> Status Tracker
                     </a>
@@ -74,6 +75,16 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     </a>
                     <a href="<?= url('/customer/documents') ?>" class="btn btn-sm <?= strpos($activeUri, '/customer/documents') !== false ? 'btn-primary' : 'btn-light border' ?>">
                         <i class="bi bi-folder-check me-1"></i> KYC Locker
+                    </a>
+                    <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm" title="Sign Out">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Mobile Header Right Actions -->
+                <div class="d-flex d-md-none align-items-center gap-1">
+                    <a href="tel:18008897875" class="btn btn-outline-success btn-sm" title="Helpline">
+                        <i class="bi bi-telephone-fill"></i>
                     </a>
                     <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm" title="Sign Out">
                         <i class="bi bi-box-arrow-right"></i>
@@ -89,11 +100,31 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
         </main>
 
-        <!-- CONSTANT FOOTER (STICKY BOTTOM) -->
-        <footer class="app-footer text-muted d-flex justify-content-between align-items-center">
+        <!-- CONSTANT FOOTER (STICKY BOTTOM, DESKTOP ONLY) -->
+        <footer class="app-footer text-muted d-none d-md-flex justify-content-between align-items-center">
             <div>© <?= date('Y') ?> <strong>Surya Vistaara Pvt. Ltd. (SVPL)</strong> — Beneficiary Support Desk.</div>
-            <div class="d-none d-md-block">Helpline Toll-Free: 1800-889-SVPL</div>
+            <div>Helpline Toll-Free: 1800-889-SVPL</div>
         </footer>
+
+        <!-- MOBILE-FIRST NATIVE BOTTOM NAVIGATION BAR (FIXED TOUCH BAR) -->
+        <nav class="svpl-mobile-bottom-nav d-md-none">
+            <a href="<?= url('/customer/dashboard') ?>" class="mob-nav-item <?= $activeUri === url('/customer/dashboard') ? 'active' : '' ?>">
+                <i class="bi bi-speedometer2"></i>
+                <span>Tracker</span>
+            </a>
+            <a href="<?= url('/customer/quotation') ?>" class="mob-nav-item <?= strpos($activeUri, '/customer/quotation') !== false ? 'active' : '' ?>">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Proposal</span>
+            </a>
+            <a href="<?= url('/customer/documents') ?>" class="mob-nav-item <?= strpos($activeUri, '/customer/documents') !== false ? 'active' : '' ?>">
+                <i class="bi bi-folder-check"></i>
+                <span>KYC Locker</span>
+            </a>
+            <a href="tel:18008897875" class="mob-nav-item">
+                <i class="bi bi-headset"></i>
+                <span>Support</span>
+            </a>
+        </nav>
     </div>
 
     <!-- Scripts -->

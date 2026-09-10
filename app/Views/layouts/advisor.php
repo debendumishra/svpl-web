@@ -38,8 +38,8 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         
         <!-- CONSTANT TOP HEADER (STICKY) -->
         <header class="app-header">
-            <!-- Ticker -->
-            <div class="live-ticker-bar px-3">
+            <!-- Ticker (Desktop) -->
+            <div class="live-ticker-bar px-3 d-none d-lg-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
                         <span class="text-white"><i class="bi bi-shield-fill-check text-warning me-1"></i> Certified Solar Advisor Partner Portal</span>
@@ -52,17 +52,22 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
 
             <!-- Primary Header Strip with User Details & Quick Actions -->
-            <div class="px-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
-                <div class="d-flex align-items-center gap-3">
+            <div class="px-2 px-md-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
+                <div class="d-flex align-items-center gap-2 gap-md-3">
+                    <!-- Mobile Hamburger Button -->
+                    <button class="btn btn-light border btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#advisorMobileDrawer" aria-label="Open Mobile Menu">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+
                     <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
                         ☀
                     </div>
                     <div>
-                        <div class="fw-bold font-heading text-navy" style="font-size: 1.05rem; line-height: 1.2;">
+                        <div class="fw-bold font-heading text-navy" style="font-size: 0.95rem; line-height: 1.2;">
                             <?= htmlspecialchars($advisorName) ?>
                         </div>
                         <div class="d-flex align-items-center gap-1">
-                            <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.68rem;"><?= htmlspecialchars($advisorCode) ?></span>
+                            <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.65rem;"><?= htmlspecialchars($advisorCode) ?></span>
                             <span class="badge <?= $qualificationStatus === 'QUALIFIED' ? 'bg-success' : 'bg-warning text-dark' ?>" style="font-size: 0.62rem;">
                                 <?= htmlspecialchars($qualificationStatus) ?>
                             </span>
@@ -70,15 +75,15 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
-                    <div class="d-none d-lg-flex align-items-center gap-2 bg-light p-1 px-3 rounded-pill border">
-                        <span class="small text-secondary">Referral Code:</span>
-                        <span class="badge bg-primary fs-6 font-monospace cursor-pointer btn-copy" data-copy="<?= htmlspecialchars($referralCode) ?>" title="Click to copy">
+                <div class="d-flex align-items-center gap-1 gap-md-2">
+                    <div class="d-none d-sm-flex align-items-center gap-1 bg-light p-1 px-2 rounded-pill border small">
+                        <span class="text-secondary" style="font-size: 0.72rem;">Ref:</span>
+                        <span class="badge bg-primary font-monospace cursor-pointer btn-copy" data-copy="<?= htmlspecialchars($referralCode) ?>" title="Click to copy">
                             <?= htmlspecialchars($referralCode) ?> <i class="bi bi-clipboard ms-1"></i>
                         </span>
                     </div>
-                    <a href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-sm-inline-block">
-                        <i class="bi bi-plus-circle-fill me-1"></i> + Register Customer
+                    <a href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-md-inline-flex">
+                        <i class="bi bi-plus-circle-fill me-1"></i> + Register
                     </a>
                     <a href="<?= url('/advisor/qr-code') ?>" class="btn btn-outline-dark btn-sm" title="Doorstep QR Code">
                         <i class="bi bi-qr-code"></i>
@@ -89,8 +94,8 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                 </div>
             </div>
 
-            <!-- Horizontal Tab Navigation Bar -->
-            <div class="bg-light px-3 py-1 border-bottom d-flex gap-1 overflow-x-auto">
+            <!-- Horizontal Tab Navigation Bar (Desktop & Tablet) -->
+            <div class="bg-light px-3 py-1 border-bottom d-none d-lg-flex gap-1 overflow-x-auto">
                 <a href="<?= url('/advisor/dashboard') ?>" class="btn btn-sm <?= $activeUri === url('/advisor/dashboard') ? 'btn-primary' : 'btn-light border' ?>">
                     <i class="bi bi-speedometer2 me-1"></i> Command Center
                 </a>
@@ -112,6 +117,82 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
         </header>
 
+        <!-- MOBILE OFFCANVAS DRAWER MENU (BOOTSTRAP 5) -->
+        <div class="offcanvas offcanvas-start offcanvas-svpl" tabindex="-1" id="advisorMobileDrawer" aria-labelledby="advisorMobileDrawerLabel">
+            <div class="offcanvas-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
+                        ☀
+                    </div>
+                    <div>
+                        <h6 class="offcanvas-title font-heading fw-bold text-white mb-0" id="advisorMobileDrawerLabel"><?= htmlspecialchars($advisorName) ?></h6>
+                        <small class="text-warning fw-semibold" style="font-size: 0.7rem;"><?= htmlspecialchars($advisorCode) ?></small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            
+            <div class="offcanvas-body p-0 d-flex flex-column justify-content-between">
+                <div class="py-2">
+                    <div class="p-3 mx-2 mb-2 rounded-3 bg-dark bg-opacity-50 border border-secondary">
+                        <div class="small text-secondary mb-1">Your Referral Code:</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <strong class="text-warning fs-5 font-monospace"><?= htmlspecialchars($referralCode) ?></strong>
+                            <button class="btn btn-warning btn-sm py-0 px-2 fw-bold btn-copy" data-copy="<?= htmlspecialchars($referralCode) ?>">
+                                Copy <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="nav-category-header">Advisor Workspace</div>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/advisor/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/advisor/dashboard') ?>">
+                                <i class="bi bi-speedometer2"></i> <span>Command Center</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>" href="<?= url('/advisor/customers') ?>">
+                                <i class="bi bi-people"></i> <span>My Customers</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/advisor/network') !== false ? 'active' : '' ?>" href="<?= url('/advisor/network') ?>">
+                                <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/advisor/wallet') !== false ? 'active' : '' ?>" href="<?= url('/advisor/wallet') ?>">
+                                <i class="bi bi-wallet2"></i> <span>Commission Wallet</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/advisor/id-card') !== false ? 'active' : '' ?>" href="<?= url('/advisor/id-card') ?>">
+                                <i class="bi bi-person-vcard"></i> <span>ID Card & Letter</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/advisor/qr-code') !== false ? 'active' : '' ?>" href="<?= url('/advisor/qr-code') ?>">
+                                <i class="bi bi-qr-code-scan"></i> <span>Doorstep QR Code</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-warning" href="<?= url('/register-customer?ref=' . urlencode($referralCode)) ?>">
+                                <i class="bi bi-plus-circle-fill text-warning"></i> <span class="fw-bold">+ Register Customer</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Sign Out in Drawer -->
+                <div class="p-3 border-top border-secondary bg-dark bg-opacity-50">
+                    <a href="<?= url('/logout') ?>" class="btn btn-outline-danger w-100 btn-sm">
+                        <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- INDEPENDENTLY SCROLLABLE MAIN CONTENT AREA -->
         <main class="app-main-content">
             <div class="container-fluid max-w-7xl">
@@ -119,11 +200,35 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
         </main>
 
-        <!-- CONSTANT FOOTER (STICKY BOTTOM) -->
-        <footer class="app-footer text-muted d-flex justify-content-between align-items-center">
+        <!-- CONSTANT FOOTER (STICKY BOTTOM, DESKTOP ONLY) -->
+        <footer class="app-footer text-muted d-none d-md-flex justify-content-between align-items-center">
             <div>© <?= date('Y') ?> <strong>Surya Vistaara Pvt. Ltd. (SVPL)</strong> — Advisor Partner Network.</div>
-            <div class="d-none d-md-block">24x7 Advisor Support: 1800-889-SVPL</div>
+            <div>24x7 Advisor Support: 1800-889-SVPL</div>
         </footer>
+
+        <!-- MOBILE-FIRST NATIVE BOTTOM NAVIGATION BAR (FIXED TOUCH BAR) -->
+        <nav class="svpl-mobile-bottom-nav d-lg-none">
+            <a href="<?= url('/advisor/dashboard') ?>" class="mob-nav-item <?= $activeUri === url('/advisor/dashboard') ? 'active' : '' ?>">
+                <i class="bi bi-speedometer2"></i>
+                <span>Home</span>
+            </a>
+            <a href="<?= url('/advisor/customers') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>">
+                <i class="bi bi-people"></i>
+                <span>Clients</span>
+            </a>
+            <a href="<?= url('/advisor/network') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/network') !== false ? 'active' : '' ?>">
+                <i class="bi bi-bezier2"></i>
+                <span>9-Tree</span>
+            </a>
+            <a href="<?= url('/advisor/wallet') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/wallet') !== false ? 'active' : '' ?>">
+                <i class="bi bi-wallet2"></i>
+                <span>Wallet</span>
+            </a>
+            <button type="button" class="mob-nav-item" data-bs-toggle="offcanvas" data-bs-target="#advisorMobileDrawer" aria-label="Open Menu">
+                <i class="bi bi-grid-fill"></i>
+                <span>Menu</span>
+            </button>
+        </nav>
     </div>
 
     <!-- Scripts -->

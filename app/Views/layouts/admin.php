@@ -36,8 +36,8 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         
         <!-- CONSTANT TOP HEADER (STICKY) -->
         <header class="app-header">
-            <!-- Top Status Live Ticker Bar -->
-            <div class="live-ticker-bar px-3 d-none d-md-block">
+            <!-- Top Status Live Ticker Bar (Desktop) -->
+            <div class="live-ticker-bar px-3 d-none d-lg-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
                         <span class="text-white"><i class="bi bi-patch-check-fill text-warning me-1"></i> PM Surya Ghar Odisha Hub</span>
@@ -51,33 +51,35 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                 </div>
             </div>
 
-            <!-- Primary App Bar with Sidebar Toggle -->
-            <div class="px-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
-                <div class="d-flex align-items-center gap-3">
-                    <!-- Expand/Collapse Sidebar Toggle Button -->
-                    <button class="btn btn-light border btn-sm" id="sidebarToggleBtn" title="Toggle Sidebar Expand/Collapse">
+            <!-- Primary App Bar with Mobile & Desktop Toggles -->
+            <div class="px-2 px-md-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
+                <div class="d-flex align-items-center gap-2 gap-md-3">
+                    <!-- Mobile Hamburger Button (triggers Offcanvas) -->
+                    <button class="btn btn-light border btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMobileDrawer" aria-label="Open Mobile Menu">
                         <i class="bi bi-list fs-5"></i>
                     </button>
 
-                    <div class="d-flex align-items-center gap-2">
-                        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
+                    <!-- Desktop Sidebar Toggle Button -->
+                    <button class="btn btn-light border btn-sm d-none d-lg-inline-block" id="sidebarToggleBtn" title="Toggle Sidebar Expand/Collapse">
+                        <i class="bi bi-layout-sidebar-inset fs-5"></i>
+                    </button>
+
+                    <a href="<?= url('/admin/dashboard') ?>" class="d-flex align-items-center gap-2 text-decoration-none">
+                        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1rem;">
                             ☀
                         </div>
                         <div>
-                            <span class="font-heading fw-bold text-navy" style="font-size: 1.05rem;">SURYA VISTAARA</span>
-                            <span class="badge bg-warning text-dark ms-1 fw-bold" style="font-size: 0.65rem;">ADMIN ENTERPRISE</span>
+                            <span class="font-heading fw-bold text-navy" style="font-size: 1.05rem; letter-spacing: -0.3px;">SURYA VISTAARA</span>
+                            <span class="badge bg-warning text-dark ms-1 fw-bold d-none d-sm-inline-block" style="font-size: 0.65rem;">ADMIN</span>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
-                <div class="d-flex align-items-center gap-2">
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-sm-inline-block">
+                <div class="d-flex align-items-center gap-1 gap-md-2">
+                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-sm-inline-flex">
                         <i class="bi bi-plus-circle-fill me-1"></i> + New Lead
                     </a>
-                    <a href="<?= url('/register-advisor') ?>" class="btn btn-outline-dark btn-sm d-none d-md-inline-block">
-                        <i class="bi bi-person-plus-fill me-1"></i> Onboard Advisor
-                    </a>
-                    <a href="<?= url('/') ?>" target="_blank" class="btn btn-light border btn-sm" title="View Public Portal">
+                    <a href="<?= url('/') ?>" target="_blank" class="btn btn-light border btn-sm" title="Public Home">
                         <i class="bi bi-globe"></i>
                     </a>
                     <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm" title="Sign Out">
@@ -87,11 +89,124 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
         </header>
 
-        <!-- APP BODY CONTAINER (SIDEBAR & MAIN VIEW SCROLL INDEPENDENTLY) -->
+        <!-- MOBILE OFFCANVAS DRAWER MENU (BOOTSTRAP 5) -->
+        <div class="offcanvas offcanvas-start offcanvas-svpl" tabindex="-1" id="adminMobileDrawer" aria-labelledby="adminMobileDrawerLabel">
+            <div class="offcanvas-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
+                        ☀
+                    </div>
+                    <div>
+                        <h6 class="offcanvas-title font-heading fw-bold text-white mb-0" id="adminMobileDrawerLabel">SURYA VISTAARA</h6>
+                        <small class="text-warning fw-semibold" style="font-size: 0.7rem;">Executive Command</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            
+            <div class="offcanvas-body p-0 d-flex flex-column justify-content-between">
+                <div class="py-2">
+                    <!-- Core Command -->
+                    <div class="nav-category-header">Core Command</div>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/dashboard') !== false ? 'active' : '' ?>" href="<?= url('/admin/dashboard') ?>">
+                                <i class="bi bi-speedometer2"></i> <span>Executive Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/leads') !== false ? 'active' : '' ?>" href="<?= url('/admin/leads') ?>">
+                                <i class="bi bi-kanban"></i> <span>10-Stage Pipeline</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Network & Citizens -->
+                    <div class="nav-category-header">Network & Citizens</div>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/advisors') !== false ? 'active' : '' ?>" href="<?= url('/admin/advisors') ?>">
+                                <i class="bi bi-person-badge"></i> <span>Advisor Registry</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/network-tree') !== false ? 'active' : '' ?>" href="<?= url('/admin/network-tree') ?>">
+                                <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/customers') !== false ? 'active' : '' ?>" href="<?= url('/admin/customers') ?>">
+                                <i class="bi bi-people"></i> <span>Customer Registry</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Operations & Supply -->
+                    <div class="nav-category-header">Operations & Supply</div>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
+                                <i class="bi bi-box-seam"></i> <span>Dispatches & Kits</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/commissions') !== false ? 'active' : '' ?>" href="<?= url('/admin/commissions') ?>">
+                                <i class="bi bi-cash-stack"></i> <span>9-Level Commissions</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
+                                <i class="bi bi-receipt"></i> <span>Payments & Invoices</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Governance & Reports -->
+                    <div class="nav-category-header">Governance</div>
+                    <ul class="nav flex-column mb-2">
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
+                                <i class="bi bi-graph-up-arrow"></i> <span>MIS Reports</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/settings') !== false ? 'active' : '' ?>" href="<?= url('/admin/settings') ?>">
+                                <i class="bi bi-sliders"></i> <span>System Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link <?= strpos($activeUri, '/admin/audit-logs') !== false ? 'active' : '' ?>" href="<?= url('/admin/audit-logs') ?>">
+                                <i class="bi bi-shield-lock"></i> <span>Audit & Logs</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- User Profile & Sign Out in Drawer -->
+                <div class="p-3 border-top border-secondary bg-dark bg-opacity-50">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width: 34px; height: 34px; border-radius: 50%; background: #0B2545; border: 2px solid var(--svpl-gold); color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem;">
+                                <?= strtoupper(substr($userName, 0, 2)) ?>
+                            </div>
+                            <div>
+                                <div class="text-white fw-bold small text-truncate" style="max-width: 140px;"><?= htmlspecialchars($userName) ?></div>
+                                <div class="text-success small" style="font-size: 0.68rem;"><i class="bi bi-circle-fill text-success" style="font-size: 0.45rem;"></i> Super Admin</div>
+                            </div>
+                        </div>
+                        <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm" title="Logout">
+                            <i class="bi bi-box-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- APP BODY CONTAINER (DESKTOP SIDEBAR + INDEPENDENT SCROLL) -->
         <div class="app-body-container">
             
-            <!-- EXPANDABLE PORTAL SIDEBAR -->
-            <aside class="portal-sidebar" id="appSidebar">
+            <!-- DESKTOP EXPANDABLE PORTAL SIDEBAR -->
+            <aside class="portal-sidebar d-none d-lg-flex" id="appSidebar">
                 <div class="py-2 flex-grow-1">
                     
                     <!-- Core Command Accordion -->
@@ -152,21 +267,6 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/admin/discom') !== false ? 'active' : '' ?>" href="<?= url('/admin/leads') ?>">
-                                    <i class="bi bi-lightning-charge"></i> <span class="sidebar-text">DISCOM Net Metering</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Finance & Subsidies Accordion -->
-                    <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#menuFinance">
-                        <span><i class="bi bi-wallet2 text-warning me-1"></i> Finance & Subsidies</span>
-                        <i class="bi bi-chevron-down collapse-arrow"></i>
-                    </div>
-                    <div class="collapse show" id="menuFinance">
-                        <ul class="nav flex-column mb-1">
-                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/commissions') !== false ? 'active' : '' ?>" href="<?= url('/admin/commissions') ?>">
                                     <i class="bi bi-cash-stack"></i> <span class="sidebar-text">9-Level Commissions</span>
                                 </a>
@@ -226,11 +326,35 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </main>
         </div>
 
-        <!-- CONSTANT FOOTER (STICKY BOTTOM) -->
-        <footer class="app-footer text-muted d-flex justify-content-between align-items-center">
+        <!-- CONSTANT FOOTER (STICKY BOTTOM, DESKTOP ONLY) -->
+        <footer class="app-footer text-muted d-none d-md-flex justify-content-between align-items-center">
             <div>© <?= date('Y') ?> <strong>Surya Vistaara Pvt. Ltd. (SVPL)</strong> — Authorized Corporate Promoter for Dhwajja Solar India.</div>
-            <div class="d-none d-md-block">Bhubaneswar HQ | PM Surya Ghar Odisha Ecosystem</div>
+            <div>Bhubaneswar HQ | PM Surya Ghar Odisha Ecosystem</div>
         </footer>
+
+        <!-- MOBILE-FIRST NATIVE BOTTOM NAVIGATION BAR (FIXED TOUCH BAR) -->
+        <nav class="svpl-mobile-bottom-nav d-lg-none">
+            <a href="<?= url('/admin/dashboard') ?>" class="mob-nav-item <?= strpos($activeUri, '/admin/dashboard') !== false ? 'active' : '' ?>">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="<?= url('/admin/leads') ?>" class="mob-nav-item <?= strpos($activeUri, '/admin/leads') !== false ? 'active' : '' ?>">
+                <i class="bi bi-kanban"></i>
+                <span>Pipeline</span>
+            </a>
+            <a href="<?= url('/admin/advisors') ?>" class="mob-nav-item <?= strpos($activeUri, '/admin/advisors') !== false ? 'active' : '' ?>">
+                <i class="bi bi-person-badge"></i>
+                <span>Advisors</span>
+            </a>
+            <a href="<?= url('/admin/network-tree') ?>" class="mob-nav-item <?= strpos($activeUri, '/admin/network-tree') !== false ? 'active' : '' ?>">
+                <i class="bi bi-bezier2"></i>
+                <span>9-Tree</span>
+            </a>
+            <button type="button" class="mob-nav-item" data-bs-toggle="offcanvas" data-bs-target="#adminMobileDrawer" aria-label="Open Full Menu">
+                <i class="bi bi-grid-fill"></i>
+                <span>Menu</span>
+            </button>
+        </nav>
     </div>
 
     <!-- Scripts & Sidebar Toggle Logic -->

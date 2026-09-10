@@ -425,6 +425,9 @@ main a:not(.btn):not(.badge):not(.nav-link):not(.navbar-brand):hover,
     padding: 0.6rem 1.4rem;
     box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-svpl-solar:hover {
@@ -443,6 +446,9 @@ main a:not(.btn):not(.badge):not(.nav-link):not(.navbar-brand):hover,
     border-radius: 8px;
     padding: 0.6rem 1.4rem;
     transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-svpl-navy:hover {
@@ -451,3 +457,387 @@ main a:not(.btn):not(.badge):not(.nav-link):not(.navbar-brand):hover,
     border-color: rgba(245, 158, 11, 0.3) !important;
     transform: translateY(-1px);
 }
+
+.btn-svpl-green {
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    border: none !important;
+    border-radius: 8px;
+    padding: 0.6rem 1.4rem;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-svpl-green:hover {
+    background: linear-gradient(135deg, #34D399 0%, #10B981 100%) !important;
+    color: #FFFFFF !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* ==========================================================================
+   STAT CARDS & MODERN COMPONENTS
+   ========================================================================== */
+.stat-card-modern {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 1.25rem;
+    border: 1px solid #E2E8F0;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+.stat-icon-modern {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.15rem;
+}
+
+.card-svpl {
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+}
+
+/* ==========================================================================
+   10-STAGE HORIZONTAL MOBILE STEPPER
+   ========================================================================== */
+.stepper-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1 1 0px;
+    min-width: 90px;
+    padding: 0 6px;
+    flex-shrink: 0;
+}
+
+.stepper-node::after {
+    content: '';
+    position: absolute;
+    top: 17px;
+    left: 50%;
+    width: 100%;
+    height: 3px;
+    background-color: #E2E8F0;
+    z-index: 1;
+}
+
+.stepper-node:last-child::after {
+    display: none;
+}
+
+.stepper-node.completed::after {
+    background-color: #10B981;
+}
+
+.stepper-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    border: 2px solid #CBD5E1;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    position: relative;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.stepper-node.completed .stepper-circle {
+    background: #10B981;
+    border-color: #10B981;
+    color: #FFFFFF;
+}
+
+.stepper-node.active .stepper-circle {
+    background: #0B2545;
+    border-color: var(--svpl-gold);
+    color: var(--svpl-gold-bright);
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25);
+}
+
+.stepper-label {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #64748B;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.stepper-node.active .stepper-label {
+    color: var(--svpl-navy-800);
+    font-weight: 800;
+}
+
+.stepper-node.completed .stepper-label {
+    color: #10B981;
+    font-weight: 700;
+}
+
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== */
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   MOBILE-FIRST BOTTOM NAVIGATION & OFFCANVAS DRAWER
+   ========================================================================== */
+.svpl-mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: rgba(6, 21, 40, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(245, 158, 11, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1045;
+    padding: 0 4px;
+    box-shadow: 0 -4px 25px rgba(0, 0, 0, 0.35);
+}
+
+.svpl-mobile-bottom-nav .mob-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    color: #94A3B8;
+    text-decoration: none;
+    font-size: 0.68rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 4px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.svpl-mobile-bottom-nav .mob-nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 2px;
+    transition: transform 0.2s ease;
+}
+
+.svpl-mobile-bottom-nav .mob-nav-item.active,
+.svpl-mobile-bottom-nav .mob-nav-item:hover {
+    color: #FBBF24;
+}
+
+.svpl-mobile-bottom-nav .mob-nav-item.active i {
+    transform: translateY(-2px);
+    color: #F59E0B;
+}
+
+/* Offcanvas Drawer for Mobile */
+.offcanvas-svpl {
+    background: linear-gradient(180deg, #061528 0%, #0B2545 100%) !important;
+    color: #FFFFFF !important;
+    border-right: 1px solid rgba(245, 158, 11, 0.25);
+    width: 310px !important;
+    max-width: 85vw;
+}
+
+.offcanvas-svpl .offcanvas-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.25rem;
+}
+
+.offcanvas-svpl .nav-category-header {
+    font-family: var(--font-heading);
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.75rem 1rem 0.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.offcanvas-svpl .nav-link {
+    color: #CBD5E1 !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 8px;
+    margin: 2px 8px;
+    transition: all 0.2s ease;
+    text-decoration: none !important;
+}
+
+.offcanvas-svpl .nav-link:hover,
+.offcanvas-svpl .nav-link.active {
+    color: #FFFFFF !important;
+    background: linear-gradient(90deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.08) 100%);
+    border-left: 3.5px solid var(--svpl-gold);
+    font-weight: 700;
+}
+
+.offcanvas-svpl .nav-link i {
+    font-size: 1.15rem;
+    color: #94A3B8;
+}
+
+.offcanvas-svpl .nav-link.active i,
+.offcanvas-svpl .nav-link:hover i {
+    color: var(--svpl-gold-bright);
+}
+
+/* ==========================================================================
+   MOBILE-FIRST RESPONSIVE MEDIA QUERIES
+   ========================================================================== */
+@media (max-width: 991.98px) {
+    /* Unlock body scrolling on mobile */
+    .app-layout-wrapper {
+        height: auto !important;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    .app-body-container {
+        display: block !important;
+        height: auto !important;
+        min-height: calc(100vh - 120px);
+        overflow: visible !important;
+    }
+
+    /* Hide desktop static sidebar on mobile */
+    .portal-sidebar {
+        display: none !important;
+    }
+
+    /* Mobile main content view padding */
+    .app-main-content {
+        height: auto !important;
+        overflow-y: visible !important;
+        padding: 1rem 0.75rem 85px 0.75rem !important;
+    }
+
+    .app-header {
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+    }
+
+    /* Hide desktop footer on mobile to avoid double-footer overlap with bottom nav */
+    .app-footer {
+        display: none !important;
+    }
+
+    /* Modern Mobile Table Responsiveness */
+    .table-responsive {
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 0.5rem;
+    }
+
+    .table {
+        min-width: 600px; /* Ensures nice horizontal swipe rather than cramped broken text */
+    }
+
+    /* Responsive Headings & Typography */
+    h3.font-heading {
+        font-size: 1.35rem !important;
+    }
+    
+    h4.font-heading {
+        font-size: 1.2rem !important;
+    }
+
+    h5.font-heading {
+        font-size: 1.05rem !important;
+    }
+
+    .stat-card-modern {
+        padding: 0.85rem !important;
+    }
+
+    .stat-card-modern h4,
+    .stat-card-modern h3 {
+        font-size: 1.25rem !important;
+    }
+
+    .stat-card-modern h5 {
+        font-size: 1.05rem !important;
+    }
+
+    .stat-icon-modern {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    /* Touch Target Optimization (>= 44px) */
+    .btn {
+        min-height: 38px;
+        padding: 0.45rem 0.85rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .app-main-content {
+        padding: 0.85rem 0.5rem 85px 0.5rem !important;
+    }
+
+    .stat-card-modern {
+        border-radius: 12px;
+    }
+
+    .card-svpl {
+        padding: 1rem !important;
+        border-radius: 14px;
+    }
+}
+
