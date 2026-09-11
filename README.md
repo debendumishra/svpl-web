@@ -136,3 +136,68 @@ SVPL-Web/
 
 ## 📜 Compliance & Statutory Notice
 Surya Vistaara Pvt. Ltd. (SVPL) is an independent corporate promoter for Dhwajja Solar India Pvt. Ltd. and is not a government agency. Subsidies and loan terms are subject to Government of India and DISCOM policies.
+
+---
+
+## 🛠️ Configuration Guide: Running on XAMPP (Default Port 80) & Shared Hosting
+
+#### 1. Standard XAMPP (Port 80 / Default Localhost)
+To run the web app on standard XAMPP (`http://localhost/svpl-web` without specifying a port number):
+
+1. **Folder Location:**
+   Place the project folder inside your standard XAMPP `htdocs` directory:
+   `C:\xampp\htdocs\svpl-web`
+
+2. **Environment File (`.env`):**
+   Edit or create the `.env` file in the root folder (`svpl-web/.env`):
+   ```ini
+   APP_NAME="Surya Vistaara"
+   APP_ENV=local
+   APP_URL=http://localhost/svpl-web
+
+   # Database Configuration
+   DB_DRIVER=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=svpl_db
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+3. **Apache Server Check:**
+   - Ensure Apache module `mod_rewrite` is enabled in `C:\xampp\apache\conf\httpd.conf` (`LoadModule rewrite_module modules/mod_rewrite.so`).
+   - Open browser: `http://localhost/svpl-web`
+
+---
+
+#### 2. Deploying to Shared Web Hosting (cPanel / DirectAdmin / Hostinger / GoDaddy)
+
+To deploy the portal to a shared Linux hosting server with a live domain name (e.g. `https://suryavistaara.com` or `https://portal.suryavistaara.com`):
+
+1. **Upload Files:**
+   Upload all project files to your website's root folder (`public_html` or domain root folder).
+
+2. **Database Setup:**
+   - Go to **cPanel > MySQL® Databases**.
+   - Create a database (e.g., `suryavis_db`) and database user with full privileges.
+   - Open **phpMyAdmin**, select `suryavis_db`, and import the file [`database/schema.sql`](file:///c:/xampp8.2/htdocs/svpl-web/database/schema.sql).
+
+3. **Configure Live `.env`:**
+   Edit the `.env` file on the server with your domain and database credentials:
+   ```ini
+   APP_NAME="Surya Vistaara"
+   APP_ENV=production
+   APP_URL=https://suryavistaara.com
+
+   # Production MySQL Database Credentials
+   DB_DRIVER=mysql
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_DATABASE=suryavis_db
+   DB_USERNAME=suryavis_user
+   DB_PASSWORD=YourSecurePasswordHere
+   ```
+
+4. **Directory Permissions & Front Controller:**
+   - Ensure `public/uploads` directory permissions are set to `755` (writable for document and image uploads).
+   - If hosting directly in `public_html`, ensure the root `.htaccess` points requests to `public/index.php`.
