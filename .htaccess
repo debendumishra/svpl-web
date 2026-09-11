@@ -11,8 +11,9 @@ DirectoryIndex index.php public/index.php
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Serve static assets from public/assets
+    # Serve static assets from public/assets and public/uploads
     RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+    RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
 
     # Route all other requests through public/index.php
     RewriteRule ^(.*)$ public/index.php [QSA,L]

@@ -292,8 +292,10 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                             <div class="photo-corner corner-bl"></div>
                             <div class="photo-corner corner-br"></div>
                             
-                            <?php if (!empty($advisor['photo_url'])): ?>
-                                <img src="<?= asset($advisor['photo_url']) ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover;">
+                            <?php 
+                            $resolvedPhoto = !empty($advisor['photo_url']) ? resolve_photo_url($advisor['photo_url']) : null;
+                            if (!empty($resolvedPhoto)): ?>
+                                <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="Advisor Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             <?php else: ?>
                                 <i class="bi bi-person-fill" style="font-size: 28px; color: #94a3b8; margin-bottom: 2px;"></i>
                                 <span style="font-size: 8px; font-weight: 800; color: #64748b; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1;">PASTE PHOTO</span>

@@ -172,6 +172,30 @@ if (!function_exists('asset')) {
     }
 }
 
+// Universal Photo / Upload URL Resolver
+if (!function_exists('resolve_photo_url')) {
+    function resolve_photo_url(?string $photoUrl): ?string {
+        if (empty($photoUrl)) {
+            return null;
+        }
+        $photoUrl = trim($photoUrl);
+        // If base64 data URI
+        if (strpos($photoUrl, 'data:image') === 0) {
+            return $photoUrl;
+        }
+        // If absolute external URL
+        if (preg_match('#^https?://#i', $photoUrl)) {
+            return $photoUrl;
+        }
+        // Strip leading slashes and optional 'public/' prefix
+        $clean = ltrim(str_replace(['../', '..\\'], '', $photoUrl), '/\\');
+        if (strpos($clean, 'public/') === 0) {
+            $clean = substr($clean, 7);
+        }
+        return url('/' . $clean);
+    }
+}
+
 // Universal CSRF Helper Functions
 if (!function_exists('csrf_token')) {
     function csrf_token(): string {

@@ -2385,5 +2385,43 @@ The **Create Dispatch** modal on the Dispatches page ([`/admin/dispatches`](file
    - Synchronized to local XAMPP server (`D:\xampp\htdocs\svpl-web`).
    - Committed and pushed to GitHub (`main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+advisor photo is not showing in the icard
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-11T21:29:34+05:30.
+</ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+The Advisor Photo rendering on official ID Cards has been resolved across all printable and portal views.
+
+---
+
+### 🔍 Root Cause & Fix Details:
+
+1. **Static Rewrite Rule in Root `.htaccess`**:
+   - The root `.htaccess` only forwarded `^assets/(.*)$` to `public/assets/`, causing browser HTTP requests for `/svpl-web/uploads/advisors/...` to fall through to `public/index.php` (returning 404/route not found instead of the image binary).
+   - **Fix**: Added `RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]` to root [`.htaccess`](file:///d:/DKM/SVPL-Web/.htaccess) so Apache directly serves all uploaded advisor photos and documents with correct `image/png` / `image/jpeg` MIME types.
+
+2. **Universal Photo Path Resolver**:
+   - Created `resolve_photo_url(?string $photoUrl)` in [`config/constants.php`](file:///d:/DKM/SVPL-Web/config/constants.php) that handles:
+     - Direct `uploads/advisors/...` relative paths.
+     - `public/uploads/advisors/...` paths.
+     - Base64 data URIs (`data:image/...`).
+     - External absolute URLs (`https://...`).
+   - Upgraded both [`app/Views/printable/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/id_card.php) and [`app/Views/advisor/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/advisor/id_card.php) to use `resolve_photo_url()`.
+
+3. **Workspace File Synchronization**:
+   - Synchronized uploaded advisor photos to both workspace and local XAMPP server (`D:\xampp\htdocs\svpl-web`).
+   - Pushed commit to remote GitHub repository (`main`).
+
+
 
 
