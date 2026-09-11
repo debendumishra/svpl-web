@@ -138,8 +138,19 @@ $(document).ready(function () {
         }
     });
 
-    // Sidebar Toggle
-    $('#sidebarToggleBtn').on('click', function () {
+    // Sidebar Toggle (Desktop Collapse & Expand)
+    $(document).on('click', '#sidebarToggleBtn', function (e) {
+        e.preventDefault();
         $('#appSidebar').toggleClass('collapsed');
+        if ($('#appSidebar').hasClass('collapsed')) {
+            localStorage.setItem('svpl_sidebar_collapsed', '1');
+        } else {
+            localStorage.removeItem('svpl_sidebar_collapsed');
+        }
     });
+
+    // Restore sidebar state preference
+    if (localStorage.getItem('svpl_sidebar_collapsed') === '1') {
+        $('#appSidebar').addClass('collapsed');
+    }
 });

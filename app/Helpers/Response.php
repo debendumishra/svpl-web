@@ -53,8 +53,10 @@ class Response
 
         // Auto-detect layout if not explicitly provided
         if ($layout === null) {
-            if (strpos($cleanView, 'admin/') === 0) {
+            if (strpos($cleanView, 'admin/') === 0 || strpos($cleanView, 'manager/') === 0) {
                 $layout = 'layouts/admin';
+            } elseif (strpos($cleanView, 'boe/') === 0) {
+                $layout = 'layouts/boe';
             } elseif (strpos($cleanView, 'advisor/') === 0) {
                 $layout = 'layouts/advisor';
             } elseif (strpos($cleanView, 'customer/') === 0) {
@@ -75,6 +77,18 @@ class Response
         ob_start();
         include $viewFile;
         $content = ob_get_clean();
+
+        // Map shorthand layout names to layouts/ directory (handles view-level $layout overrides)
+        $layoutAliases = [
+            'boe' => 'layouts/boe',
+            'admin' => 'layouts/admin',
+            'advisor' => 'layouts/advisor',
+            'customer' => 'layouts/customer',
+            'main' => 'layouts/main',
+        ];
+        if (isset($layoutAliases[$layout])) {
+            $layout = $layoutAliases[$layout];
+        }
 
         // Render with Layout if specified
         if (!empty($layout)) {

@@ -51,12 +51,13 @@ $stageMap = [
                     <th>DISCOM / Meter</th>
                     <th>Capacity</th>
                     <th>Live Project Stage</th>
+                    <th>Handled By (BOE)</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($customers)): ?>
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-muted">No direct customers enrolled yet. Click "+ Register New Customer" to submit customer leads.</td>
+                        <td colspan="7" class="text-center py-4 text-muted">No direct customers enrolled yet. Click "+ Register New Customer" to submit customer leads.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($customers as $c): 
@@ -82,6 +83,14 @@ $stageMap = [
                                 <span class="badge <?= $stageInfo['badge'] ?> px-2 py-1" style="font-size: 0.76rem;">
                                     <i class="bi bi-record-circle me-1"></i> <?= htmlspecialchars($stageInfo['label']) ?>
                                 </span>
+                            </td>
+                            <td>
+                                <?php if (!empty($c['boe_name'])): ?>
+                                    <span class="badge bg-info text-dark" title="Mobile: <?= htmlspecialchars($c['boe_mobile'] ?? 'N/A') ?>"><i class="bi bi-headset"></i> <?= htmlspecialchars($c['boe_name']) ?></span><br>
+                                    <small class="text-muted"><i class="bi bi-telephone text-success me-1"></i><?= htmlspecialchars($c['boe_mobile'] ?? '') ?></small>
+                                <?php else: ?>
+                                    <span class="badge bg-light text-secondary border">Stage 1 Pool</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

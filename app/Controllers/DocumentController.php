@@ -91,14 +91,15 @@ class DocumentController
         $rootDir = dirname(__DIR__, 2);
 
         // Candidate search paths
+        $xamppPath = getenv('XAMPP_PATH') ? rtrim(getenv('XAMPP_PATH'), '/\\') : null;
         $candidates = [
             $rootDir . '/public/' . $cleanFile,
             $rootDir . '/' . $cleanFile,
             $rootDir . '/public/uploads/documents/' . basename($cleanFile),
             $rootDir . '/public/uploads/' . basename($cleanFile),
             $rootDir . '/uploads/documents/' . basename($cleanFile),
-            'D:/xampp/htdocs/svpl-web/public/' . $cleanFile,
-            'D:/xampp/htdocs/svpl-web/public/uploads/documents/' . basename($cleanFile),
+            $xamppPath ? $xamppPath . '/htdocs/svpl-web/public/' . $cleanFile : null,
+            $xamppPath ? $xamppPath . '/htdocs/svpl-web/public/uploads/documents/' . basename($cleanFile) : null,
         ];
 
         $foundPath = null;

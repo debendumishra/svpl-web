@@ -13,18 +13,26 @@ class Customer
     public static function findById(int $id): ?array
     {
         return Database::fetchOne("SELECT c.*, u.mobile as user_mobile, u.email as user_email,
-                                          a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name
+                                          a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name, a.mobile as advisor_mobile, a.email as advisor_email,
+                                          boe.full_name as boe_name, boe.employee_code as boe_code, boe.mobile as boe_mobile, boe.email as boe_email, boe.designation as boe_designation,
+                                          l.stage as lead_stage, l.status as lead_status, l.id as lead_id
                                    FROM customers c
                                    LEFT JOIN users u ON c.user_id = u.id
                                    LEFT JOIN advisors a ON c.advisor_id = a.id
+                                   LEFT JOIN users boe ON c.assigned_boe_id = boe.id
+                                   LEFT JOIN leads l ON l.customer_id = c.id
                                    WHERE c.id = ?", [$id]);
     }
 
     public static function findByUserId(int $userId): ?array
     {
-        return Database::fetchOne("SELECT c.*, a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name
+        return Database::fetchOne("SELECT c.*, a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name, a.mobile as advisor_mobile, a.email as advisor_email,
+                                          boe.full_name as boe_name, boe.employee_code as boe_code, boe.mobile as boe_mobile, boe.email as boe_email, boe.designation as boe_designation,
+                                          l.stage as lead_stage, l.status as lead_status, l.id as lead_id
                                    FROM customers c
                                    LEFT JOIN advisors a ON c.advisor_id = a.id
+                                   LEFT JOIN users boe ON c.assigned_boe_id = boe.id
+                                   LEFT JOIN leads l ON l.customer_id = c.id
                                    WHERE c.user_id = ?", [$userId]);
     }
 
@@ -35,16 +43,16 @@ class Customer
                     mobile, email, state, district, block, gram_panchayat,
                     village, pincode, address_line, discom_name, consumer_number,
                     sanctioned_load_kw, proposed_solar_kw, monthly_avg_bill,
-                    roof_type, roof_area_sqft, status, created_at
+                    roof_type, roof_area_sqft, status, assigned_boe_id, created_at
                 ) VALUES (
                     ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
                     ?, ?, ?,
-                    ?, ?, ?, NOW()
+                    ?, ?, ?, ?, NOW()
                 )";
 
-        Database::query($sql, [
+        Database::execute($sql, [
             $data['user_id'] ?? null,
             $data['customer_code'],
             $data['advisor_id'] ?? null,
@@ -67,6 +75,7 @@ class Customer
             $data['roof_type'] ?? 'RCC Roof',
             $data['roof_area_sqft'] ?? 300,
             $data['status'] ?? 'New',
+            $data['assigned_boe_id'] ?? null,
         ]);
 
         return (int) Database::lastInsertId();
@@ -75,9 +84,11 @@ class Customer
     public static function getByAdvisorId(int $advisorId): array
     {
         return Database::fetchAll(
-            "SELECT c.*, l.stage as lead_stage, l.status as lead_status, l.id as lead_id
+            "SELECT c.*, l.stage as lead_stage, l.status as lead_status, l.id as lead_id,
+                    boe.full_name as boe_name, boe.employee_code as boe_code, boe.mobile as boe_mobile, boe.email as boe_email, boe.designation as boe_designation
              FROM customers c
              LEFT JOIN leads l ON l.customer_id = c.id
+             LEFT JOIN users boe ON c.assigned_boe_id = boe.id
              WHERE c.advisor_id = ?
              ORDER BY c.id DESC",
             [$advisorId]
@@ -95,14 +106,52 @@ class Customer
         }
 
         $sql = "SELECT c.*, a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name,
-                       l.stage as lead_stage, l.status as lead_status, l.id as lead_id
+                       l.stage as lead_stage, l.status as lead_status, l.id as lead_id,
+                       boe.full_name as boe_name, boe.employee_code as boe_code, boe.designation as boe_designation
                 FROM customers c
                 LEFT JOIN advisors a ON c.advisor_id = a.id
                 LEFT JOIN leads l ON l.customer_id = c.id
+                LEFT JOIN users boe ON c.assigned_boe_id = boe.id
                 {$where}
                 ORDER BY c.id DESC LIMIT {$limit} OFFSET {$offset}";
 
         return Database::fetchAll($sql, $params);
+    }
+
+    public static function getCustomersForBOE(int $boeUserId, ?string $search = null): array
+    {
+        $params = [];
+        $where = "WHERE (
+                    (COALESCE(l.stage, 'REGISTRATION') = 'REGISTRATION' AND (c.assigned_boe_id IS NULL OR c.assigned_boe_id = ?))
+                    OR (c.assigned_boe_id = ?)
+                  )";
+        $params[] = $boeUserId;
+        $params[] = $boeUserId;
+
+        if ($search) {
+            $where .= " AND (c.customer_code LIKE ? OR c.first_name LIKE ? OR c.last_name LIKE ? OR c.mobile LIKE ? OR c.district LIKE ?)";
+            $term = "%{$search}%";
+            $params = array_merge($params, [$term, $term, $term, $term, $term]);
+        }
+
+        $sql = "SELECT c.*, a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name, a.mobile as advisor_mobile, a.email as advisor_email,
+                       l.stage as lead_stage, l.status as lead_status, l.id as lead_id,
+                       boe.full_name as boe_name, boe.employee_code as boe_code
+                FROM customers c
+                LEFT JOIN advisors a ON c.advisor_id = a.id
+                LEFT JOIN leads l ON l.customer_id = c.id
+                LEFT JOIN users boe ON c.assigned_boe_id = boe.id
+                {$where}
+                ORDER BY c.id DESC";
+
+        return Database::fetchAll($sql, $params);
+    }
+
+    public static function assignBOE(int $customerId, int $boeUserId): bool
+    {
+        $res = Database::execute("UPDATE customers SET assigned_boe_id = ?, updated_at = NOW() WHERE id = ?", [$boeUserId, $customerId]);
+        Database::execute("UPDATE leads SET assigned_to_user_id = ?, updated_at = NOW() WHERE customer_id = ?", [$boeUserId, $customerId]);
+        return $res;
     }
 
     public static function update(int $id, array $data): bool

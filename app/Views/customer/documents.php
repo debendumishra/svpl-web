@@ -25,17 +25,19 @@ $title = "My Documents — SVPL";
                 <div class="mb-3">
                     <label class="form-label small fw-bold text-secondary">Document Category *</label>
                     <select name="document_type" class="form-select" required>
+                        <option value="PASSPORT_PHOTO">Passport Size Photo (Beneficiary Photo)</option>
                         <option value="ELECTRICITY_BILL">Latest Electricity Bill (Mandatory for DISCOM)</option>
                         <option value="AADHAAR">Aadhaar Card (Front/Back)</option>
+                        <option value="PASSPORT_PHOTO">Passport Size Photo</option>
                         <option value="PAN">PAN Card</option>
                         <option value="BANK_PASSBOOK">Bank Passbook / Cheque (For ₹1.38L Subsidy DBT)</option>
-                        <option value="ROOFTOP_PHOTO">Rooftop / House Photograph</option>
-                        <option value="OTHER">Other Supporting Document</option>
+                        <option value="ROOFTOP_PHOTO">Rooftop / House Camera Photograph</option>
+                        <option value="OTHER">Other Supporting Documents</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label small fw-bold text-secondary">Choose File (PDF, JPG, PNG - Max 5MB) *</label>
-                    <input type="file" name="file" class="form-control" required accept=".pdf,.jpg,.jpeg,.png">
+                    <label class="form-label small fw-bold text-secondary">Choose File / Snap Camera Photo (JPG, PNG, PDF) *</label>
+                    <input type="file" name="file" class="form-control" required accept="image/*,.pdf" capture="environment">
                 </div>
                 <button type="submit" class="btn btn-svpl-solar w-100 py-2">
                     <i class="bi bi-cloud-arrow-up-fill me-1"></i> Upload & Submit Document

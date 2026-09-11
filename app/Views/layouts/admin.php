@@ -174,8 +174,13 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/admin/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
+                                <a class="nav-link <?= strpos($activeUri, '/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
                                     <i class="bi bi-receipt"></i> <span>Payments & Invoices</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/withdrawals') !== false ? 'active' : '' ?>" href="<?= url('/admin/withdrawals') ?>">
+                                    <i class="bi bi-bank text-success"></i> <span>Bank Payouts & Withdrawals</span>
                                 </a>
                             </li>
                         </ul>
@@ -302,8 +307,13 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/admin/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
+                                <a class="nav-link <?= strpos($activeUri, '/payments') !== false ? 'active' : '' ?>" href="<?= url('/admin/payments') ?>">
                                     <i class="bi bi-receipt"></i> <span class="sidebar-text">Payments & Invoices</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/withdrawals') !== false ? 'active' : '' ?>" href="<?= url('/admin/withdrawals') ?>">
+                                    <i class="bi bi-bank text-success"></i> <span class="sidebar-text">Bank Payouts & Withdrawals</span>
                                 </a>
                             </li>
                         </ul>
@@ -317,13 +327,28 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     <div class="collapse show" id="menuGovernance">
                         <ul class="nav flex-column mb-2">
                             <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/boe') !== false ? 'active' : '' ?>" href="<?= url('/admin/boe') ?>">
+                                    <i class="bi bi-person-badge-fill text-warning"></i> <span class="sidebar-text">BOE Staff Management</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
                                     <i class="bi bi-graph-up-arrow"></i> <span class="sidebar-text">MIS Reports</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/admin/settings') !== false ? 'active' : '' ?>" href="<?= url('/admin/settings') ?>">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/boe/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/boe/reports') ?>">
+                                    <i class="bi bi-file-earmark-bar-graph"></i> <span class="sidebar-text">BOE Performance Reports</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/settings') !== false ? 'active' : '' ?>" href="<?= url('/admin/settings') ?>">
                                     <i class="bi bi-sliders"></i> <span class="sidebar-text">System Settings</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/database') !== false ? 'active' : '' ?>" href="<?= url('/admin/database') ?>">
+                                    <i class="bi bi-database-fill-gear text-warning"></i> <span class="sidebar-text">Database & Backup</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -387,20 +412,10 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         </nav>
     </div>
 
-    <!-- Scripts & Sidebar Toggle Logic -->
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= asset('assets/js/app.js') ?>"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('sidebarToggleBtn');
-        const sidebar = document.getElementById('appSidebar');
-        if (toggleBtn && sidebar) {
-            toggleBtn.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-            });
-        }
-    });
-    </script>
+    <script src="<?= asset('assets/js/image-compressor.js') ?>"></script>
 </body>
 </html>

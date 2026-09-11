@@ -82,22 +82,58 @@ class Lead
         return (int) Database::lastInsertId();
     }
 
-    public static function updateStage(int $leadId, string $stage, string $status, ?string $remarks = null): bool
+    public static function updateStage(int $leadId, string $stage, string $status, ?string $remarks = null, ?int $userId = null): bool
     {
+        $lead = self::findById($leadId);
+        $prevStage = $lead['stage'] ?? 'REGISTRATION';
+        $prevStatus = $lead['status'] ?? 'New';
+        $customerId = $lead['customer_id'] ?? null;
+
         $sql = "UPDATE leads SET stage = ?, status = ?, updated_at = NOW() WHERE id = ?";
         $res = Database::execute($sql, [$stage, $status, $leadId]);
 
-        // Sync customer record status if customer is linked
-        $lead = self::findById($leadId);
-        if ($lead && !empty($lead['customer_id'])) {
-            Database::execute("UPDATE customers SET status = ?, updated_at = NOW() WHERE id = ?", [$stage, (int)$lead['customer_id']]);
+        if ($customerId) {
+            Database::execute("UPDATE customers SET status = ?, updated_at = NOW() WHERE id = ?", [$stage, (int)$customerId]);
+
+            // Auto-assign customer to BOE if moving out of Stage 1 (REGISTRATION) and user is a BOE
+            if ($userId) {
+                $user = User::findById($userId);
+                if ($user && $user['role'] === 'BOE') {
+                    $cust = Customer::findById((int)$customerId);
+                    if ($cust && empty($cust['assigned_boe_id'])) {
+                        Customer::assignBOE((int)$customerId, $userId);
+                    }
+                }
+            }
         }
 
-        // Insert into history
-        Database::query(
-            "INSERT INTO lead_stage_history (lead_id, stage, status_notes, created_at) VALUES (?, ?, ?, NOW())",
-            [$leadId, $stage, $remarks ?: "Status changed to {$status}"]
+        // Fetch User Audit Metadata
+        $userCode = 'SYSTEM';
+        $userName = 'System Action';
+        $userDesignation = 'System';
+        if ($userId) {
+            $user = User::findById($userId);
+            if ($user) {
+                $userName = $user['full_name'] ?? 'User #' . $userId;
+                $userCode = $user['employee_code'] ?? ($user['advisor_code'] ?? 'USR-' . $user['id']);
+                $userDesignation = $user['designation'] ?? ($user['role'] ?? 'Staff');
+            }
+        }
+
+        // Record in lead_stage_history
+        Database::execute(
+            "INSERT INTO lead_stage_history (lead_id, stage, from_stage, to_stage, status_notes, remarks, changed_by_user_id, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+            [$leadId, $stage, $prevStage, $stage, "Status changed to {$status}", $remarks, $userId]
         );
+
+        // Record in customer_status_history (Comprehensive Audit Trail)
+        if ($customerId) {
+            Database::execute(
+                "INSERT INTO customer_status_history (customer_id, lead_id, from_stage, to_stage, from_status, to_status, changed_by_user_id, user_code, user_name, user_designation, remarks, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$customerId, $leadId, $prevStage, $stage, $prevStatus, $status, $userId, $userCode, $userName, $userDesignation, $remarks]
+            );
+        }
 
         return $res;
     }
@@ -107,6 +143,14 @@ class Lead
         return Database::fetchAll(
             "SELECT * FROM lead_stage_history WHERE lead_id = ? ORDER BY id ASC",
             [$leadId]
+        );
+    }
+
+    public static function getCustomerAuditHistory(int $customerId): array
+    {
+        return Database::fetchAll(
+            "SELECT * FROM customer_status_history WHERE customer_id = ? ORDER BY id DESC",
+            [$customerId]
         );
     }
 

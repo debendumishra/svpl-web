@@ -22,6 +22,7 @@ use App\Models\Loan;
 use App\Models\Subsidy;
 use App\Models\Payment;
 use App\Models\CompanyLedger;
+use App\Models\User;
 use App\Services\AuthService;
 
 class AdminController
@@ -642,5 +643,274 @@ class AdminController
             'pageTitle' => 'Security Audit Logs — SVPL Admin',
             'logs' => $logs,
         ]);
+    }
+
+    public function boeManagement(): void
+    {
+        $boeList = User::getBOEUsers();
+        
+        foreach ($boeList as &$b) {
+            $bId = (int)$b['id'];
+            $b['assigned_customers_count'] = Database::fetchOne("SELECT COUNT(*) as cnt FROM customers WHERE assigned_boe_id = ?", [$bId])['cnt'] ?? 0;
+            $b['completed_stage_count'] = Database::fetchOne(
+                "SELECT COUNT(*) as cnt FROM customers c LEFT JOIN leads l ON l.customer_id = c.id WHERE c.assigned_boe_id = ? AND l.stage IN ('INSTALLATION_COMPLETED', 'JE_REPORT', 'SUBSIDY_APPLIED', 'SUBSIDY_RECEIVED')",
+                [$bId]
+            )['cnt'] ?? 0;
+        }
+
+        $nextCode = User::generateBOECode();
+
+        Response::view('admin/boe_management', [
+            'pageTitle' => 'Back Office Executive (BOE) Staff Management — SVPL Admin',
+            'boeList' => $boeList,
+            'nextCode' => $nextCode,
+            'successMsg' => $_SESSION['success_msg'] ?? null,
+            'errorMsg' => $_SESSION['error_msg'] ?? null,
+        ]);
+
+        unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+    }
+
+    public function createBoe(): void
+    {
+        $fullName = trim($_POST['full_name'] ?? '');
+        $mobile = trim($_POST['mobile'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $employeeCode = trim($_POST['employee_code'] ?? User::generateBOECode());
+        $designation = trim($_POST['designation'] ?? 'Back Office Executive');
+        $password = trim($_POST['password'] ?? 'Password@123');
+
+        if (empty($fullName) || empty($mobile) || empty($password)) {
+            $_SESSION['error_msg'] = "Full Name, Mobile Number and Password are required fields.";
+            Response::redirect('/admin/boe');
+            return;
+        }
+
+        if (User::findByMobile($mobile)) {
+            $_SESSION['error_msg'] = "User with mobile number {$mobile} already exists.";
+            Response::redirect('/admin/boe');
+            return;
+        }
+
+        if (!empty($email) && User::findByEmail($email)) {
+            $_SESSION['error_msg'] = "User with email address {$email} already exists.";
+            Response::redirect('/admin/boe');
+            return;
+        }
+
+        $userId = User::create([
+            'role' => 'BOE',
+            'full_name' => $fullName,
+            'mobile' => $mobile,
+            'email' => $email ?: null,
+            'employee_code' => $employeeCode,
+            'designation' => $designation,
+            'password_hash' => password_hash($password, PASSWORD_BCRYPT),
+            'is_active' => 1,
+        ]);
+
+        $currentUser = AuthService::user();
+        AuditLog::log($currentUser['id'] ?? 1, 'BOE_CREATE', 'USER', $userId, "Created BOE Staff: {$fullName} ({$employeeCode})");
+
+        $_SESSION['success_msg'] = "Back Office Executive account created successfully! Code: {$employeeCode}, Password: {$password}";
+        Response::redirect('/admin/boe');
+    }
+
+    public function toggleBoeStatus(string $id): void
+    {
+        $userId = (int)$id;
+        $user = User::findById($userId);
+        if ($user && $user['role'] === 'BOE') {
+            $newStatus = ((int)$user['is_active']) ? 0 : 1;
+            Database::execute("UPDATE users SET is_active = ?, updated_at = NOW() WHERE id = ?", [$newStatus, $userId]);
+            
+            $currentUser = AuthService::user();
+            AuditLog::log($currentUser['id'] ?? 1, 'BOE_STATUS_TOGGLE', 'USER', $userId, "Toggled BOE active status to {$newStatus}");
+            $_SESSION['success_msg'] = "BOE account status updated successfully.";
+        }
+        Response::redirect('/admin/boe');
+    }
+
+    public function boeReports(): void
+    {
+        $boeUsers = User::getBOEUsers();
+
+        $reportData = [];
+        foreach ($boeUsers as $b) {
+            $bId = (int)$b['id'];
+            $customers = Database::fetchAll(
+                "SELECT c.*, a.advisor_code, CONCAT(a.first_name, ' ', a.last_name) as advisor_name,
+                        l.stage as lead_stage, l.status as lead_status
+                 FROM customers c
+                 LEFT JOIN advisors a ON c.advisor_id = a.id
+                 LEFT JOIN leads l ON l.customer_id = c.id
+                 WHERE c.assigned_boe_id = ?
+                 ORDER BY c.id DESC",
+                [$bId]
+            );
+
+            $stageCounts = [
+                'REGISTRATION' => 0,
+                'DOCUMENTS' => 0,
+                'GOVT_PORTAL' => 0,
+                'LOAN' => 0,
+                'INSTALLATION' => 0,
+                'JE_REPORT' => 0,
+                'SUBSIDY' => 0,
+            ];
+
+            foreach ($customers as $c) {
+                $st = $c['lead_stage'] ?? 'REGISTRATION';
+                if (strpos($st, 'LOAN') !== false) {
+                    $stageCounts['LOAN']++;
+                } elseif (strpos($st, 'INSTALLATION') !== false) {
+                    $stageCounts['INSTALLATION']++;
+                } elseif (strpos($st, 'SUBSIDY') !== false) {
+                    $stageCounts['SUBSIDY']++;
+                } elseif (isset($stageCounts[$st])) {
+                    $stageCounts[$st]++;
+                }
+            }
+
+            $reportData[] = [
+                'boe' => $b,
+                'total_assigned' => count($customers),
+                'stage_counts' => $stageCounts,
+                'customers' => $customers,
+            ];
+        }
+
+        Response::view('admin/boe_reports', [
+            'pageTitle' => 'BOE-Wise Customer Summary & Performance Reports — SVPL Admin',
+            'reportData' => $reportData,
+            'allBoeList' => $boeUsers,
+            'successMsg' => $_SESSION['success_msg'] ?? null,
+            'errorMsg' => $_SESSION['error_msg'] ?? null,
+        ]);
+
+        unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+    }
+
+    public function reassignBoe(): void
+    {
+        $customerId = (int)($_POST['customer_id'] ?? 0);
+        $newBoeId = !empty($_POST['new_boe_id']) ? (int)$_POST['new_boe_id'] : null;
+        $remarks = trim($_POST['remarks'] ?? 'Case reassigned by Admin/Manager');
+
+        $customer = Customer::findById($customerId);
+        if (!$customer) {
+            $_SESSION['error_msg'] = "Customer record not found.";
+            Response::redirect($_SERVER['HTTP_REFERER'] ?? '/admin/boe/reports');
+            return;
+        }
+
+        $oldBoeId = $customer['assigned_boe_id'] ? (int)$customer['assigned_boe_id'] : null;
+        $oldBoe = $oldBoeId ? User::findById($oldBoeId) : null;
+        $oldBoeName = $oldBoe ? ($oldBoe['full_name'] . ' (' . ($oldBoe['employee_code'] ?? 'BOE') . ')') : 'Unassigned Stage 1 Pool';
+
+        $newBoe = $newBoeId ? User::findById($newBoeId) : null;
+        $newBoeName = $newBoe ? ($newBoe['full_name'] . ' (' . ($newBoe['employee_code'] ?? 'BOE') . ')') : 'Unassigned Stage 1 Shared Pool';
+
+        // Update assigned_boe_id on customer record
+        Database::execute("UPDATE customers SET assigned_boe_id = ?, updated_at = NOW() WHERE id = ?", [
+            $newBoeId,
+            $customerId
+        ]);
+
+        $currentUser = AuthService::user();
+        $adminId = $currentUser['id'] ?? 1;
+        $adminName = $currentUser['full_name'] ?? 'Admin/Manager';
+        $adminCode = $currentUser['employee_code'] ?? ($currentUser['role'] ?? 'ADMIN');
+        $adminDesg = $currentUser['designation'] ?? ($currentUser['role'] ?? 'Executive Manager');
+
+        // Fetch current lead stage & status
+        $lead = Lead::findByCustomerId($customerId);
+        $stage = $lead['stage'] ?? 'REGISTRATION';
+
+        $auditRemarks = "Swapped assigned BOE from [{$oldBoeName}] to [{$newBoeName}]. Note: {$remarks}";
+
+        // Record in customer_status_history audit trail
+        Database::execute(
+            "INSERT INTO customer_status_history 
+             (customer_id, lead_id, from_stage, to_stage, to_status, user_id, user_name, user_code, user_designation, remarks, created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())",
+            [
+                $customerId,
+                $lead['id'] ?? null,
+                $stage,
+                $stage,
+                "BOE SWAPPED",
+                $adminId,
+                $adminName,
+                $adminCode,
+                $adminDesg,
+                $auditRemarks
+            ]
+        );
+
+        AuditLog::log($adminId, 'BOE_REASSIGNED', 'CUSTOMER', $customerId, $auditRemarks);
+
+        $_SESSION['success_msg'] = "Customer application #{$customer['customer_code']} successfully reassigned to {$newBoeName}!";
+        Response::redirect($_SERVER['HTTP_REFERER'] ?? '/admin/boe/reports');
+    }
+
+    public function withdrawals(): void
+    {
+        $statusFilter = $_GET['status'] ?? 'ALL';
+        $withdrawals = \App\Models\WithdrawalRequest::getAll($statusFilter);
+
+        $currentUser = AuthService::user();
+        $isManager = strpos($_SERVER['REQUEST_URI'] ?? '', '/manager/') !== false;
+        $prefix = $isManager ? '/manager' : '/admin';
+
+        Response::view('admin/withdrawals', [
+            'pageTitle' => 'Advisor Bank Withdrawals & Payouts — SVPL',
+            'withdrawals' => $withdrawals,
+            'statusFilter' => $statusFilter,
+            'prefix' => $prefix,
+            'successMsg' => $_SESSION['success_msg'] ?? null,
+            'errorMsg' => $_SESSION['error_msg'] ?? null,
+        ]);
+
+        unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+    }
+
+    public function approveWithdrawal(int $id): void
+    {
+        $currentUser = AuthService::user();
+        $utrNumber = trim($_POST['utr_number'] ?? '');
+        $remarks = trim($_POST['remarks'] ?? '');
+
+        if (empty($utrNumber)) {
+            $_SESSION['error_msg'] = "Bank UTR / Transaction reference number is required to approve & pay a withdrawal.";
+            Response::redirect($_SERVER['HTTP_REFERER'] ?? '/admin/withdrawals');
+            return;
+        }
+
+        $res = \App\Models\WithdrawalRequest::approveAndPay($id, (int)$currentUser['id'], $utrNumber, $remarks);
+
+        if ($res) {
+            $_SESSION['success_msg'] = "Withdrawal request approved and processed! Transaction UTR: {$utrNumber}";
+        } else {
+            $_SESSION['error_msg'] = "Failed to process withdrawal payout. Request may already be processed or invalid.";
+        }
+
+        Response::redirect($_SERVER['HTTP_REFERER'] ?? '/admin/withdrawals');
+    }
+
+    public function rejectWithdrawal(int $id): void
+    {
+        $currentUser = AuthService::user();
+        $rejectionReason = trim($_POST['rejection_reason'] ?? 'Rejected by Administrator');
+
+        $res = \App\Models\WithdrawalRequest::reject($id, (int)$currentUser['id'], $rejectionReason);
+
+        if ($res) {
+            $_SESSION['success_msg'] = "Withdrawal request rejected. Funds refunded to Advisor's wallet.";
+        } else {
+            $_SESSION['error_msg'] = "Failed to reject withdrawal request.";
+        }
+
+        Response::redirect($_SERVER['HTTP_REFERER'] ?? '/admin/withdrawals');
     }
 }

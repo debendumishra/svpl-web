@@ -254,8 +254,8 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
                     <label class="form-label small fw-bold text-navy">
                         <i class="bi bi-receipt text-primary me-1"></i> 1. Latest Electricity Bill <span class="text-danger">*</span>
                     </label>
-                    <input type="file" name="doc_electricity_bill" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="form-text small" style="font-size: 0.72rem;">Clear scan/photo showing Consumer Number, Sanctioned Load, and Address.</div>
+                    <input type="file" name="doc_electricity_bill" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
+                    <div class="form-text small" style="font-size: 0.72rem;">Clear scan or camera photo showing Consumer Number & Address.</div>
                 </div>
             </div>
 
@@ -264,7 +264,7 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
                     <label class="form-label small fw-bold text-navy">
                         <i class="bi bi-person-badge text-danger me-1"></i> 2. Customer Aadhaar Card (Front & Back) <span class="text-danger">*</span>
                     </label>
-                    <input type="file" name="doc_aadhaar_card" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" name="doc_aadhaar_card" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
                     <div class="form-text small" style="font-size: 0.72rem;">Customer Identity and address proof for PM Surya Ghar DBT linkage.</div>
                 </div>
             </div>
@@ -272,10 +272,10 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
             <div class="col-md-6">
                 <div class="p-3 bg-light rounded border h-100">
                     <label class="form-label small fw-bold text-navy">
-                        <i class="bi bi-card-text text-info me-1"></i> 3. Customer PAN Card (Optional for < 10kW)
+                        <i class="bi bi-person-bounding-box text-info me-1"></i> 3. Customer Passport Size Photo <span class="text-danger">*</span>
                     </label>
-                    <input type="file" name="doc_pan_card" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="form-text small" style="font-size: 0.72rem;">Required for bank loan disbursement and larger installations.</div>
+                    <input type="file" name="doc_passport_photo" class="form-control form-control-sm" accept="image/*" capture="user">
+                    <div class="form-text small" style="font-size: 0.72rem;">Click camera selfie/portrait photo of customer for official records.</div>
                 </div>
             </div>
 
@@ -284,7 +284,7 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
                     <label class="form-label small fw-bold text-navy">
                         <i class="bi bi-bank text-success me-1"></i> 4. Bank Passbook / Cancelled Cheque <span class="text-danger">*</span>
                     </label>
-                    <input type="file" name="doc_bank_passbook" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" name="doc_bank_passbook" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
                     <div class="form-text small" style="font-size: 0.72rem;">Account where central DBT subsidy (₹78k) & state subsidy (₹60k) will be credited.</div>
                 </div>
             </div>
@@ -292,9 +292,19 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
             <div class="col-md-6">
                 <div class="p-3 bg-light rounded border h-100">
                     <label class="form-label small fw-bold text-navy">
-                        <i class="bi bi-house text-warning me-1"></i> 5. Land Patta / Ownership / Holding Tax Document
+                        <i class="bi bi-camera-fill text-primary me-1"></i> 5. Rooftop / Site Photograph <span class="text-danger">*</span>
                     </label>
-                    <input type="file" name="doc_land_patta" class="form-control form-control-sm" accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" name="doc_roof_photo" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
+                    <div class="form-text small" style="font-size: 0.72rem;">Snap camera photo of customer's roof showing shadow-free installation area.</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded border h-100">
+                    <label class="form-label small fw-bold text-navy">
+                        <i class="bi bi-house text-warning me-1"></i> 6. Land Patta / Ownership / Holding Tax Document
+                    </label>
+                    <input type="file" name="doc_land_patta" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
                     <div class="form-text small" style="font-size: 0.72rem;">Proof of building ownership or Municipal holding tax receipt.</div>
                 </div>
             </div>
@@ -302,10 +312,20 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
             <div class="col-md-6">
                 <div class="p-3 bg-light rounded border h-100">
                     <label class="form-label small fw-bold text-navy">
-                        <i class="bi bi-camera-fill text-primary me-1"></i> 6. Rooftop / Site Photograph <span class="text-danger">*</span>
+                        <i class="bi bi-card-text text-secondary me-1"></i> 7. Customer PAN Card (Optional)
                     </label>
-                    <input type="file" name="doc_roof_photo" class="form-control form-control-sm" accept=".jpg,.jpeg,.png">
-                    <div class="form-text small" style="font-size: 0.72rem;">Photo of customer's roof showing shadow-free area available.</div>
+                    <input type="file" name="doc_pan_card" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
+                    <div class="form-text small" style="font-size: 0.72rem;">Required for bank loan disbursement and larger installations.</div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded border h-100">
+                    <label class="form-label small fw-bold text-navy">
+                        <i class="bi bi-file-earmark-plus text-secondary me-1"></i> 8. Other Supporting Documents (Optional)
+                    </label>
+                    <input type="file" name="doc_other" class="form-control form-control-sm" accept="image/*,.pdf" capture="environment">
+                    <div class="form-text small" style="font-size: 0.72rem;">Additional site photos, NOC, or supporting discom documents.</div>
                 </div>
             </div>
         </div>

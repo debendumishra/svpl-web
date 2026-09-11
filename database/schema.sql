@@ -15,6 +15,8 @@ CREATE TABLE `users` (
   `mobile` VARCHAR(20) NOT NULL UNIQUE,
   `password_hash` VARCHAR(255) NOT NULL,
   `full_name` VARCHAR(150) NOT NULL,
+  `employee_code` VARCHAR(50) NULL UNIQUE,
+  `designation` VARCHAR(100) NULL DEFAULT 'Back Office Executive',
   `is_active` TINYINT(1) NOT NULL DEFAULT 1,
   `last_login` DATETIME NULL,
   `remember_token` VARCHAR(100) NULL,
@@ -186,12 +188,15 @@ CREATE TABLE `customers` (
   `joining_bonus_amount` DECIMAL(10,2) DEFAULT 500.00,
   `converted_to_advisor` TINYINT(1) NOT NULL DEFAULT 0,
   `converted_advisor_id` INT UNSIGNED NULL,
+  `assigned_boe_id` INT UNSIGNED NULL,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   FOREIGN KEY (`advisor_id`) REFERENCES `advisors` (`id`) ON DELETE SET NULL,
+  FOREIGN KEY (`assigned_boe_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   INDEX `idx_cus_code` (`customer_code`),
   INDEX `idx_cus_advisor` (`advisor_id`),
+  INDEX `idx_cus_boe` (`assigned_boe_id`),
   INDEX `idx_cus_mobile` (`mobile`),
   INDEX `idx_cus_district` (`district`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -251,6 +256,28 @@ CREATE TABLE `lead_stage_history` (
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`lead_id`) REFERENCES `leads` (`id`) ON DELETE CASCADE,
   FOREIGN KEY (`changed_by_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 8B. CUSTOMER STATUS HISTORY & AUDIT TRAIL
+DROP TABLE IF EXISTS `customer_status_history`;
+CREATE TABLE `customer_status_history` (
+  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  `customer_id` INT UNSIGNED NOT NULL,
+  `lead_id` INT UNSIGNED NULL,
+  `from_stage` VARCHAR(50) NULL,
+  `to_stage` VARCHAR(50) NULL,
+  `from_status` VARCHAR(50) NULL,
+  `to_status` VARCHAR(50) NULL,
+  `changed_by_user_id` INT UNSIGNED NULL,
+  `user_code` VARCHAR(50) NULL,
+  `user_name` VARCHAR(150) NULL,
+  `user_designation` VARCHAR(100) NULL,
+  `remarks` TEXT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`customer_id`) REFERENCES `customers` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`changed_by_user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  INDEX `idx_csh_customer` (`customer_id`),
+  INDEX `idx_csh_user` (`changed_by_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 9. DOCUMENTS

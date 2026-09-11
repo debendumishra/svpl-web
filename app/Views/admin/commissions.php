@@ -95,7 +95,7 @@ foreach ($commissions as $c) {
                 <?php if (!empty($slabs)): ?>
                     <?php foreach ($slabs as $s): ?>
                         <tr class="<?= $s['level'] == 1 ? 'table-warning-subtle fw-bold' : '' ?>">
-                            <td><span class="badge bg-navy text-white">Level <?= $s['level'] ?></span></td>
+                            <td><span class="badge bg-dark text-warning border border-warning">Level <?= $s['level'] ?></span></td>
                             <td class="text-start ps-3">
                                 <?php if ($s['level'] == 1): ?>
                                     <strong class="text-navy">Direct Onboarding Advisor</strong>
@@ -123,7 +123,7 @@ foreach ($commissions as $c) {
                     <?php endforeach; ?>
                 <?php else: ?>
                     <tr>
-                        <td><span class="badge bg-navy text-white">Level 1</span></td>
+                        <td><span class="badge bg-dark text-warning border border-warning">Level 1</span></td>
                         <td class="text-start ps-3"><strong>Direct Sponsoring Advisor</strong></td>
                         <td><strong class="text-success">₹1,000.00</strong></td>
                         <td><span class="badge bg-success text-white">+ ₹500.00 Bonus</span></td>

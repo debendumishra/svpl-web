@@ -115,12 +115,20 @@ class Database
 
     public static function beginTransaction(): bool
     {
-        return self::getInstance()->beginTransaction();
+        $db = self::getInstance();
+        if (!$db->inTransaction()) {
+            return $db->beginTransaction();
+        }
+        return true;
     }
 
     public static function commit(): bool
     {
-        return self::getInstance()->commit();
+        $db = self::getInstance();
+        if ($db->inTransaction()) {
+            return $db->commit();
+        }
+        return true;
     }
 
     public static function rollBack(): bool
@@ -139,9 +147,31 @@ class Database
             $stmt->execute([$tableName]);
             return (bool)$stmt->fetchColumn();
         } else {
-            $stmt = $db->prepare("SHOW TABLES LIKE ?");
+            $stmt = $db->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?");
             $stmt->execute([$tableName]);
-            return (bool)$stmt->fetchColumn();
+            return ((int)$stmt->fetchColumn()) > 0;
+        }
+    }
+
+    public static function columnExists(string $tableName, string $columnName): bool
+    {
+        $db = self::getInstance();
+        try {
+            if (self::$driver === 'sqlite') {
+                $stmt = $db->prepare("PRAGMA table_info(`{$tableName}`)");
+                $stmt->execute();
+                $cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($cols as $c) {
+                    if (strcasecmp($c['name'], $columnName) === 0) return true;
+                }
+                return false;
+            } else {
+                $stmt = $db->prepare("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
+                $stmt->execute([$tableName, $columnName]);
+                return ((int)$stmt->fetchColumn()) > 0;
+            }
+        } catch (\Throwable $t) {
+            return false;
         }
     }
 }

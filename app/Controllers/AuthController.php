@@ -79,6 +79,8 @@ class AuthController
         $role = $res['user']['role'];
         if (in_array($role, ['SUPER_ADMIN', 'ADMIN', 'ACCOUNTS', 'OPERATIONS'])) {
             Response::redirect('/admin/dashboard');
+        } elseif ($role === 'BOE') {
+            Response::redirect('/boe/dashboard');
         } elseif ($role === 'ADVISOR') {
             Response::redirect('/advisor/dashboard');
         } else {

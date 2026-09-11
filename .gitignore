@@ -8,6 +8,10 @@
 storage/logs/*.log
 *.log
 
+# Uploaded Files & Attachments
+public/uploads/*
+!public/uploads/.gitkeep
+
 # Temporary / Scratch
 scratch/
 .system_generated/

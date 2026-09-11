@@ -89,6 +89,7 @@ class CustomerController
         $targetFile = $uploadDir . $fileName;
 
         if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+            \App\Helpers\ImageCompressor::compressIfNeeded($targetFile);
             $lead = Lead::findByCustomerCode($customer['customer_code']);
             Document::create([
                 'entity_type' => 'CUSTOMER',

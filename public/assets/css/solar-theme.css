@@ -57,6 +57,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .text-navy { color: var(--svpl-navy-800) !important; }
+.bg-navy { background-color: var(--svpl-navy-800) !important; color: #FFFFFF !important; border: 1px solid rgba(245, 158, 11, 0.35); }
+.bg-navy-subtle { background-color: rgba(11, 37, 69, 0.12) !important; color: var(--svpl-navy-800) !important; border: 1px solid rgba(11, 37, 69, 0.25) !important; }
 .text-gold { color: var(--svpl-gold) !important; }
 .text-emerald { color: var(--svpl-green-dark) !important; }
 

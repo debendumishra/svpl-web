@@ -67,6 +67,62 @@ class Wallet
         }
     }
 
+    public static function debit(int $userId, float $amount, string $type, string $description, ?int $referenceId = null): bool
+    {
+        $wallet = self::getByUserId($userId);
+        if ((float) $wallet['balance'] < $amount) {
+            return false;
+        }
+
+        $newBalance = (float) $wallet['balance'] - $amount;
+
+        Database::beginTransaction();
+        try {
+            Database::execute(
+                "UPDATE wallets SET balance = ?, updated_at = NOW() WHERE user_id = ?",
+                [$newBalance, $userId]
+            );
+
+            Database::execute(
+                "INSERT INTO wallet_transactions (wallet_id, user_id, txn_type, amount, balance_after, description, reference_id, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, NOW())",
+                [$wallet['id'], $userId, $type, -$amount, $newBalance, $description, $referenceId]
+            );
+
+            Database::commit();
+            return true;
+        } catch (\Throwable $t) {
+            Database::rollBack();
+            return false;
+        }
+    }
+
+    public static function refund(int $userId, float $amount, string $description, ?int $referenceId = null): bool
+    {
+        $wallet = self::getByUserId($userId);
+        $newBalance = (float) $wallet['balance'] + $amount;
+
+        Database::beginTransaction();
+        try {
+            Database::execute(
+                "UPDATE wallets SET balance = ?, updated_at = NOW() WHERE user_id = ?",
+                [$newBalance, $userId]
+            );
+
+            Database::execute(
+                "INSERT INTO wallet_transactions (wallet_id, user_id, txn_type, amount, balance_after, description, reference_id, created_at)
+                 VALUES (?, ?, 'WITHDRAWAL_REFUND', ?, ?, ?, ?, NOW())",
+                [$wallet['id'], $userId, $amount, $newBalance, $description, $referenceId]
+            );
+
+            Database::commit();
+            return true;
+        } catch (\Throwable $t) {
+            Database::rollBack();
+            return false;
+        }
+    }
+
     public static function getTransactions(int $userId, int $limit = 50): array
     {
         return Database::fetchAll(

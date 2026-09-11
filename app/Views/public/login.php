@@ -24,12 +24,31 @@ $title = "Login — Surya Vistaara Pvt. Ltd.";
                     </div>
                 <?php endif; ?>
 
-                <form action="<?= url('/login') ?>" method="POST">
+                <!-- Quick Role Fill Selector -->
+                <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted d-block text-center mb-2">Quick Role Login Fill:</label>
+                    <div class="d-flex justify-content-center gap-1 flex-wrap">
+                        <button type="button" class="btn btn-xs btn-outline-info text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('boe1@suryavistaara.com', 'Password@123')">
+                            <i class="bi bi-headset text-info me-1"></i> BOE Staff
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-primary text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('admin@suryavistaara.com', 'Password@123')">
+                            <i class="bi bi-shield-lock-fill text-primary me-1"></i> Admin
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-warning text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9437012345', 'Password@123')">
+                            <i class="bi bi-person-badge-fill text-warning me-1"></i> Advisor
+                        </button>
+                        <button type="button" class="btn btn-xs btn-outline-success text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9861011223', 'Password@123')">
+                            <i class="bi bi-person-circle text-success me-1"></i> Customer
+                        </button>
+                    </div>
+                </div>
+
+                <form action="<?= url('/login') ?>" method="POST" id="loginForm">
                     <div class="mb-3">
                         <label class="form-label fw-semibold text-dark">Mobile Number or Email:</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
-                            <input type="text" name="identifier" class="form-control" placeholder="e.g. 9876543210 or admin@suryavistaara.com" value="<?= htmlspecialchars($oldIdentifier ?? '') ?>" required autofocus>
+                            <input type="text" name="identifier" id="loginIdentifier" class="form-control" placeholder="e.g. boe1@suryavistaara.com or 9861000111" value="<?= htmlspecialchars($oldIdentifier ?? '') ?>" required autofocus>
                         </div>
                     </div>
 
@@ -37,13 +56,13 @@ $title = "Login — Surya Vistaara Pvt. Ltd.";
                         <label class="form-label fw-semibold text-dark">Password:</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
-                            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                            <input type="password" name="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
                         </div>
                     </div>
 
                     <!-- Security Verification CAPTCHA -->
                     <div class="mb-3 p-3 bg-light rounded-3 border">
-                        <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center">
+                        <label class="form-label small fw-bold text-dark d-flex justify-content-between align-items-center mb-2">
                             <span><i class="bi bi-shield-check text-primary me-1"></i> Security Code (CAPTCHA) *</span>
                             <span class="text-muted fw-normal" style="font-size: 0.75rem;">Case-insensitive</span>
                         </label>
@@ -83,6 +102,7 @@ $title = "Login — Surya Vistaara Pvt. Ltd.";
 
                 <div class="alert alert-info py-2 px-3 mt-4 mb-0 small" style="background: #EEF2F6; border: 1px solid #D0DCE8;">
                     <strong><i class="bi bi-info-circle me-1"></i> Demo Credentials:</strong><br>
+                    • <strong>BOE Staff:</strong> <code>boe1@suryavistaara.com</code> / <code>Password@123</code><br>
                     • <strong>Admin:</strong> <code>admin@suryavistaara.com</code> / <code>Password@123</code><br>
                     • <strong>Advisor:</strong> <code>9437012345</code> / <code>Password@123</code><br>
                     • <strong>Customer:</strong> <code>9861011223</code> / <code>Password@123</code>
@@ -91,3 +111,10 @@ $title = "Login — Surya Vistaara Pvt. Ltd.";
         </div>
     </div>
 </div>
+
+<script>
+function fillLogin(identifier, password) {
+    document.getElementById('loginIdentifier').value = identifier;
+    document.getElementById('loginPassword').value = password;
+}
+</script>

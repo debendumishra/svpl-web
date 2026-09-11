@@ -74,6 +74,9 @@ class AuthService
                 $_SESSION['customer_id'] = (int) $cust['id'];
                 $_SESSION['customer_code'] = $cust['customer_code'];
             }
+        } elseif ($user['role'] === 'BOE') {
+            $_SESSION['employee_code'] = $user['employee_code'] ?? ('SVPL-BOE-' . $user['id']);
+            $_SESSION['designation'] = $user['designation'] ?? 'Back Office Executive';
         }
 
         User::updateLastLogin((int) $user['id']);
@@ -96,6 +99,8 @@ class AuthService
             'advisor_id' => $_SESSION['advisor_id'] ?? null,
             'advisor_code' => $_SESSION['advisor_code'] ?? null,
             'customer_id' => $_SESSION['customer_id'] ?? null,
+            'employee_code' => $_SESSION['employee_code'] ?? null,
+            'designation' => $_SESSION['designation'] ?? null,
         ];
     }
 

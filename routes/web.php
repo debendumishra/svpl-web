@@ -17,6 +17,8 @@ use App\Controllers\LeadController;
 use App\Controllers\DocumentController;
 use App\Controllers\ReportController;
 use App\Controllers\LocationController;
+use App\Controllers\BoeController;
+use App\Controllers\DatabaseController;
 
 // ==========================================
 // 1. PUBLIC WEBSITE ROUTES
@@ -126,6 +128,52 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
 
     // Reports Export
     Router::get('/admin/export/csv', [ReportController::class, 'exportCsv']);
+
+    // Back Office Executive (BOE) Management (Admin & Manager)
+    Router::get('/admin/boe', [AdminController::class, 'boeManagement']);
+    Router::get('/manager/boe', [AdminController::class, 'boeManagement']);
+    Router::post('/admin/boe/create', [AdminController::class, 'createBoe']);
+    Router::post('/manager/boe/create', [AdminController::class, 'createBoe']);
+    Router::get('/admin/boe/toggle/{id}', [AdminController::class, 'toggleBoeStatus']);
+    Router::get('/manager/boe/toggle/{id}', [AdminController::class, 'toggleBoeStatus']);
+    Router::get('/admin/boe/reports', [AdminController::class, 'boeReports']);
+    Router::get('/manager/boe/reports', [AdminController::class, 'boeReports']);
+    Router::post('/admin/boe/reassign', [AdminController::class, 'reassignBoe']);
+    Router::post('/manager/boe/reassign', [AdminController::class, 'reassignBoe']);
+
+    // Database Maintenance, Backup, Restore, Purge & Demo Seeding (Admin & Manager)
+    Router::get('/admin/database', [DatabaseController::class, 'index']);
+    Router::get('/manager/database', [DatabaseController::class, 'index']);
+    Router::get('/admin/database/backup', [DatabaseController::class, 'backup']);
+    Router::get('/manager/database/backup', [DatabaseController::class, 'backup']);
+    Router::post('/admin/database/restore', [DatabaseController::class, 'restore']);
+    Router::post('/manager/database/restore', [DatabaseController::class, 'restore']);
+    Router::post('/admin/database/purge', [DatabaseController::class, 'purgeData']);
+    Router::post('/manager/database/purge', [DatabaseController::class, 'purgeData']);
+    Router::post('/admin/database/seed-demo', [DatabaseController::class, 'seedDemoData']);
+    Router::post('/manager/database/seed-demo', [DatabaseController::class, 'seedDemoData']);
+
+    // Withdrawal Requests Management (Admin & Manager)
+    Router::get('/admin/withdrawals', [AdminController::class, 'withdrawals']);
+    Router::get('/manager/withdrawals', [AdminController::class, 'withdrawals']);
+    Router::post('/admin/withdrawals/approve/{id}', [AdminController::class, 'approveWithdrawal']);
+    Router::post('/manager/withdrawals/approve/{id}', [AdminController::class, 'approveWithdrawal']);
+    Router::post('/admin/withdrawals/reject/{id}', [AdminController::class, 'rejectWithdrawal']);
+    Router::post('/manager/withdrawals/reject/{id}', [AdminController::class, 'rejectWithdrawal']);
+});
+
+// ==========================================
+// 3B. BACK OFFICE EXECUTIVE (BOE) PORTAL ROUTES
+// ==========================================
+Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('BOE', 'ADMIN', 'SUPER_ADMIN')]], function() {
+    Router::get('/boe/dashboard', [BoeController::class, 'dashboard']);
+    Router::get('/boe/customers', [BoeController::class, 'customers']);
+    Router::get('/boe/customers/{id}', [BoeController::class, 'customerDetail']);
+    Router::post('/boe/update-status', [BoeController::class, 'updateStatus']);
+    Router::post('/boe/upload-document', [BoeController::class, 'uploadDocument']);
+    Router::post('/boe/replace-document', [BoeController::class, 'replaceDocument']);
+    Router::post('/boe/request-document', [BoeController::class, 'requestDocument']);
+    Router::get('/boe/reports', [BoeController::class, 'reports']);
 });
 
 // ==========================================
@@ -139,6 +187,7 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ADVIS
     Router::get('/advisor/customers', [AdvisorController::class, 'myCustomers']);
     Router::get('/advisor/leads', [AdvisorController::class, 'leads']);
     Router::get('/advisor/wallet', [AdvisorController::class, 'wallet']);
+    Router::post('/advisor/wallet/request-withdrawal', [AdvisorController::class, 'requestWithdrawal']);
     Router::get('/advisor/id-card', [AdvisorController::class, 'idCard']);
     Router::get('/advisor/qr-code', [AdvisorController::class, 'qrCode']);
 });

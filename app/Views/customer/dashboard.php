@@ -157,15 +157,40 @@ $title = "My Solar Journey — SVPL Customer Portal";
         </div>
 
         <!-- Assigned Solar Advisor Card -->
-        <div class="card card-svpl p-3 bg-white border-0 shadow-sm">
+        <div class="card card-svpl p-3 bg-white border-0 shadow-sm mb-3">
             <div class="d-flex align-items-center gap-3">
                 <div style="width: 46px; height: 46px; border-radius: 50%; background: #0B2545; color: #F59E0B; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
                     <i class="bi bi-person-fill-gear"></i>
                 </div>
                 <div>
-                    <div class="text-secondary small">Your Dedicated Solar Mitra:</div>
-                    <div class="fw-bold text-navy font-heading">Ramesh Chandra Das (SVPL-ADV-8842)</div>
-                    <div class="text-secondary small"><i class="bi bi-telephone-fill text-success me-1"></i> +91 98610 11223</div>
+                    <div class="text-secondary small">Your Dedicated Solar Advisor / Mitra:</div>
+                    <div class="fw-bold text-navy font-heading"><?= htmlspecialchars($customer['advisor_name'] ?? 'Ramesh Chandra Das') ?> (<?= htmlspecialchars($customer['advisor_code'] ?? 'SVPL-ADV-8842') ?>)</div>
+                    <div class="text-secondary small"><i class="bi bi-telephone-fill text-success me-1"></i> <?= htmlspecialchars($customer['advisor_mobile'] ?? '+91 98610 11223') ?></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assigned Back Office Executive (BOE) Dealing with Request (Req 10) -->
+        <div class="card card-svpl p-3 bg-white border-0 shadow-sm border-start border-4 border-info">
+            <div class="d-flex align-items-center gap-3">
+                <div style="width: 46px; height: 46px; border-radius: 50%; background: #0284C7; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <div>
+                    <div class="text-secondary small">Back Office Executive Handling Your Application:</div>
+                    <?php if (!empty($customer['boe_name'])): ?>
+                        <div class="fw-bold text-navy font-heading"><?= htmlspecialchars($customer['boe_name']) ?> <span class="badge bg-light text-dark border"><?= htmlspecialchars($customer['boe_code'] ?? 'SVPL-BOE') ?></span></div>
+                        <div class="text-muted small"><?= htmlspecialchars($customer['boe_designation'] ?? 'Back Office Executive') ?></div>
+                        <div class="text-secondary small mt-1">
+                            <i class="bi bi-telephone-fill text-success me-1"></i> <?= htmlspecialchars($customer['boe_mobile'] ?? 'N/A') ?> 
+                            <?php if (!empty($customer['boe_email'])): ?>
+                                | <i class="bi bi-envelope me-1"></i> <?= htmlspecialchars($customer['boe_email']) ?>
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="fw-bold text-navy font-heading">SVPL Central Back Office Helpdesk</div>
+                        <div class="text-secondary small mt-1"><i class="bi bi-headset text-info me-1"></i> Helpline: +91 674 295 4800 | support@suryavistaara.com</div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

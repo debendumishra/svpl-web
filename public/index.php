@@ -50,7 +50,7 @@ use App\Helpers\Database;
 use App\Helpers\Router;
 
 try {
-    if (!Database::tableExists('users')) {
+    if (!Database::tableExists('users') || !Database::tableExists('settings')) {
         require_once dirname(__DIR__) . '/database/setup.php';
         \DatabaseSetup::run();
     }

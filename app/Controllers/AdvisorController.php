@@ -90,14 +90,88 @@ class AdvisorController
     public function wallet(): void
     {
         $user = AuthService::user();
+        $advisor = Advisor::findByUserId((int) $user['id']);
         $wallet = Wallet::getByUserId((int) $user['id']);
         $transactions = Wallet::getTransactions((int) $user['id'], 50);
+        $withdrawals = \App\Models\WithdrawalRequest::getByUserId((int) $user['id']);
 
         Response::view('advisor/wallet', [
-            'pageTitle' => 'My Wallet & Earnings — SVPL',
+            'pageTitle' => 'My Wallet & Payouts — SVPL',
+            'advisor' => $advisor,
             'wallet' => $wallet,
             'transactions' => $transactions,
+            'withdrawals' => $withdrawals,
+            'successMsg' => $_SESSION['success_msg'] ?? null,
+            'errorMsg' => $_SESSION['error_msg'] ?? null,
         ]);
+
+        unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+    }
+
+    public function requestWithdrawal(): void
+    {
+        $user = AuthService::user();
+        $advisor = Advisor::findByUserId((int) $user['id']);
+
+        if (!$advisor) {
+            $_SESSION['error_msg'] = "Advisor profile not found.";
+            Response::redirect(url('/advisor/wallet'));
+            return;
+        }
+
+        $amount = (float) ($_POST['amount'] ?? 0);
+        $wallet = Wallet::getByUserId((int) $user['id']);
+        $currentBalance = (float) ($wallet['balance'] ?? 0);
+
+        if ($amount < 100) {
+            $_SESSION['error_msg'] = "Minimum withdrawal amount is ₹100.";
+            Response::redirect(url('/advisor/wallet'));
+            return;
+        }
+
+        if ($amount > $currentBalance) {
+            $_SESSION['error_msg'] = "Requested amount (₹" . number_format($amount, 2) . ") exceeds your available wallet balance (₹" . number_format($currentBalance, 2) . ").";
+            Response::redirect(url('/advisor/wallet'));
+            return;
+        }
+
+        if (empty($advisor['account_number']) || empty($advisor['ifsc_code'])) {
+            $_SESSION['error_msg'] = "Please update your Bank Name, Account Number, and IFSC Code in your profile before requesting a bank payout.";
+            Response::redirect(url('/advisor/wallet'));
+            return;
+        }
+
+        $tds = round($amount * 0.05, 2);
+        $netPayable = $amount - $tds;
+
+        $debitSuccess = Wallet::debit(
+            (int) $user['id'],
+            $amount,
+            'WITHDRAWAL_REQUEST',
+            "Bank Withdrawal Request of ₹" . number_format($amount, 2) . " (Net: ₹" . number_format($netPayable, 2) . " after 5% TDS)"
+        );
+
+        if (!$debitSuccess) {
+            $_SESSION['error_msg'] = "Failed to process wallet debit. Please try again.";
+            Response::redirect(url('/advisor/wallet'));
+            return;
+        }
+
+        \App\Models\WithdrawalRequest::create([
+            'user_id' => (int) $user['id'],
+            'advisor_id' => (int) $advisor['id'],
+            'amount' => $amount,
+            'tds_amount' => $tds,
+            'net_payable' => $netPayable,
+            'bank_name' => $advisor['bank_name'] ?? 'N/A',
+            'bank_branch' => $advisor['bank_branch'] ?? '',
+            'account_holder' => $advisor['account_holder'] ?? ($advisor['first_name'] . ' ' . $advisor['last_name']),
+            'account_number' => $advisor['account_number'],
+            'ifsc_code' => $advisor['ifsc_code']
+        ]);
+
+        $_SESSION['success_msg'] = "Bank Withdrawal request of ₹" . number_format($amount, 2) . " submitted successfully! Payout will be processed via NEFT.";
+        Response::redirect(url('/advisor/wallet'));
     }
 
     public function idCard(): void
@@ -226,12 +300,14 @@ class AdvisorController
             }
 
             $docMap = [
-                'doc_electricity_bill' => ['type' => 'ELECTRICITY_BILL', 'title' => 'Electricity Bill (' . trim($post['consumer_number']) . ')'],
+                'doc_electricity_bill' => ['type' => 'ELECTRICITY_BILL', 'title' => 'Electricity Bill'],
                 'doc_aadhaar_card'     => ['type' => 'AADHAAR_CARD', 'title' => 'Customer Aadhaar Card'],
+                'doc_passport_photo'   => ['type' => 'PASSPORT_PHOTO', 'title' => 'Customer Passport Size Photo'],
                 'doc_pan_card'         => ['type' => 'PAN_CARD', 'title' => 'Customer PAN Card'],
                 'doc_land_patta'       => ['type' => 'LAND_PATTA', 'title' => 'Land Patta / Property Ownership Document'],
                 'doc_bank_passbook'    => ['type' => 'BANK_PASSBOOK', 'title' => 'Bank Passbook / Cancelled Cheque'],
                 'doc_roof_photo'       => ['type' => 'ROOF_PHOTO', 'title' => 'Rooftop Solar Site Photo'],
+                'doc_other'            => ['type' => 'OTHER_DOCUMENT', 'title' => 'Other Supporting Documents'],
             ];
 
             foreach ($docMap as $inputName => $meta) {
@@ -240,6 +316,7 @@ class AdvisorController
                     $filename = strtolower($meta['type']) . '_' . $custId . '_' . time() . '_' . rand(100, 999) . '.' . $ext;
                     $targetPath = $uploadDir . $filename;
                     if (move_uploaded_file($_FILES[$inputName]['tmp_name'], $targetPath)) {
+                        \App\Helpers\ImageCompressor::compressIfNeeded($targetPath);
                         \App\Models\Document::create([
                             'entity_type' => 'CUSTOMER',
                             'entity_id' => $custId,
