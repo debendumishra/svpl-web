@@ -678,6 +678,9 @@ class AdminController
         $email = trim($_POST['email'] ?? '');
         $employeeCode = trim($_POST['employee_code'] ?? User::generateBOECode());
         $designation = trim($_POST['designation'] ?? 'Back Office Executive');
+        $jurisdiction = trim($_POST['jurisdiction'] ?? '');
+        $bloodGroup = trim($_POST['blood_group'] ?? 'O+ve');
+        $address = trim($_POST['address'] ?? '');
         $password = trim($_POST['password'] ?? 'Password@123');
 
         if (empty($fullName) || empty($mobile) || empty($password)) {
@@ -698,6 +701,41 @@ class AdminController
             return;
         }
 
+        // Photo Upload / Live Webcam Capture
+        $photoUrl = null;
+        $uploadDir = dirname(dirname(__DIR__)) . '/public/uploads/staff/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // 1. Live Webcam Base64
+        if (!empty($_POST['boe_photo_base64']) && strpos($_POST['boe_photo_base64'], 'data:image/') === 0) {
+            $base64Str = $_POST['boe_photo_base64'];
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Str, $type)) {
+                $data = substr($base64Str, strpos($base64Str, ',') + 1);
+                $decoded = base64_decode($data);
+                if ($decoded !== false) {
+                    $ext = strtolower($type[1]) === 'jpeg' ? 'jpg' : strtolower($type[1]);
+                    $filename = 'boe_cam_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                    if (file_put_contents($uploadDir . $filename, $decoded)) {
+                        $photoUrl = 'public/uploads/staff/' . $filename;
+                    }
+                }
+            }
+        }
+        // 2. File Upload
+        elseif (isset($_FILES['boe_photo']) && $_FILES['boe_photo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['boe_photo'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+            if (in_array($ext, $allowedExts)) {
+                $filename = 'boe_photo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                if (move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
+                    $photoUrl = 'public/uploads/staff/' . $filename;
+                }
+            }
+        }
+
         $userId = User::create([
             'role' => 'BOE',
             'full_name' => $fullName,
@@ -705,6 +743,10 @@ class AdminController
             'email' => $email ?: null,
             'employee_code' => $employeeCode,
             'designation' => $designation,
+            'jurisdiction' => $jurisdiction ?: null,
+            'blood_group' => $bloodGroup,
+            'photo_url' => $photoUrl,
+            'address' => $address ?: null,
             'password_hash' => password_hash($password, PASSWORD_BCRYPT),
             'is_active' => 1,
         ]);
@@ -713,6 +755,110 @@ class AdminController
         AuditLog::log($currentUser['id'] ?? 1, 'BOE_CREATE', 'USER', $userId, "Created BOE Staff: {$fullName} ({$employeeCode})");
 
         $_SESSION['success_msg'] = "Back Office Executive account created successfully! Code: {$employeeCode}, Password: {$password}";
+        Response::redirect('/admin/boe');
+    }
+
+    public function updateBoe(string $id): void
+    {
+        $userId = (int)$id;
+        $user = User::findById($userId);
+        if (!$user || $user['role'] !== 'BOE') {
+            $_SESSION['error_msg'] = "BOE Staff record not found.";
+            Response::redirect('/admin/boe');
+            return;
+        }
+
+        $fullName = trim($_POST['full_name'] ?? '');
+        $mobile = trim($_POST['mobile'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $designation = trim($_POST['designation'] ?? $user['designation']);
+        $jurisdiction = trim($_POST['jurisdiction'] ?? '');
+        $bloodGroup = trim($_POST['blood_group'] ?? 'O+ve');
+        $address = trim($_POST['address'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $isActive = isset($_POST['is_active']) ? (int)$_POST['is_active'] : (int)$user['is_active'];
+
+        if (empty($fullName) || empty($mobile)) {
+            $_SESSION['error_msg'] = "Full Name and Mobile Number are required.";
+            Response::redirect('/admin/boe');
+            return;
+        }
+
+        // Validate unique mobile/email if changed
+        if ($mobile !== $user['mobile']) {
+            $existing = User::findByMobile($mobile);
+            if ($existing && (int)$existing['id'] !== $userId) {
+                $_SESSION['error_msg'] = "User with mobile number {$mobile} already exists.";
+                Response::redirect('/admin/boe');
+                return;
+            }
+        }
+        if (!empty($email) && $email !== ($user['email'] ?? '')) {
+            $existing = User::findByEmail($email);
+            if ($existing && (int)$existing['id'] !== $userId) {
+                $_SESSION['error_msg'] = "User with email {$email} already exists.";
+                Response::redirect('/admin/boe');
+                return;
+            }
+        }
+
+        // Photo Handling
+        $photoUrl = $user['photo_url'];
+        $uploadDir = dirname(dirname(__DIR__)) . '/public/uploads/staff/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        // 1. Live Webcam Snapshot Base64
+        if (!empty($_POST['boe_photo_base64']) && strpos($_POST['boe_photo_base64'], 'data:image/') === 0) {
+            $base64Str = $_POST['boe_photo_base64'];
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Str, $type)) {
+                $data = substr($base64Str, strpos($base64Str, ',') + 1);
+                $decoded = base64_decode($data);
+                if ($decoded !== false) {
+                    $ext = strtolower($type[1]) === 'jpeg' ? 'jpg' : strtolower($type[1]);
+                    $filename = 'boe_cam_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                    if (file_put_contents($uploadDir . $filename, $decoded)) {
+                        $photoUrl = 'public/uploads/staff/' . $filename;
+                    }
+                }
+            }
+        }
+        // 2. File Upload
+        elseif (isset($_FILES['boe_photo']) && $_FILES['boe_photo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['boe_photo'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'webp'];
+            if (in_array($ext, $allowedExts)) {
+                $filename = 'boe_photo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                if (move_uploaded_file($file['tmp_name'], $uploadDir . $filename)) {
+                    $photoUrl = 'public/uploads/staff/' . $filename;
+                }
+            }
+        }
+
+        $updateData = [
+            'full_name' => $fullName,
+            'mobile' => $mobile,
+            'email' => $email ?: null,
+            'designation' => $designation,
+            'jurisdiction' => $jurisdiction ?: null,
+            'blood_group' => $bloodGroup,
+            'photo_url' => $photoUrl,
+            'address' => $address ?: null,
+            'is_active' => $isActive,
+        ];
+
+        if (!empty($password)) {
+            $updateData['password_hash'] = password_hash($password, PASSWORD_BCRYPT);
+        }
+
+        User::updateBOE($userId, $updateData);
+
+        $currentUser = AuthService::user();
+        AuditLog::log($currentUser['id'] ?? 1, 'BOE_UPDATE', 'USER', $userId, "Updated BOE Staff: {$fullName} ({$user['employee_code']})");
+
+        $_SESSION['success_msg'] = "BOE Executive [{$user['employee_code']}] updated successfully!";
         Response::redirect('/admin/boe');
     }
 

@@ -35,8 +35,8 @@ class User
 
     public static function create(array $data): int
     {
-        $sql = "INSERT INTO users (role, email, mobile, password_hash, full_name, employee_code, designation, is_active, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        $sql = "INSERT INTO users (role, email, mobile, password_hash, full_name, employee_code, designation, jurisdiction, blood_group, photo_url, address, is_active, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
         Database::execute($sql, [
             $data['role'] ?? 'CUSTOMER',
             $data['email'] ?? null,
@@ -45,9 +45,40 @@ class User
             $data['full_name'],
             $data['employee_code'] ?? null,
             $data['designation'] ?? 'Back Office Executive',
+            $data['jurisdiction'] ?? null,
+            $data['blood_group'] ?? null,
+            $data['photo_url'] ?? null,
+            $data['address'] ?? null,
             $data['is_active'] ?? 1,
         ]);
         return (int) Database::lastInsertId();
+    }
+
+    public static function updateBOE(int $userId, array $data): bool
+    {
+        $fields = [];
+        $params = [];
+
+        $allowed = ['full_name', 'email', 'mobile', 'designation', 'jurisdiction', 'blood_group', 'photo_url', 'address', 'is_active'];
+        foreach ($allowed as $f) {
+            if (array_key_exists($f, $data)) {
+                $fields[] = "`$f` = ?";
+                $params[] = $data[$f];
+            }
+        }
+
+        if (!empty($data['password_hash'])) {
+            $fields[] = "`password_hash` = ?";
+            $params[] = $data['password_hash'];
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $params[] = $userId;
+        $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = ? AND role = 'BOE'";
+        return Database::execute($sql, $params);
     }
 
     public static function updatePassword(int $userId, string $newHash): bool

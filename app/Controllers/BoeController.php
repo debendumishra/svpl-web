@@ -438,4 +438,10 @@ class BoeController
             'reportData' => $reportData,
         ], 'boe');
     }
+
+    public function idCard(): void
+    {
+        $user = $this->authUser();
+        Response::redirect('/print/boe-id-card/' . $user['id']);
+    }
 }

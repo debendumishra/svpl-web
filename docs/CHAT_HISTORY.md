@@ -2422,6 +2422,54 @@ The Advisor Photo rendering on official ID Cards has been resolved across all pr
    - Synchronized uploaded advisor photos to both workspace and local XAMPP server (`D:\xampp\htdocs\svpl-web`).
    - Pushed commit to remote GitHub repository (`main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+1. in the BOE entry add jurisdiction, Passport Photo, Blood group fields to the exiting fields.
+2. In the action add facility to generate ID Cards
+3. Allow edit the BOE INFORMATION
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-11T21:47:25+05:30.
+</ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+### Summary of Enhancements Implemented:
+
+1. **BOE Entry Fields & Schema Upgrade**:
+   - Added `jurisdiction`, `blood_group`, `photo_url`, and `address` fields to the `users` table for Back Office Executive (BOE) accounts.
+   - Upgraded [`app/Models/User.php`](file:///d:/DKM/SVPL-Web/app/Models/User.php) `create()` method to accept and persist `jurisdiction`, `blood_group`, `photo_url`, and `address`.
+   - Added `User::updateBOE(int $userId, array $data): bool` to allow updating all executive profile fields, status, and password.
+
+2. **Passport Photo & Live Webcam Capture for BOE**:
+   - In [`app/Views/admin/boe_management.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/boe_management.php), added:
+     - **Option A**: Upload Passport Photo (JPG, PNG, WEBP).
+     - **Option B**: Interactive Live Webcam Capture modal (`#modalLiveCamera`) with real-time video stream, oval face guide, and high-resolution aspect-ratio snapshot generation.
+     - Live preview container showing the captured or uploaded photo before submission.
+
+3. **Official Printable CR80 Duplex BOE ID Card Generation**:
+   - Designed and built [`app/Views/printable/boe_id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/boe_id_card.php) adhering strictly to standard CR80 portrait dimensions (54 × 85.6 mm) with Stitch Solar branding:
+     - **Front Side**: Full-width header, photo with corner brackets, executive name, designation badge, employee code, blood group badge, assigned jurisdiction block, and flowing gold-accented wave ribbon footer.
+     - **Back Side**: Corporate headquarters address, official contact helplines, support email, dynamic verification QR code, non-transferable security/emergency terms, and Managing Director signature block.
+   - Added route `/print/boe-id-card/{id}` in [`app/Controllers/DocumentController.php`](file:///d:/DKM/SVPL-Web/app/Controllers/DocumentController.php) and `/boe/id-card` in [`app/Controllers/BoeController.php`](file:///d:/DKM/SVPL-Web/app/Controllers/BoeController.php).
+   - Added **"ID Card"** action button in the BOE table to view and print duplex cards with 1-click browser printing.
+
+4. **Complete BOE Information Editing & Management**:
+   - Added **"Edit"** action button opening an interactive modal (`#editBoeModal`) populated with executive data.
+   - Supports modifying Full Name, Mobile, Email, Designation, Blood Group, Jurisdiction, Address, Account Active Status, Password Reset, and uploading/capturing a new photo.
+   - Added `AdminController::updateBoe(string $id)` and registered routes `POST /admin/boe/update/{id}` & `POST /manager/boe/update/{id}` in [`routes/web.php`](file:///d:/DKM/SVPL-Web/routes/web.php).
+
+5. **Deployment & Verification**:
+   - Synchronized all files to local live XAMPP server (`D:\xampp\htdocs\svpl-web`).
+   - Verified PHP syntax and test flows.
+   - Pushed updates to GitHub (`main`).
+
+
 
 
 

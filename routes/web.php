@@ -134,6 +134,8 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/manager/boe', [AdminController::class, 'boeManagement']);
     Router::post('/admin/boe/create', [AdminController::class, 'createBoe']);
     Router::post('/manager/boe/create', [AdminController::class, 'createBoe']);
+    Router::post('/admin/boe/update/{id}', [AdminController::class, 'updateBoe']);
+    Router::post('/manager/boe/update/{id}', [AdminController::class, 'updateBoe']);
     Router::get('/admin/boe/toggle/{id}', [AdminController::class, 'toggleBoeStatus']);
     Router::get('/manager/boe/toggle/{id}', [AdminController::class, 'toggleBoeStatus']);
     Router::get('/admin/boe/reports', [AdminController::class, 'boeReports']);
@@ -174,6 +176,7 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('BOE',
     Router::post('/boe/replace-document', [BoeController::class, 'replaceDocument']);
     Router::post('/boe/request-document', [BoeController::class, 'requestDocument']);
     Router::get('/boe/reports', [BoeController::class, 'reports']);
+    Router::get('/boe/id-card', [BoeController::class, 'idCard']);
 });
 
 // ==========================================
@@ -181,6 +184,8 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('BOE',
 // ==========================================
 Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ADVISOR')]], function() {
     Router::get('/advisor/dashboard', [AdvisorController::class, 'dashboard']);
+    Router::get('/advisor/profile', [AdvisorController::class, 'profile']);
+    Router::post('/advisor/profile/update', [AdvisorController::class, 'updateProfile']);
     Router::get('/advisor/register-customer', [AdvisorController::class, 'showRegisterCustomer']);
     Router::post('/advisor/register-customer', [AdvisorController::class, 'registerCustomer']);
     Router::get('/advisor/network', [AdvisorController::class, 'myNetwork']);
@@ -206,6 +211,7 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('CUSTO
 // 6. PRINTABLE DOCUMENTS & VERIFIED DOWNLOADS
 // ==========================================
 Router::get('/print/id-card/{id}', [DocumentController::class, 'printIdCard']);
+Router::get('/print/boe-id-card/{id}', [DocumentController::class, 'printBoeIdCard']);
 Router::get('/print/appointment/{id}', [DocumentController::class, 'printAppointment']);
 Router::get('/print/receipt/{id}', [DocumentController::class, 'printReceipt']);
 Router::get('/print/quotation/{id}', [DocumentController::class, 'printQuotation']);

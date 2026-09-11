@@ -12,6 +12,7 @@ use App\Models\Lead;
 use App\Models\Customer;
 use App\Models\Quotation;
 use App\Models\JEReport;
+use App\Models\User;
 use App\Services\DocumentGenerator;
 
 class DocumentController
@@ -27,6 +28,23 @@ class DocumentController
         $qrUrl = DocumentGenerator::getQrCodeUrl(DocumentGenerator::getVerificationUrl('ADVISOR', $advisor['referral_code']));
         Response::view('printable/id_card', [
             'advisor' => $advisor,
+            'qrUrl' => $qrUrl,
+        ]);
+    }
+
+    public function printBoeIdCard(string $id): void
+    {
+        $user = User::findById((int) $id);
+        if (!$user || $user['role'] !== 'BOE') {
+            Response::notFound("BOE Staff ID #{$id} not found.");
+            return;
+        }
+
+        $empCode = $user['employee_code'] ?? ('SVPL-BOE-' . $user['id']);
+        $qrUrl = DocumentGenerator::getQrCodeUrl(DocumentGenerator::getVerificationUrl('STAFF', $empCode));
+
+        Response::view('printable/boe_id_card', [
+            'boe' => $user,
             'qrUrl' => $qrUrl,
         ]);
     }
