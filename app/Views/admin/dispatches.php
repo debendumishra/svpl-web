@@ -199,7 +199,7 @@ foreach ($dispatches as $d) {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Dispatch Type *</label>
-                            <select name="dispatch_type" class="form-select" required>
+                            <select name="dispatch_type" id="selectDispatchType" class="form-select" required>
                                 <option value="ADVISOR_KIT">Advisor Welcome Induction Kit</option>
                                 <option value="SOLAR_EQUIPMENT">Solar Panels & Inverter Package</option>
                                 <option value="NET_METER">DISCOM Net Meter & BOS Kit</option>
@@ -208,21 +208,46 @@ foreach ($dispatches as $d) {
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Recipient Advisor (Optional)</label>
-                            <select name="advisor_id" class="form-select">
-                                <option value="">-- None / Customer Lead --</option>
-                                <?php foreach (($advisors ?? []) as $adv): ?>
-                                    <option value="<?= $adv['id'] ?>">
-                                        <?= htmlspecialchars($adv['first_name'] . ' ' . $adv['last_name']) ?> (<?= htmlspecialchars($adv['advisor_code']) ?>)
+                            <select name="advisor_id" id="selectDispatchAdvisor" class="form-select">
+                                <option value="" data-address="">-- None / Select Advisor --</option>
+                                <?php foreach (($advisors ?? []) as $adv): 
+                                    $addrParts = array_filter([
+                                        !empty($adv['address_line']) ? trim($adv['address_line']) : '',
+                                        !empty($adv['village']) ? 'Vill: ' . trim($adv['village']) : '',
+                                        !empty($adv['gram_panchayat']) ? 'GP: ' . trim($adv['gram_panchayat']) : '',
+                                        !empty($adv['block']) ? 'Block: ' . trim($adv['block']) : '',
+                                        !empty($adv['district']) ? 'Dist: ' . trim($adv['district']) : '',
+                                        !empty($adv['state']) ? trim($adv['state']) : 'Odisha',
+                                        !empty($adv['pincode']) ? 'PIN: ' . trim($adv['pincode']) : '',
+                                        !empty($adv['mobile']) ? 'Mob: ' . trim($adv['mobile']) : ''
+                                    ], fn($v) => !empty($v));
+                                    $fullAdvAddress = implode(', ', $addrParts);
+                                ?>
+                                    <option value="<?= $adv['id'] ?>" data-address="<?= htmlspecialchars($fullAdvAddress) ?>">
+                                        <?= htmlspecialchars($adv['first_name'] . ' ' . $adv['last_name']) ?> (<?= htmlspecialchars($adv['advisor_code']) ?>) - <?= htmlspecialchars($adv['district']) ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            <small class="text-muted" style="font-size: 0.72rem;">Selecting an advisor will automatically fill their complete address below.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Recipient Customer Lead (Optional)</label>
-                            <select name="lead_id" class="form-select">
-                                <option value="">-- None / Advisor Kit --</option>
-                                <?php foreach (($leads ?? []) as $ld): ?>
-                                    <option value="<?= $ld['id'] ?>">
+                            <select name="lead_id" id="selectDispatchLead" class="form-select">
+                                <option value="" data-address="">-- None / Select Customer Lead --</option>
+                                <?php foreach (($leads ?? []) as $ld): 
+                                    $ldAddrParts = array_filter([
+                                        !empty($ld['address_line']) ? trim($ld['address_line']) : '',
+                                        !empty($ld['village']) ? 'Vill: ' . trim($ld['village']) : '',
+                                        !empty($ld['gram_panchayat']) ? 'GP: ' . trim($ld['gram_panchayat']) : '',
+                                        !empty($ld['block']) ? 'Block: ' . trim($ld['block']) : '',
+                                        !empty($ld['district']) ? 'Dist: ' . trim($ld['district']) : '',
+                                        !empty($ld['state']) ? trim($ld['state']) : 'Odisha',
+                                        !empty($ld['pincode']) ? 'PIN: ' . trim($ld['pincode']) : '',
+                                        !empty($ld['mobile']) ? 'Mob: ' . trim($ld['mobile']) : ''
+                                    ], fn($v) => !empty($v));
+                                    $fullLdAddress = implode(', ', $ldAddrParts);
+                                ?>
+                                    <option value="<?= $ld['id'] ?>" data-address="<?= htmlspecialchars($fullLdAddress) ?>">
                                         <?= htmlspecialchars($ld['lead_code']) ?> - <?= htmlspecialchars($ld['first_name'] . ' ' . $ld['last_name']) ?> (<?= htmlspecialchars($ld['district']) ?>)
                                     </option>
                                 <?php endforeach; ?>
@@ -249,11 +274,17 @@ foreach ($dispatches as $d) {
                         </div>
                         <div class="col-md-12">
                             <label class="form-label fw-semibold small">Items Included in Shipment *</label>
-                            <textarea name="items_included" class="form-control" rows="2" placeholder="e.g. Official Photo ID Card, Appointment Letter, SVPL Bag, Doorstep QR Code, Marketing Flyers..." required>Official Photo ID Card, Appointment Letter, SVPL Bag, Doorstep QR Code, Marketing Flyers</textarea>
+                            <textarea name="items_included" id="inputDispatchItems" class="form-control" rows="2" placeholder="e.g. Official Photo ID Card, Appointment Letter, SVPL Bag, Doorstep QR Code, Marketing Flyers..." required>Official Photo ID Card, Appointment Letter, SVPL Bag, Doorstep QR Code, Marketing Flyers</textarea>
                         </div>
                         <div class="col-md-12">
-                            <label class="form-label fw-semibold small">Delivery Address</label>
-                            <input type="text" name="delivery_address" class="form-control" placeholder="Recipient full delivery address">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-semibold small mb-0">Delivery Address (Auto-filled on Advisor/Lead selection, fully editable) *</label>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none small text-primary" onclick="document.getElementById('inputDeliveryAddress').value = ''">
+                                    <i class="bi bi-eraser"></i> Clear
+                                </button>
+                            </div>
+                            <textarea name="delivery_address" id="inputDeliveryAddress" class="form-control font-monospace" rows="3" placeholder="Plot No / Street, Village, Gram Panchayat, Block, District, State, PIN, Mobile..." required></textarea>
+                            <small class="text-muted" style="font-size: 0.72rem;">Complete comma-separated address for courier consignment label and dispatch note.</small>
                         </div>
                     </div>
                 </div>
@@ -267,3 +298,53 @@ foreach ($dispatches as $d) {
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAdvisor = document.getElementById('selectDispatchAdvisor');
+    const selectLead = document.getElementById('selectDispatchLead');
+    const inputAddress = document.getElementById('inputDeliveryAddress');
+    const selectType = document.getElementById('selectDispatchType');
+    const inputItems = document.getElementById('inputDispatchItems');
+
+    if (selectAdvisor && inputAddress) {
+        selectAdvisor.addEventListener('change', function () {
+            const selectedOpt = this.options[this.selectedIndex];
+            if (selectedOpt && selectedOpt.dataset && selectedOpt.dataset.address) {
+                inputAddress.value = selectedOpt.dataset.address;
+            }
+            // If an advisor is selected, reset lead dropdown
+            if (this.value && selectLead) {
+                selectLead.value = '';
+            }
+        });
+    }
+
+    if (selectLead && inputAddress) {
+        selectLead.addEventListener('change', function () {
+            const selectedOpt = this.options[this.selectedIndex];
+            if (selectedOpt && selectedOpt.dataset && selectedOpt.dataset.address) {
+                inputAddress.value = selectedOpt.dataset.address;
+            }
+            // If a lead is selected, reset advisor dropdown
+            if (this.value && selectAdvisor) {
+                selectAdvisor.value = '';
+            }
+        });
+    }
+
+    if (selectType && inputItems) {
+        selectType.addEventListener('change', function () {
+            if (this.value === 'ADVISOR_KIT') {
+                inputItems.value = 'Official Photo ID Card, Appointment Letter, SVPL Bag, Doorstep QR Code, Marketing Flyers';
+            } else if (this.value === 'SOLAR_EQUIPMENT') {
+                inputItems.value = 'Solar PV Modules (550W Mono PERC / TopCon), Solar Grid-Tie Inverter, HDGI Module Mounting Structure, AC/DC Distribution Box';
+            } else if (this.value === 'NET_METER') {
+                inputItems.value = 'Bi-Directional Net Meter, CT / PT Unit, Net Meter Testing Certificate, DISCOM BOS Interconnection Kit';
+            } else if (this.value === 'MARKETING_MATERIAL') {
+                inputItems.value = 'SVPL Outdoor Promotional Canopy (6x6 ft), Roll-up Standee, Solar Brochures (500 Nos), PM Surya Ghar Scheme Posters';
+            }
+        });
+    }
+});
+</script>

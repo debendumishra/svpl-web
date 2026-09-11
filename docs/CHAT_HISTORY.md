@@ -2349,4 +2349,41 @@ Full provision to edit and modify all data of **Advisors** and **Customers** in 
 * **Customer Registry (`/admin/customers`)**: Direct **"Edit"** action button alongside **"Track Lead"** on every customer row.
 * **Lead Dossier (`/admin/leads/{id}`)**: **"Edit Customer Data"** quick action button in the command header.
 
+---
+
+## User
+
+<USER_REQUEST>
+in the dispatches page, in create despatch, on selection of advisor it should bring the complete address separated by comma to the address field autometically and also allow editing also.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-11T21:22:25+05:30.
+</ADDITIONAL_METADATA>
+
+---
+
+## Assistant
+
+The **Create Dispatch** modal on the Dispatches page ([`/admin/dispatches`](file:///d:/DKM/SVPL-Web/app/Views/admin/dispatches.php)) has been upgraded to **automatically populate the complete, comma-separated postal address** upon selecting an Advisor or Customer Lead, while maintaining full inline editability.
+
+---
+
+### 📦 Key Details of Implementation:
+
+1. **Structured Comma-Separated Address Formulation**:
+   - Each `<option>` in the Advisor and Customer Lead dropdowns carries a pre-formatted `data-address` attribute composed of all non-empty address components:
+     `[Address Line, Vill: <Village>, GP: <Gram Panchayat>, Block: <Block>, Dist: <District>, <State>, PIN: <Pincode>, Mob: <Mobile Number>]`
+   - Formatted with clear comma separations suitable for shipping consignments and courier labels.
+
+2. **Instant JavaScript Auto-Population**:
+   - Whenever an Advisor is selected in the **"Recipient Advisor"** dropdown, the complete address is instantly populated into the **Delivery Address** field.
+   - The field is a full-width multi-line textarea (`rows="3"`), allowing the dispatch manager to freely adjust, append landmark notes, or edit phone numbers before generating the consignment.
+   - Includes a quick **"Clear"** button to reset the address field if needed.
+   - Also supports automatic item description presets based on the selected Dispatch Type (*Advisor Induction Kit*, *Solar Equipment Package*, *Net Meter & BOS Kit*, or *Marketing Material*).
+
+3. **Synchronization & Remote Git**:
+   - Synchronized to local XAMPP server (`D:\xampp\htdocs\svpl-web`).
+   - Committed and pushed to GitHub (`main`).
+
+
 
