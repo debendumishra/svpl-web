@@ -85,6 +85,12 @@ class AuthService
         return ['success' => true, 'user' => $user];
     }
 
+    public static function authenticate(string $identifier, string $password): ?array
+    {
+        $res = self::attempt($identifier, $password);
+        return $res['success'] ? ($res['user'] ?? null) : null;
+    }
+
     public static function user(): ?array
     {
         if (empty($_SESSION['user_id'])) {

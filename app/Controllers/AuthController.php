@@ -43,36 +43,41 @@ class AuthController
             'pageTitle' => 'Sign In — ' . company_name(),
             'error' => $_SESSION['login_error'] ?? null,
             'success' => $_SESSION['login_success'] ?? null,
+            'oldIdentifier' => $_SESSION['old_identifier'] ?? '',
         ]);
-        unset($_SESSION['login_error'], $_SESSION['login_success']);
+        unset($_SESSION['login_error'], $_SESSION['login_success'], $_SESSION['old_identifier']);
     }
 
     public function login(): void
     {
-        $loginInput = trim($_POST['login_id'] ?? '');
+        $loginInput = trim($_POST['identifier'] ?? $_POST['login_id'] ?? $_POST['mobile'] ?? $_POST['email'] ?? '');
         $password = trim($_POST['password'] ?? '');
         $captchaInput = trim($_POST['captcha'] ?? '');
 
         // 1. CAPTCHA Security Validation
         if (!Captcha::verify($captchaInput)) {
             $_SESSION['login_error'] = 'Invalid or expired CAPTCHA code. Please type the characters shown in the security image.';
+            $_SESSION['old_identifier'] = $loginInput;
             Response::redirect('/login');
             return;
         }
 
         if (empty($loginInput) || empty($password)) {
             $_SESSION['login_error'] = 'Please enter both User ID / Mobile and Password.';
+            $_SESSION['old_identifier'] = $loginInput;
             Response::redirect('/login');
             return;
         }
 
-        $user = AuthService::authenticate($loginInput, $password);
-        if (!$user) {
-            $_SESSION['login_error'] = 'Invalid credentials or account is pending administrator verification.';
+        $result = AuthService::attempt($loginInput, $password);
+        if (!$result['success']) {
+            $_SESSION['login_error'] = $result['message'] ?? 'Invalid credentials or account is pending administrator verification.';
+            $_SESSION['old_identifier'] = $loginInput;
             Response::redirect('/login');
             return;
         }
 
+        $user = $result['user'] ?? [];
         $role = $user['role'] ?? 'CUSTOMER';
         if (in_array($role, ['SUPER_ADMIN', 'ADMIN', 'ACCOUNTS', 'OPERATIONS'])) {
             Response::redirect('/admin/dashboard');

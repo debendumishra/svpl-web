@@ -34,16 +34,16 @@ $title = "Login — " . company_name();
                 <div class="mb-3">
                     <label class="form-label small fw-bold text-muted d-block text-center mb-2">Quick Role Login Fill:</label>
                     <div class="d-flex justify-content-center gap-1 flex-wrap">
-                        <button type="button" class="btn btn-xs btn-outline-info text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('boe1@suryavistaara.com', 'Password@123')">
+                        <button type="button" class="btn btn-xs btn-outline-info text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9124589345', 'Password@123')">
                             <i class="bi bi-headset text-info me-1"></i> BOE Staff
                         </button>
                         <button type="button" class="btn btn-xs btn-outline-primary text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('admin@suryavistaara.com', 'Password@123')">
                             <i class="bi bi-shield-lock-fill text-primary me-1"></i> Admin
                         </button>
-                        <button type="button" class="btn btn-xs btn-outline-warning text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9437012345', 'Password@123')">
+                        <button type="button" class="btn btn-xs btn-outline-warning text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9040999899', 'Password@123')">
                             <i class="bi bi-person-badge-fill text-warning me-1"></i> Advisor
                         </button>
-                        <button type="button" class="btn btn-xs btn-outline-success text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9861011223', 'Password@123')">
+                        <button type="button" class="btn btn-xs btn-outline-success text-dark font-sans py-1 px-2" style="font-size: 0.78rem;" onclick="fillLogin('9040237079', 'Password@123')">
                             <i class="bi bi-person-circle text-success me-1"></i> Customer
                         </button>
                     </div>
@@ -54,7 +54,7 @@ $title = "Login — " . company_name();
                         <label class="form-label fw-semibold text-dark">Mobile Number or Email:</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
-                            <input type="text" name="identifier" id="loginIdentifier" class="form-control" placeholder="e.g. boe1@suryavistaara.com or 9861000111" value="<?= htmlspecialchars($oldIdentifier ?? '') ?>" required autofocus>
+                            <input type="text" name="identifier" id="loginIdentifier" class="form-control" placeholder="e.g. 9124589345 or admin@suryavistaara.com" value="<?= htmlspecialchars($oldIdentifier ?? '') ?>" required autofocus>
                         </div>
                     </div>
 
@@ -108,10 +108,10 @@ $title = "Login — " . company_name();
 
                 <div class="alert alert-info py-2 px-3 mt-4 mb-0 small" style="background: #EEF2F6; border: 1px solid #D0DCE8;">
                     <strong><i class="bi bi-info-circle me-1"></i> Demo Credentials:</strong><br>
-                    • <strong>BOE Staff:</strong> <code>boe1@suryavistaara.com</code> / <code>Password@123</code><br>
-                    • <strong>Admin:</strong> <code>admin@suryavistaara.com</code> / <code>Password@123</code><br>
-                    • <strong>Advisor:</strong> <code>9437012345</code> / <code>Password@123</code><br>
-                    • <strong>Customer:</strong> <code>9861011223</code> / <code>Password@123</code>
+                    • <strong>BOE Staff:</strong> <code>9124589345</code> or <code>dsmitamishra@gmail.com</code> / <code>Password@123</code><br>
+                    • <strong>Admin:</strong> <code>admin@suryavistaara.com</code> or <code>9876543210</code> / <code>Password@123</code><br>
+                    • <strong>Advisor:</strong> <code>9040999899</code> or <code>dhwajja@gmail.com</code> / <code>Password@123</code><br>
+                    • <strong>Customer:</strong> <code>9040237079</code> or <code>dmishra@gmail.com</code> / <code>Password@123</code>
                 </div>
             </div>
         </div>

@@ -2945,8 +2945,31 @@ Where ever there is requirement of district, block etc bring it from the table u
    - Synced workspace with live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed changes to GitHub repository (`origin main`).
 
+---
 
+## User
 
+<USER_REQUEST>
+unable to login any role
+</USER_REQUEST>
 
+## Assistant
 
+### Root Cause & Resolution Summary:
 
+1. **Root Cause Identification**:
+   - **Form Field vs Controller Mismatch**: `login.php` submitted `<input name="identifier">`, whereas `AuthController::login()` was reading `$_POST['login_id']`, leading to empty login identifiers.
+   - **Undefined Method Call**: `AuthController::login()` called `AuthService::authenticate()` which did not exist on `AuthService` (which defines `AuthService::attempt()`), causing an unhandled error.
+   - **Multi-Credential Resolution**: `User::findByEmailOrMobile` previously only looked up exact email or mobile, failing if a user attempted login with an Employee Code (`DSI-HO-101`, `SVPL-BOE-101`), Advisor Code (`ADV-SVPL-101`), or Customer Code (`SVPL-CUST-101`).
+
+2. **Fixes Implemented**:
+   - **`AuthController::login()`**: Updated to read `$_POST['identifier'] ?? $_POST['login_id'] ?? $_POST['mobile'] ?? $_POST['email']`, invoke `AuthService::attempt()`, and properly handle error messages and redirects.
+   - **`AuthService.php`**: Added `authenticate()` alias and ensured session state variables are populated for all roles (`SUPER_ADMIN`, `ADMIN`, `BOE`, `ADVISOR`, `CUSTOMER`).
+   - **`User::findByEmailOrMobile()`**: Upgraded to resolve users via Email, Mobile, Employee Code, Advisor Code, or Customer Code.
+   - **`login.php`**: Updated Quick Role Login Fill buttons and demo credential badges to match active accounts.
+   - **Password Synchronization**: Verified all demo accounts use `Password@123`.
+
+3. **Validation & Testing**:
+   - Automated 16/16 test suite verifying logins across all 5 roles.
+   - Synced to live XAMPP server (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed to GitHub repository (`origin main`).

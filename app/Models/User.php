@@ -17,10 +17,39 @@ class User
 
     public static function findByEmailOrMobile(string $identifier): ?array
     {
-        return Database::fetchOne(
-            "SELECT * FROM users WHERE email = ? OR mobile = ?",
+        $identifier = trim($identifier);
+        if (empty($identifier)) {
+            return null;
+        }
+
+        // 1. Direct match on users email, mobile, or employee_code
+        $user = Database::fetchOne(
+            "SELECT * FROM users WHERE email = ? OR mobile = ? OR employee_code = ?",
+            [$identifier, $identifier, $identifier]
+        );
+        if ($user) {
+            return $user;
+        }
+
+        // 2. Match by advisor code or referral code in advisors table
+        $adv = Database::fetchOne(
+            "SELECT user_id FROM advisors WHERE advisor_code = ? OR referral_code = ?",
             [$identifier, $identifier]
         );
+        if ($adv && !empty($adv['user_id'])) {
+            return self::findById((int)$adv['user_id']);
+        }
+
+        // 3. Match by customer code in customers table
+        $cust = Database::fetchOne(
+            "SELECT user_id FROM customers WHERE customer_code = ?",
+            [$identifier]
+        );
+        if ($cust && !empty($cust['user_id'])) {
+            return self::findById((int)$cust['user_id']);
+        }
+
+        return null;
     }
 
     public static function findByMobile(string $mobile): ?array
