@@ -102,6 +102,8 @@ $stageMap = [
                                 'label' => ucwords(strtolower(str_replace('_', ' ', $currentStage))),
                                 'badge' => 'bg-secondary text-white'
                             ];
+                            $custPhoto = !empty($c['photo_url']) ? resolve_photo_url($c['photo_url']) : null;
+                            $cInitials = strtoupper(substr($c['first_name'] ?? 'C', 0, 1) . substr($c['last_name'] ?? 'S', 0, 1));
                         ?>
                             <tr>
                                 <td>
@@ -110,8 +112,20 @@ $stageMap = [
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="fw-bold text-dark"><?= htmlspecialchars($c['first_name'] . ' ' . $c['last_name']) ?></div>
-                                    <small class="text-muted"><i class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($c['village'] ?? $c['gram_panchayat'] ?? 'Odisha') ?></small>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="position-relative" style="width: 40px; height: 48px; border-radius: 6px; overflow: hidden; background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border: 1.5px solid #0f2d59; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center;">
+                                            <?php if (!empty($custPhoto)): ?>
+                                                <img src="<?= htmlspecialchars($custPhoto) ?>" alt="Customer Photo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <span class="text-white fw-bold" style="font-size: 0.78rem; display: none; align-items: center; justify-content: center; width: 100%; height: 100%; letter-spacing: 1px;"><?= htmlspecialchars($cInitials) ?></span>
+                                            <?php else: ?>
+                                                <span class="text-white fw-bold" style="font-size: 0.78rem; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; letter-spacing: 1px;"><?= htmlspecialchars($cInitials) ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.95rem;"><?= htmlspecialchars($c['first_name'] . ' ' . $c['last_name']) ?></div>
+                                            <small class="text-muted"><i class="bi bi-geo-alt me-1"></i><?= htmlspecialchars($c['village'] ?? $c['gram_panchayat'] ?? 'Odisha') ?></small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="font-monospace text-dark fw-semibold"><?= htmlspecialchars($c['mobile']) ?></div>

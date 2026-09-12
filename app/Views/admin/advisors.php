@@ -54,12 +54,27 @@ $title = "Advisor Network Management — SVPL Admin";
                         <td colspan="8" class="text-center py-4 text-secondary">No advisors found.</td>
                     </tr>
                 <?php else: ?>
-                    <?php foreach ($advisors as $adv): ?>
+                    <?php foreach ($advisors as $adv): 
+                        $advPhoto = !empty($adv['photo_url']) ? resolve_photo_url($adv['photo_url']) : null;
+                        $initials = strtoupper(substr($adv['first_name'] ?? 'A', 0, 1) . substr($adv['last_name'] ?? 'D', 0, 1));
+                    ?>
                         <tr>
-                            <td><span class="badge bg-light text-dark border font-monospace"><?= htmlspecialchars($adv['advisor_code']) ?></span></td>
+                            <td><span class="badge bg-light text-dark border font-monospace fw-bold"><?= htmlspecialchars($adv['advisor_code']) ?></span></td>
                             <td>
-                                <div class="fw-bold text-navy"><?= htmlspecialchars($adv['first_name'] . ' ' . $adv['last_name']) ?></div>
-                                <span class="text-secondary small"><?= htmlspecialchars($adv['mobile']) ?></span>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="position-relative" style="width: 40px; height: 48px; border-radius: 6px; overflow: hidden; background: linear-gradient(135deg, #0B2545 0%, #1E3A8A 100%); border: 1.5px solid #0f2d59; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center;">
+                                        <?php if (!empty($advPhoto)): ?>
+                                            <img src="<?= htmlspecialchars($advPhoto) ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <span class="text-white fw-bold" style="font-size: 0.78rem; display: none; align-items: center; justify-content: center; width: 100%; height: 100%; letter-spacing: 1px;"><?= htmlspecialchars($initials) ?></span>
+                                        <?php else: ?>
+                                            <span class="text-white fw-bold" style="font-size: 0.78rem; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; letter-spacing: 1px;"><?= htmlspecialchars($initials) ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-navy" style="font-size: 0.95rem;"><?= htmlspecialchars($adv['first_name'] . ' ' . $adv['last_name']) ?></div>
+                                        <span class="text-secondary small"><i class="bi bi-telephone text-success me-1"></i><?= htmlspecialchars($adv['mobile']) ?></span>
+                                    </div>
+                                </div>
                             </td>
                             <td>
                                 <div class="text-navy small fw-semibold"><?= htmlspecialchars($adv['district']) ?></div>

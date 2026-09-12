@@ -186,17 +186,12 @@ if (!function_exists('resolve_photo_url')) {
         if (preg_match('#^https?://#i', $photoUrl)) {
             return $photoUrl;
         }
-        // Strip leading slashes and optional 'public/' prefix
-        $clean = ltrim(str_replace(['../', '..\\'], '', $photoUrl), '/\\');
+        // Normalize slashes and remove dot-dots
+        $clean = str_replace('\\', '/', $photoUrl);
+        $clean = ltrim(str_replace(['../', '..\\'], '', $clean), '/');
+        
         if (strpos($clean, 'public/') === 0) {
             $clean = substr($clean, 7);
-        }
-
-        // Verify that the file exists in the filesystem (check root, public directory, or XAMPP htdocs)
-        $rootCheck = dirname(__DIR__) . '/' . $clean;
-        $publicCheck = dirname(__DIR__) . '/public/' . $clean;
-        if (!file_exists($rootCheck) && !file_exists($publicCheck)) {
-            return null;
         }
 
         return url('/' . $clean);
