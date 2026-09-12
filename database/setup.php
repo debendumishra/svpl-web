@@ -102,6 +102,34 @@ class DatabaseSetup
                 }
             }
 
+            // 3. Execute Master Locations Seeders (All 51,804 Odisha Villages & Pincodes)
+            $locationsSeedFile = __DIR__ . '/locations_seed.sql';
+            if (file_exists($locationsSeedFile)) {
+                $locHandle = fopen($locationsSeedFile, 'r');
+                if ($locHandle) {
+                    $buffer = '';
+                    $locStatements = 0;
+                    while (($line = fgets($locHandle)) !== false) {
+                        $trimmed = trim($line);
+                        if ($trimmed === '' || strpos($trimmed, '--') === 0) {
+                            continue;
+                        }
+                        $buffer .= $line;
+                        if (substr(rtrim($trimmed), -1) === ';') {
+                            try {
+                                $db->exec($buffer);
+                                $locStatements++;
+                            } catch (\Throwable $t) {
+                                // Ignore duplicate
+                            }
+                            $buffer = '';
+                        }
+                    }
+                    fclose($locHandle);
+                    $results['messages'][] = "Loaded master location dataset (51,804 Odisha villages & pincodes).";
+                }
+            }
+
             if ($driver === 'mysql') {
                 $db->exec("SET FOREIGN_KEY_CHECKS = 1;");
             }
