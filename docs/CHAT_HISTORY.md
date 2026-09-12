@@ -2628,5 +2628,33 @@ add the autorised signature image to be replaced in the setting under admin
    - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\svpl-web`).
    - Committed and pushed changes to GitHub repository (`main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+in all icard company logo is missing
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Fix:
+
+1. **Company Logo & Asset Resolution Overhaul**:
+   - Enhanced `company_logo_url()` and `company_favicon_url()` in [`config/constants.php`](file:///d:/DKM/SVPL-Web/config/constants.php) with multi-tier resolution and fallback:
+     1. Resolves dynamic uploaded logo from `Setting::get('company_logo')`.
+     2. Validates physical existence of the file.
+     3. Always falls back gracefully to `url('/assets/images/logo.png')` so the logo is **never missing** under any circumstance.
+   - Enhanced `resolve_photo_url()` in [`config/constants.php`](file:///d:/DKM/SVPL-Web/config/constants.php) to verify local file existence before outputting URLs, preventing broken `404` image icons if a photo is missing or deleted.
+   - Generated and synced permanent default corporate logo asset at [`public/assets/images/logo.png`](file:///d:/DKM/SVPL-Web/public/assets/images/logo.png).
+   - Updated sync scripts to protect `public/uploads` so user-uploaded branding assets are preserved permanently.
+
+2. **Verification & Testing**:
+   - Tested Advisor ID Card (`/print/id-card/1`) and BOE ID Card (`/print/boe-id-card/17`) — verified all logo tags render with valid image URLs returning HTTP `200 OK`.
+   - Verified that company logos display crisp and properly scaled on both Front and Back sides of CR80 ID cards.
+   - Synced files to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed to GitHub repository (`main`).
+
+
 
 

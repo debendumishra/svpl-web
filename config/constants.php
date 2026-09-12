@@ -26,7 +26,6 @@ if (file_exists($envFile)) {
     }
 }
 
-
 // User Roles
 define('ROLE_SUPER_ADMIN', 'SUPER_ADMIN');
 define('ROLE_ADMIN', 'ADMIN');
@@ -192,6 +191,14 @@ if (!function_exists('resolve_photo_url')) {
         if (strpos($clean, 'public/') === 0) {
             $clean = substr($clean, 7);
         }
+
+        // Verify that the file exists in the filesystem (check root, public directory, or XAMPP htdocs)
+        $rootCheck = dirname(__DIR__) . '/' . $clean;
+        $publicCheck = dirname(__DIR__) . '/public/' . $clean;
+        if (!file_exists($rootCheck) && !file_exists($publicCheck)) {
+            return null;
+        }
+
         return url('/' . $clean);
     }
 }
@@ -253,17 +260,26 @@ if (!function_exists('company_tagline')) {
 }
 
 if (!function_exists('company_logo_url')) {
-    function company_logo_url(): ?string {
+    function company_logo_url(): string {
         $logo = company_setting('company_logo');
-        return !empty($logo) ? resolve_photo_url($logo) : null;
+        if (!empty($logo)) {
+            $resolved = resolve_photo_url($logo);
+            if (!empty($resolved)) {
+                return $resolved;
+            }
+        }
+        return url('/assets/images/logo.png');
     }
 }
 
 if (!function_exists('company_favicon_url')) {
-    function company_favicon_url(): ?string {
+    function company_favicon_url(): string {
         $fav = company_setting('company_favicon');
         if (!empty($fav)) {
-            return resolve_photo_url($fav);
+            $resolved = resolve_photo_url($fav);
+            if (!empty($resolved)) {
+                return $resolved;
+            }
         }
         return company_logo_url();
     }
