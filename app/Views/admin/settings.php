@@ -147,8 +147,8 @@ $currentFavicon = company_favicon_url();
                             <small class="text-muted" style="font-size: 0.75rem;">Used in navbar badges & codes.</small>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label small fw-bold text-navy">Promoter Entity Name *</label>
-                            <input type="text" name="promoter_entity" class="form-control fw-semibold" value="<?= htmlspecialchars($settings['promoter_entity'] ?? 'Dhwajja Solar India Pvt. Ltd.') ?>" required>
+                            <label class="form-label small fw-bold text-navy">Promoter Entity Name</label>
+                            <input type="text" name="promoter_entity" class="form-control fw-semibold" value="<?= htmlspecialchars($settings['promoter_entity'] ?? 'Dhwajja Solar India Pvt. Ltd.') ?>">
                             <small class="text-muted" style="font-size: 0.75rem;">Corporate partner entity.</small>
                         </div>
 

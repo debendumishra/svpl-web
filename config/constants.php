@@ -269,6 +269,16 @@ if (!function_exists('company_favicon_url')) {
     }
 }
 
+if (!function_exists('company_signature_url')) {
+    function company_signature_url(): string {
+        $sig = company_setting('company_signature');
+        if (!empty($sig)) {
+            return resolve_photo_url($sig);
+        }
+        return url('/assets/images/authorised_signatory.png');
+    }
+}
+
 if (!function_exists('company_phone')) {
     function company_phone(): string {
         return (string) company_setting('support_phone', '9040999899');

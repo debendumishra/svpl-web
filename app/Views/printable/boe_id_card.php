@@ -271,18 +271,18 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                         <!-- Header Text & Tagline -->
                         <div style="flex: 1; min-width: 0; text-align: left;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
-                                <span style="font-size: 17px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
+                                <span style="font-size: 16px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
                             </div>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px; line-height: 1;">
                                 <h3 style="font-size: 10px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars(company_promoter()) ?></h3>
                                 <div style="display: flex; align-items: center; gap: 3px;">
                                     <span style="height: 5px; width: 10px; background: #0284c7; border-radius: 9999px;"></span>
-                                    <span style="height: 5px; width: 14px; background: #10b981; border-radius: 9999px;"></span>
+                                    <span style="height: 5px; width: 14px; background: #ff7600; border-radius: 9999px;"></span>
                                 </div>
                             </div>
                             <div style="margin-top: 3px; display: flex; align-items: center;">
                                 <span style="font-size: 7.5px; font-weight: 900; color: #0f2d59; letter-spacing: 0.08em; text-transform: uppercase; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(191, 219, 254, 0.8);">
-                                    OFFICIAL OPERATIONS EXECUTIVE
+                                    <?= htmlspecialchars(strtoupper(company_tagline())) ?>
                                 </span>
                             </div>
                         </div>
@@ -352,8 +352,8 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                             <i class="bi bi-geo-alt-fill" style="font-size: 9px;"></i>
                         </div>
                         <div style="flex: 1;">
-                            <span style="font-size: 7.5px; font-weight: 800; color: #64748b; text-transform: uppercase; display: block;">ASSIGNED JURISDICTION:</span>
-                            <span style="font-size: 8.5px; font-weight: 700; line-height: 1.25; color: #0f2d59;">
+                            <span style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; display: block;">ASSIGNED JURISDICTION:</span>
+                            <span style="font-size: 12px; font-weight: 700; line-height: 1.25; color: #0f2d59;">
                                 <?= $jurisdiction ?>
                             </span>
                         </div>
@@ -409,16 +409,22 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                                 ☀
                             </div>
                         <?php endif; ?>
+                        <!-- Header Text & Tagline -->
                         <div style="flex: 1; min-width: 0; text-align: left;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
-                                <span style="font-size: 17px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
+                                <span style="font-size: 16px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
                             </div>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px; line-height: 1;">
                                 <h3 style="font-size: 10px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars(company_promoter()) ?></h3>
                                 <div style="display: flex; align-items: center; gap: 3px;">
                                     <span style="height: 5px; width: 10px; background: #0284c7; border-radius: 9999px;"></span>
-                                    <span style="height: 5px; width: 14px; background: #10b981; border-radius: 9999px;"></span>
+                                    <span style="height: 5px; width: 14px; background: #ff7600; border-radius: 9999px;"></span>
                                 </div>
+                            </div>
+                            <div style="margin-top: 3px; display: flex; align-items: center;">
+                                <span style="font-size: 7.5px; font-weight: 900; color: #0f2d59; letter-spacing: 0.08em; text-transform: uppercase; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(191, 219, 254, 0.8);">
+                                    <?= htmlspecialchars(strtoupper(company_tagline())) ?>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -469,16 +475,10 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                         <p style="font-weight: 600; margin-top: 1px;">• If found, please return to <?= htmlspecialchars(company_name()) ?> Corporate Office.</p>
                     </div>
 
-                    <!-- Signatures Section: Authorised Signatory -->
+                    <!-- Signatures Section: Authorised Signatory Seal & Signature -->
                     <div style="padding-top: 4px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;">
-                        <div style="width: 120px; text-align: center;">
-                            <div style="font-family: 'Space Grotesk', cursive; font-size: 13px; font-weight: 800; color: #0f2d59; transform: rotate(-3deg); margin-bottom: 2px; letter-spacing: 0.5px;">
-                                M. Biswal
-                            </div>
-                            <div style="height: 1px; border-bottom: 1.5px dashed #94a3b8; width: 100%; margin-bottom: 2px;"></div>
-                            <span style="font-size: 8px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.05em; display: block;">
-                                MANAGING DIRECTOR
-                            </span>
+                        <div style="text-align: center; min-width: 130px; display: flex; flex-direction: column; align-items: center;">
+                            <img src="<?= htmlspecialchars(company_signature_url()) ?>" alt="Authorised Signatory" style="height: 38px; max-width: 135px; object-fit: contain; display: block;">
                         </div>
                     </div>
 
