@@ -11,8 +11,24 @@ $title = "Official Verification — Surya Vistaara";
         <div class="col-md-7">
             <div class="card card-svpl p-4 p-md-5 text-center bg-white border-0 shadow-sm" style="border-radius: 16px;">
                 <?php if ($record): ?>
-                    <div class="text-success mb-3">
-                        <i class="bi bi-patch-check-fill display-3"></i>
+                    <?php 
+                    $resolvedPhoto = !empty($record['photo_url']) ? resolve_photo_url($record['photo_url']) : null;
+                    ?>
+                    <div class="d-flex flex-column align-items-center mb-3">
+                        <?php if ($resolvedPhoto): ?>
+                            <div class="position-relative mb-2">
+                                <div style="width: 96px; height: 112px; border-radius: 12px; overflow: hidden; border: 3px solid #0B2545; box-shadow: 0 6px 16px rgba(11, 37, 69, 0.15); background: #f8fafc;">
+                                    <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="Official Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                </div>
+                                <span class="position-absolute bottom-0 end-0 translate-middle-y badge rounded-pill bg-success border border-white p-1" title="Verified Badge">
+                                    <i class="bi bi-patch-check-fill fs-6"></i>
+                                </span>
+                            </div>
+                        <?php else: ?>
+                            <div class="text-success mb-2">
+                                <i class="bi bi-patch-check-fill display-3"></i>
+                            </div>
+                        <?php endif; ?>
                     </div>
                     <h3 class="fw-bold text-navy" style="color: #0B2545;">Verified Official Record</h3>
                     <p class="text-muted small">This identity has been authenticated against the <?= htmlspecialchars(company_name()) ?> Central Database.</p>

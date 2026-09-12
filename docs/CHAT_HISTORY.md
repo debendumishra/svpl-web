@@ -2692,3 +2692,27 @@ it is showing "No authentic record was found matching the scanned QR code parame
 
 
 
+
+
+---
+
+## User
+
+<USER_REQUEST>
+verify should also show the photo of the person also
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Fix:
+
+1. **Photo Display on Official QR Verification Page**:
+   - Updated [`app/Views/public/verify.php`](file:///d:/DKM/SVPL-Web/app/Views/public/verify.php) to display the official authenticated photograph of the verified Advisor or BOE Staff member.
+   - Built with a frame (`96px × 112px`, rounded corners, border, and official green verification badge).
+   - Gracefully resolves uploaded photos using `resolve_photo_url()` with fallback if no photo is available.
+
+2. **Verification & Deployment**:
+   - Tested HTTP GET on `/verify?type=STAFF&code=SVPL-BOE-101` and `/verify?type=ADVISOR&code=SVPL1001` — verified that photos render clearly with HTTP `200 OK`.
+   - Synced workspace to live XAMPP directory (`D:
+mpp\htdocs\SVPL-Web`).
+   - Committed and pushed updates to GitHub repository (`origin main`).
