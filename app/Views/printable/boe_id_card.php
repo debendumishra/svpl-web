@@ -150,16 +150,16 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
             z-index: 10;
             padding: 16px 14px 8px 14px;
             background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.95) 80%, rgba(255,255,255,0.7) 100%);
-            border-bottom: 1px solid rgba(224, 231, 255, 0.7);
+            border-bottom: 1px solid rgba(255, 98, 0, 0.7);
         }
 
         /* Photo Box */
         .photo-frame {
-            width: 90px;
-            height: 104px;
+            width: 120px;
+            height: 144px;
             border-radius: 10px;
             border: 2px dashed rgba(15, 45, 89, 0.35);
-            background: rgba(255, 255, 255, 0.95);
+            /* background: rgba(255, 255, 255, 0.95); */
             position: relative;
             overflow: hidden;
             display: flex;
@@ -195,7 +195,7 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
         /* Wave SVG at bottom */
         .bottom-wave-banner {
             width: 100%;
-            height: 48px;
+            height: 68px;
             position: relative;
             z-index: 20;
             overflow: hidden;
@@ -243,8 +243,6 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
         
         <!-- ==================== FRONT SIDE ==================== -->
         <div class="card-column">
-            <span class="side-badge badge-front">Front Side • CR80 Portrait</span>
-            
             <div class="id-card">
                 <!-- Slot Punch Guide -->
                 <div style="position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 30;">
@@ -269,19 +267,12 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
                         <?php endif; ?>
                         
                         <!-- Header Text & Tagline -->
-                        <div style="flex: 1; min-width: 0; text-align: left;">
+                        <div style="flex: 1; min-width: 0; text-align: center; align-items: center;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
                                 <span style="font-size: 16px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
                             </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px; line-height: 1;">
-                                <h3 style="font-size: 10px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars(company_promoter()) ?></h3>
-                                <div style="display: flex; align-items: center; gap: 3px;">
-                                    <span style="height: 5px; width: 10px; background: #0284c7; border-radius: 9999px;"></span>
-                                    <span style="height: 5px; width: 14px; background: #ff7600; border-radius: 9999px;"></span>
-                                </div>
-                            </div>
                             <div style="margin-top: 3px; display: flex; align-items: center;">
-                                <span style="font-size: 7.5px; font-weight: 900; color: #0f2d59; letter-spacing: 0.08em; text-transform: uppercase; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(191, 219, 254, 0.8);">
+                                <span style="font-size: 8px; font-weight: 900; color: #0f2d59; letter-spacing: 0.08em; text-transform: uppercase; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(191, 219, 254, 0.8);">
                                     <?= htmlspecialchars(strtoupper(company_tagline())) ?>
                                 </span>
                             </div>
@@ -303,7 +294,7 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
                             <?php 
                             $resolvedPhoto = !empty($boe['photo_url']) ? resolve_photo_url($boe['photo_url']) : null;
                             if (!empty($resolvedPhoto)): ?>
-                                <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="BOE Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="BOE Photo" style="width: 100%; height: 100%; display: block;">
                             <?php else: ?>
                                 <i class="bi bi-person-badge-fill" style="font-size: 26px; color: #94a3b8; margin-bottom: 2px;"></i>
                                 <span style="font-size: 8px; font-weight: 800; color: #64748b; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1;">OFFICIAL PHOTO</span>
@@ -314,39 +305,39 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
 
                     <!-- 2. Scaled Name, Designation, Phone & Center-Aligned Address -->
                     <div style="text-align: center; width: 100%;">
-                        <h3 style="font-size: 15px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 2px;">
+                        <h3 style="font-size: 18px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 2px;">
                             <?= htmlspecialchars($fullName) ?>
                         </h3>
                         <div style="display: inline-block; padding: 2px 10px; background: rgba(224, 242, 254, 0.95); border-radius: 9999px; border: 1px solid #7dd3fc;">
-                            <p style="font-size: 9px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">
+                            <p style="font-size: 12px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">
                                 <?= $designation ?>
                             </p>
                         </div>
                         <div style="margin-top: 2px; display: flex; align-items: center; justify-content: center; gap: 4px; color: #0f2d59;">
-                            <i class="bi bi-telephone-fill" style="color: #0284c7; font-size: 12px;"></i>
-                            <span class="font-mono-num" style="font-weight: 800; font-size: 14px; letter-spacing: -0.2px;">
+                            <i class="bi bi-telephone-fill" style="color: #0284c7; font-size: 16px;"></i>
+                            <span class="font-mono-num" style="font-weight: 800; font-size: 16px; letter-spacing: -0.2px;">
                                 <?= $mobileNumber ?>
                             </span>
                         </div>
                         <!-- Address just below mobile number, center aligned with 10px font size -->
                         <?php if (!empty($boe['address'])): ?>
-                        <div style="margin-top: 2px; font-size: 10px; font-weight: 600; color: #334155; line-height: 1.25; text-align: center; padding: 0 2px;">
-                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 9px;"></i><?= htmlspecialchars($boe['address']) ?>
+                        <div style="margin-top: 2px; font-size: 12px; font-weight: 600; color: #334155; line-height: 1.25; text-align: center; padding: 0 2px;">
+                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 18px; color: red;"></i><?= htmlspecialchars($boe['address']) ?>
                         </div>
                         <?php endif; ?>
                     </div>
 
                     <!-- 3. Badges Grid: Employee Code & Blood Group -->
                     <div style="width: 100%;" class="grid-badge-box">
-                        <div style="border-right: 1px solid #e2e8f0; padding-right: 4px; text-align: left;">
-                            <span style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; display: block;">EMPLOYEE CODE</span>
-                            <span class="font-mono-num" style="font-size: 13px; font-weight: 900; color: #0f2d59; letter-spacing: 0.3px; line-height: 1.1; display: block;">
+                        <div style="border-right: 1px solid #e2e8f0; padding-right: 4px; text-align: center;">
+                            <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; display: block;">EMPLOYEE CODE</span>
+                            <span class="font-mono-num" style="font-size: 16px; font-weight: 900; color: #0f2d59; letter-spacing: 0.3px; ">
                                 <?= $empCode ?>
                             </span>
                         </div>
-                        <div style="padding-left: 4px; text-align: left;">
-                            <span style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; display: block;">BLOOD GROUP</span>
-                            <span style="font-size: 13px; font-weight: 900; color: #e11d48; display: flex; align-items: center; gap: 3px; line-height: 1.1;">
+                        <div style="padding-left: 4px; text-align: center;">
+                            <span style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; display: block;">BLOOD GROUP</span>
+                            <span style="font-size: 16px; font-weight: 900; color: #e11d48; align-items: center; gap: 3px; line-height: 1.1;">
                                 <i class="bi bi-droplet-fill" style="font-size: 11px;"></i> <?= htmlspecialchars($bloodGroup) ?>
                             </span>
                         </div>
@@ -355,11 +346,11 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
                     <!-- 4. Jurisdiction Block -->
                     <div style="width: 100%; text-align: left; background: rgba(255, 255, 255, 0.95); padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; align-items: flex-start; z-index: 20;">
                         <div style="width: 16px; height: 16px; border-radius: 4px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; margin-right: 6px; flex-shrink: 0; color: #0284c7; margin-top: 1px;">
-                            <i class="bi bi-geo-alt-fill" style="font-size: 9px;"></i>
+                            <i class="bi bi-geo-alt-fill" style="font-size: 16px;"></i>
                         </div>
                         <div style="flex: 1;">
-                            <span style="font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; display: block;">ASSIGNED JURISDICTION:</span>
-                            <span style="font-size: 12px; font-weight: 700; line-height: 1.25; color: #0f2d59;">
+                            <span style="font-size: 12px; font-weight: 800; color: #64748b; text-transform: uppercase; display: block;">JURISDICTION:</span>
+                            <span style="font-size: 16px; font-weight: 700; line-height: 1.25; color: #0f2d59;">
                                 <?= $jurisdiction ?>
                             </span>
                         </div>
@@ -392,8 +383,6 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
 
         <!-- ==================== BACK SIDE ==================== -->
         <div class="card-column">
-            <span class="side-badge badge-back">Back Side • CR80 Portrait</span>
-            
             <div class="id-card">
                 <!-- Slot Punch Guide -->
                 <div style="position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 30;">
@@ -416,19 +405,12 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
                             </div>
                         <?php endif; ?>
                         <!-- Header Text & Tagline -->
-                        <div style="flex: 1; min-width: 0; text-align: left;">
+                        <div style="flex: 1; min-width: 0; text-align: center; align-items: center;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
                                 <span style="font-size: 16px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
                             </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px; line-height: 1;">
-                                <h3 style="font-size: 10px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars(company_promoter()) ?></h3>
-                                <div style="display: flex; align-items: center; gap: 3px;">
-                                    <span style="height: 5px; width: 10px; background: #0284c7; border-radius: 9999px;"></span>
-                                    <span style="height: 5px; width: 14px; background: #ff7600; border-radius: 9999px;"></span>
-                                </div>
-                            </div>
                             <div style="margin-top: 3px; display: flex; align-items: center;">
-                                <span style="font-size: 7.5px; font-weight: 900; color: #0f2d59; letter-spacing: 0.08em; text-transform: uppercase; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(191, 219, 254, 0.8);">
+                                <span style="font-size: 8px; font-weight: 900; color: #0f2d59; letter-spacing: 0.08em; text-transform: uppercase; background: #eff6ff; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(191, 219, 254, 0.8);">
                                     <?= htmlspecialchars(strtoupper(company_tagline())) ?>
                                 </span>
                             </div>
@@ -442,52 +424,52 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
                     <!-- Company Information Block with QR -->
                     <div style="background: rgba(255, 255, 255, 0.95); border-radius: 8px; padding: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            <div style="flex: 1; font-size: 9px; line-height: 1.35; color: #334155;">
+                            <div style="flex: 1; font-size: 12px; line-height: 1.35; color: #334155;">
                                 <div style="margin-bottom: 2px;">
-                                    <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">HEAD OFFICE:</span>
+                                    <span style="font-weight: 900; color: #0f2d59; font-size: 11.5px; text-transform: uppercase;">HEAD OFFICE:</span>
                                     <span style="font-weight: 600;"><?= htmlspecialchars(company_address()) ?></span>
                                 </div>
                                 <div style="margin-bottom: 2px;">
-                                    <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">HELPLINE:</span>
-                                    <span class="font-mono-num" style="font-weight: 900; color: #0f2d59;"><?= htmlspecialchars(company_phone()) ?></span>
+                                    <span style="font-weight: 900; color: #0f2d59; font-size: 11.5px; text-transform: uppercase;">HELPLINE:</span>
+                                    <span class="font-mono-num" style="font-weight: 900; font-size: 13px; color: #0f2d59;"><?= htmlspecialchars(company_phone()) ?></span>
                                 </div>
                                 <div>
-                                    <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">SUPPORT:</span>
-                                    <span style="font-weight: 700; color: #0891b2; font-size: 8px; word-break: break-all;"><?= htmlspecialchars(company_email()) ?></span>
+                                    <span style="font-weight: 700; color: #0891b2; font-size: 12px; word-break: break-all;"><?= htmlspecialchars(company_email()) ?></span>
                                 </div>
                             </div>
                             
-                            <!-- Digital QR Code -->
-                            <div style="text-align: center; flex-shrink: 0; background: #f8fafc; padding: 4px; border-radius: 6px; border: 1px solid #cbd5e1;">
-                                <img src="<?= $qrUrl ?>" alt="QR" style="width: 58px; height: 58px; display: block;">
-                                <span style="font-size: 6px; font-weight: 700; color: #64748b; text-transform: uppercase;">Scan to Verify</span>
-                            </div>
                         </div>
 
                         <div style="margin-top: 6px; padding-top: 4px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 8.5px; font-weight: 900; color: #0f2d59; text-transform: uppercase;">STAFF ROLE:</span>
-                            <span class="font-mono-num" style="font-size: 9px; font-weight: 900; color: #0f2d59; background: #eff6ff; padding: 1px 6px; border-radius: 4px; border: 1px solid #bfdbfe;">
+                            <span style="font-size: 12px; font-weight: 900; color: #0f2d59; text-transform: uppercase;">STAFF ROLE:</span>
+                            <span class="font-mono-num" style="font-size: 12px; font-weight: 900; color: #0f2d59; background: #eff6ff; padding: 1px 6px; border-radius: 4px; border: 1px solid #bfdbfe;">
                                 BACK OFFICE EXECUTIVE (BOE)
                             </span>
                         </div>
                     </div>
 
                     <!-- Instructions / Security Warning Box -->
-                    <div style="background: rgba(254, 243, 199, 0.95); border-left: 3px solid #f59e0b; padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 8px; color: #451a03; line-height: 1.35;">
-                        <p style="font-size: 8.5px; font-weight: 900; text-transform: uppercase; color: #78350f; margin-bottom: 2px;">
+                    <div style="background: rgba(254, 243, 199, 0.95); border-left: 3px solid #f59e0b; padding: 6px 8px; border-radius: 0 6px 6px 0; font-size: 11px; color: #451a03; line-height: 1.35;">
+                        <p style="font-size: 10.5px; font-weight: 900; text-transform: uppercase; color: #78350f; margin-bottom: 2px;">
                             <i class="bi bi-shield-lock-fill me-1"></i> TERMS & CONDITIONS
                         </p>
                         <p style="font-weight: 600;">• This identity card is strictly non-transferable and remains company property.</p>
                         <p style="font-weight: 600; margin-top: 1px;">• If found, please return to <?= htmlspecialchars(company_name()) ?> Corporate Office.</p>
                     </div>
 
-                    <!-- Signatures Section: Authorised Signatory Seal & Signature -->
-                    <div style="padding-top: 4px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;">
-                        <div style="text-align: center; min-width: 130px; display: flex; flex-direction: column; align-items: center;">
-                            <img src="<?= htmlspecialchars(company_signature_url()) ?>" alt="Authorised Signatory" style="height: 38px; max-width: 135px; object-fit: contain; display: block;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <!-- Digital QR Code -->
+                        <div style="text-align: center; flex-shrink: 0; background: #f8fafc; padding: 4px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&amp;data=https%3A%2F%2Fsuryavistaara.com%2Fverify%3Ftype%3DSTAFF%26code%3DDSI-HO-101" alt="QR" style="width: 58px; height: 58px; display: block;">
+                            <span style="font-size: 6px; font-weight: 700; color: #64748b; text-transform: uppercase;">Scan to Verify</span>
+                        </div>
+                        <!-- Signatures Section: Authorised Signatory Seal & Signature -->
+                        <div style="padding-top: 4px; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: flex-end; justify-content: flex-end;">
+                            <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+                                <img src="<?= htmlspecialchars(company_signature_url()) ?>" alt="Authorised Signatory" style="height: 55px; object-fit: contain; display: block;">
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
                 <!-- Flowing Wave Ribbon Banner (Back) -->
@@ -514,11 +496,5 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/
         </div>
 
     </div>
-
-    <!-- Print Specification Note -->
-    <div style="margin-top: 24px; text-align: center; font-size: 0.75rem; color: #64748b;">
-        <strong>Print Specification:</strong> CR80 Standard (85.6 mm × 54 mm) • 300 DPI Duplex PVC Card Printing • Full-Width Header & Scaled Typography
-    </div>
-
 </body>
 </html>

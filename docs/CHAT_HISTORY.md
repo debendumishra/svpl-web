@@ -2973,3 +2973,34 @@ unable to login any role
    - Automated 16/16 test suite verifying logins across all 5 roles.
    - Synced to live XAMPP server (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed to GitHub repository (`origin main`).
+
+---
+
+## User
+
+<USER_REQUEST>
+Now the boe_id_card design is final. modify the custom_id_card and id_Card accordingly. the other identity card design, font size, font etc should be exactly same. do not change anything in boe_id_card
+</USER_REQUEST>
+
+## Assistant
+
+### ID Card Design Standardization Summary:
+
+1. **Golden Reference Preservation**:
+   - `app/Views/printable/boe_id_card.php` was kept strictly untouched as the golden design standard.
+
+2. **Pixel-Perfect Alignment Across All ID Cards**:
+   - Synchronized `app/Views/printable/custom_id_card.php`, `app/Views/printable/id_card.php`, and `app/Views/advisor/id_card.php` to match `boe_id_card.php` 100% identically:
+     - **Header**: Centered company name (`16px`, `font-weight: 900`), tagline badge (`8px`, background `#eff6ff`), orange border-bottom `1px solid rgba(255, 98, 0, 0.7)`.
+     - **Photo Box**: `120px × 144px`, `border: 2px dashed rgba(15, 45, 89, 0.35)`, 4 corner brackets, image `width: 100%; height: 100%; display: block;`.
+     - **Typography**: Name (`18px`, `font-weight: 900`), Designation badge (`12px`, `font-weight: 800`), Phone (`16px`, icon `16px`), Address (`12px`, `font-weight: 600`, icon `18px red`).
+     - **Badges Grid**: 2-column grid (`grid-badge-box`), titles `11px`, values `16px font-weight: 900`.
+     - **Jurisdiction Block**: Title `12px`, value `16px font-weight: 700`, icon `16px`.
+     - **Wave Ribbon Banner**: `height: 68px` with vibrant SVG gradients.
+     - **Back Side**: Head office (`12px`, title `11.5px`), Helpline (`13px`, title `11.5px`), Support email (`12px`), Role badge (`12px`), Terms & Conditions (`11px`, title `10.5px`), QR code (`58px × 58px`) positioned side-by-side with Authorized Signatory seal (`height: 55px`).
+
+3. **Validation & Synchronization**:
+   - Linted all modified PHP files with `D:\xampp\php\php.exe -l` with zero syntax errors.
+   - Synchronized workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed to GitHub repository (`origin main`).
+
