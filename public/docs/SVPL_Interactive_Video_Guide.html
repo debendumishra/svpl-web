@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Operations Video & Voice Guide — Surya Vistaara (SVPL)</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons & CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <style>
+        :root {
+            --svpl-navy: #0f2d59;
+            --svpl-blue: #0284c7;
+            --svpl-gold: #f59e0b;
+            --svpl-dark: #091a33;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #091a33;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .font-mono {
+            font-family: 'Space Grotesk', monospace;
+        }
+        
+        /* Top Navigation Bar */
+        .guide-header {
+            background: #0f2d59;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 24px;
+        }
+
+        /* Video Player Screen Container */
+        .video-stage-card {
+            background: #020617;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .video-screen {
+            aspect-ratio: 16 / 9;
+            background: #0b1329;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Voice Wave Animation */
+        .voice-wave {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 24px;
+        }
+        .voice-bar {
+            width: 4px;
+            height: 6px;
+            background: #f59e0b;
+            border-radius: 9999px;
+            transition: height 0.15s ease;
+        }
+        .voice-wave.speaking .voice-bar:nth-child(1) { animation: wave 0.8s infinite ease-in-out; }
+        .voice-wave.speaking .voice-bar:nth-child(2) { animation: wave 0.8s 0.2s infinite ease-in-out; }
+        .voice-wave.speaking .voice-bar:nth-child(3) { animation: wave 0.8s 0.4s infinite ease-in-out; }
+        .voice-wave.speaking .voice-bar:nth-child(4) { animation: wave 0.8s 0.1s infinite ease-in-out; }
+        .voice-wave.speaking .voice-bar:nth-child(5) { animation: wave 0.8s 0.3s infinite ease-in-out; }
+        
+        @keyframes wave {
+            0%, 100% { height: 6px; }
+            50% { height: 24px; }
+        }
+
+        /* Subtitles Overlay */
+        .subtitle-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 5%;
+            right: 5%;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.4;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            z-index: 20;
+        }
+
+        /* Chapter Playlist Item */
+        .chapter-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chapter-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(245, 158, 11, 0.4);
+            transform: translateX(3px);
+        }
+        .chapter-item.active {
+            background: linear-gradient(135deg, rgba(2, 132, 199, 0.2) 0%, rgba(15, 45, 89, 0.4) 100%);
+            border-color: #f59e0b;
+        }
+        .chapter-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0f2d59;
+            color: #f59e0b;
+            font-weight: 800;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .chapter-item.active .chapter-badge {
+            background: #f59e0b;
+            color: #0f2d59;
+        }
+
+        /* Slide Content Cards */
+        .slide-visual {
+            width: 100%;
+            height: 100%;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1e3a8a 0%, #0b1329 100%);
+            position: relative;
+        }
+        .slide-step-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.2);
+            border: 1px solid #f59e0b;
+            color: #fcd34d;
+            font-weight: 800;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            margin-bottom: 12px;
+        }
+        .slide-title {
+            font-size: 1.9rem;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+        .slide-desc {
+            font-size: 1rem;
+            color: #cbd5e1;
+            max-width: 620px;
+            line-height: 1.5;
+        }
+
+        .highlight-box {
+            background: rgba(15, 45, 89, 0.6);
+            border: 1px dashed rgba(245, 158, 11, 0.6);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-top: 16px;
+            display: flex;
+            gap: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="guide-header">
+        <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <a href="#" class="text-decoration-none d-flex align-items-center gap-2">
+                    <span class="fs-4 text-warning">☀</span>
+                    <span class="fw-bold fs-5 text-white">Surya Vistaara Pvt. Ltd. (SVPL)</span>
+                </a>
+                <span class="badge bg-warning text-dark fw-bold px-2 py-1">
+                    <i class="bi bi-mic-fill me-1"></i> Interactive Voice & Video Suite (Standalone)
+                </span>
+            </div>
+            
+            <div class="d-flex align-items-center gap-2">
+                <a href="SVPL_Operations_Manual.html" target="_blank" class="btn btn-outline-light btn-sm fw-bold">
+                    <i class="bi bi-file-earmark-pdf-fill text-danger me-1"></i> PDF Operations Manual
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Player Layout -->
+    <main class="container-fluid py-4 flex-grow-1">
+        <div class="row g-4">
+            
+            <!-- Left 8-Cols: Interactive Video / Slide Player -->
+            <div class="col-lg-8">
+                <div class="video-stage-card">
+                    
+                    <!-- Screen Area -->
+                    <div class="video-screen" id="videoScreen">
+                        
+                        <!-- Slide Content Visual -->
+                        <div class="slide-visual" id="slideVisual">
+                            <span class="slide-step-badge" id="slideBadge">CHAPTER 1 • INTRODUCTION</span>
+                            <h2 class="slide-title" id="slideTitle">Surya Vistaara Platform Architecture</h2>
+                            <p class="slide-desc" id="slideDesc">
+                                Welcome to the official operational walkthrough for Surya Vistaara and Dhwajja Solar India. 
+                                In this guide, we will explore administrative governance, BOE document verification, advisor hierarchy, 
+                                and the 10-stage PM Surya Ghar solar project pipeline.
+                            </p>
+                            
+                            <div class="highlight-box" id="slideHighlights">
+                                <div>
+                                    <div class="text-warning fw-bold small"><i class="bi bi-person-fill-gear me-1"></i> 5 Roles</div>
+                                    <div class="small text-light">Admin, BOE, Advisor, Citizen, Staff</div>
+                                </div>
+                                <div class="border-start ps-3 border-secondary">
+                                    <div class="text-info fw-bold small"><i class="bi bi-grid-3x3-gap-fill me-1"></i> 10 Stages</div>
+                                    <div class="small text-light">Registration to ₹1.38L DBT Subsidy</div>
+                                </div>
+                                <div class="border-start ps-3 border-secondary">
+                                    <div class="text-success fw-bold small"><i class="bi bi-card-heading me-1"></i> CR80 Cards</div>
+                                    <div class="small text-light">With Live QR Privacy Verification</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Subtitle Live Transcript -->
+                        <div class="subtitle-bar" id="subtitleBar">
+                            Click "Play Voice Guide" below to begin the voice-narrated video operations tour.
+                        </div>
+                    </div>
+
+                    <!-- Player Controls Bar -->
+                    <div class="p-3 bg-dark d-flex flex-wrap align-items-center justify-content-between gap-3 border-top border-secondary">
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="btn btn-warning fw-bold px-3 py-2" id="playBtn" onclick="togglePlay()">
+                                <i class="bi bi-play-fill fs-5" id="playIcon"></i> <span id="playText">Play Voice Guide</span>
+                            </button>
+                            <button class="btn btn-outline-secondary text-white btn-sm" onclick="prevChapter()" title="Previous Chapter">
+                                <i class="bi bi-skip-backward-fill"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary text-white btn-sm" onclick="nextChapter()" title="Next Chapter">
+                                <i class="bi bi-skip-forward-fill"></i>
+                            </button>
+                            
+                            <!-- Voice Wave Indicator -->
+                            <div class="voice-wave ms-2" id="voiceWave">
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                                <div class="voice-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Voice Settings -->
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="small text-secondary fw-bold text-nowrap"><i class="bi bi-speedometer2 me-1"></i> Speed:</label>
+                                <select class="form-select form-select-sm bg-dark text-white border-secondary" id="rateSelect" onchange="updateRate(this.value)" style="width: 80px;">
+                                    <option value="0.9">0.9x</option>
+                                    <option value="1.0" selected>1.0x</option>
+                                    <option value="1.15">1.15x</option>
+                                    <option value="1.25">1.25x</option>
+                                </select>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="small text-secondary fw-bold text-nowrap"><i class="bi bi-person-voice me-1"></i> Voice:</label>
+                                <select class="form-select form-select-sm bg-dark text-white border-secondary" id="voiceSelect" onchange="changeVoice(this.value)" style="max-width: 150px;">
+                                    <option value="">Default AI Voice</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Chapter Details Card -->
+                <div class="card bg-dark border-secondary text-light mt-4 p-4 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="fw-bold text-warning mb-0" id="detailTitle">Chapter Transcript & Action Steps</h4>
+                        <span class="badge bg-secondary font-mono" id="detailChapterNum">Chapter 1 of 8</span>
+                    </div>
+                    <div class="text-secondary leading-relaxed" id="detailContent" style="font-size: 0.95rem;">
+                        This module covers the end-to-end multi-tier access model designed for Surya Vistaara.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right 4-Cols: Chapter Playlist & Interactive Navigation -->
+            <div class="col-lg-4">
+                <div class="card bg-dark border-secondary p-3 shadow-sm h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-bold text-white mb-0"><i class="bi bi-collection-play-fill text-warning me-2"></i> Guide Chapters</h5>
+                        <span class="badge bg-primary">8 Modules</span>
+                    </div>
+
+                    <div class="chapter-playlist" id="chapterList">
+                        <!-- Rendered by JavaScript -->
+                    </div>
+
+                    <!-- Direct Documentation Quick Access -->
+                    <div class="mt-4 p-3 rounded bg-dark border border-secondary">
+                        <h6 class="fw-bold text-warning mb-2"><i class="bi bi-download me-1"></i> Offline Resources</h6>
+                        <p class="small text-secondary mb-3">Download the comprehensive PDF Operations Manual or inspect the live ID card system.</p>
+                        <div class="d-grid gap-2">
+                            <a href="SVPL_Operations_Manual.html" target="_blank" class="btn btn-outline-warning btn-sm fw-bold">
+                                <i class="bi bi-printer-fill me-1"></i> Open Printable PDF Manual
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Interactive Player Script with Web Speech API -->
+    <script>
+        const chapters = [
+            {
+                id: 1,
+                title: "Platform Overview & Roles",
+                badge: "CHAPTER 1 • ARCHITECTURE",
+                desc: "Explore the 5 unified enterprise roles: Super Admin, Management, Back Office Executive (BOE), Solar Advisors, and Citizens under PM Surya Ghar.",
+                subtitles: "Welcome to Surya Vistaara and Dhwajja Solar India. The platform coordinates solar onboarding across all 30 Odisha districts with 5 secure role-based portals.",
+                transcript: "The platform provides unified access for Super Admins, Managers, Back Office Executives, Solar Advisors, and Customers. Every role is secured with password protection, role middleware, and multi-credential identifier logins.",
+                highlights: [
+                    { title: "5 Roles", sub: "Super Admin, Manager, BOE, Advisor, Citizen" },
+                    { title: "Multi-Login", sub: "Email, Mobile, or Unique Staff/Advisor Code" },
+                    { title: "Security", sub: "Session Guards & Role Middleware" }
+                ],
+                speech: "Welcome to the Surya Vistaara and Dhwajja Solar India operations guide. Our cloud platform connects citizens, solar advisors, back office executives, and administrators to deliver seamless rooftop solar installations under the PM Surya Ghar scheme across Odisha. You can log in using your registered email, mobile number, or unique employee and advisor code."
+            },
+            {
+                id: 2,
+                title: "Super Admin & Management Command",
+                badge: "CHAPTER 2 • EXECUTIVE DESK",
+                desc: "Centralized management of global onboarding fees (₹2,700), DISCOM dispatch tracking, statutory TDS rules, and system audits.",
+                subtitles: "Super Admins control core system settings, review incoming ₹2,700 onboarding fees, manage dispatches, and monitor company ledgers.",
+                transcript: "From the Executive Dashboard at /admin/dashboard, managers can verify pending UTR numbers, adjust commission rules, generate MIS reports, and dispatch solar hardware kits.",
+                highlights: [
+                    { title: "Fee Desk", sub: "Verify ₹2,700 Advisor UTRs" },
+                    { title: "Dispatches", sub: "Track Canopy, Panels & Net Meters" },
+                    { title: "Settings", sub: "Adjust TDS & Direct Bonus" }
+                ],
+                speech: "In Chapter 2, we explore the Super Admin and Manager portals. Administrators have full visibility into daily operations, pending onboarding fee UTR verifications, courier dispatch tracking, and financial ledgers. When an advisor pays their 2,700 rupee joining fee, administrators verify the transaction reference to immediately activate their account."
+            },
+            {
+                id: 3,
+                title: "Back Office Executive (BOE) Scrutiny",
+                badge: "CHAPTER 3 • BOE SCRUTINY",
+                desc: "Review daily customer application queues, inspect 6 mandatory KYC documents, advance stages, and request file replacements.",
+                subtitles: "BOE staff scrutinize customer electricity bills, Aadhaar cards, PAN, land pattas, bank passbooks, and rooftop photos.",
+                transcript: "BOEs log in to /boe/dashboard to inspect applicant dossiers. Once documents are verified, the executive advances the milestone to Site Feasibility, Bank Loan, or Net Meter Inspection.",
+                highlights: [
+                    { title: "6 Documents", sub: "Bill, Aadhaar, PAN, Patta, Bank, Roof Photo" },
+                    { title: "Actions", sub: "Approve, Replace, or Request Fresh Upload" },
+                    { title: "Alerts", sub: "Auto-notifies Sponsoring Advisor" }
+                ],
+                speech: "Chapter 3 details the Back Office Executive daily workflow. Executives review incoming customer solar applications, validating the electricity bill consumer number, Aadhaar, PAN, property ownership patta, bank account details for dual DBT subsidies, and rooftop photographs. Executives can approve documents, replace blurry files, or request re-uploads with instant alerts."
+            },
+            {
+                id: 4,
+                title: "Solar Advisor & 9-Level Tree",
+                badge: "CHAPTER 4 • ADVISOR ONBOARDING",
+                desc: "Public registration, live sponsor lookup, ₹2,700 onboarding fee submission, 9-level genealogy tree, and commission wallet.",
+                subtitles: "New advisors register online with referral attribution. Upon fee approval, their digital wallet, 9-level tree, and ID card are active.",
+                transcript: "Advisors earn commissions across 9 tiers when their registered customer reaches Stage 7 (Installation) and Stage 10 (Subsidy). TDS is automatically deducted with instant wallet credits.",
+                highlights: [
+                    { title: "₹2,700 Fee", sub: "Welcome Kit, ID Card & 9-Level License" },
+                    { title: "Genealogy", sub: "9-Tier Closure Table Matrix" },
+                    { title: "Commissions", sub: "Auto-credited with 5% TDS Ledger" }
+                ],
+                speech: "In Chapter 4, we examine the Solar Advisor network. Aspiring advisors register through the portal with real-time sponsor verification. Once the onboarding fee is confirmed, the advisor gains access to their 9-level genealogy network tree, digital commission wallet, customer registration desk, and personalized marketing collateral."
+            },
+            {
+                id: 5,
+                title: "10-Stage Customer Solar Pipeline",
+                badge: "CHAPTER 5 • 10-STAGE PIPELINE",
+                desc: "Trace customer applications from Lead Registration to Site Feasibility, Loan Sanction, Net Metering, and Dual DBT Subsidies.",
+                subtitles: "Every rooftop project progresses through 10 clear milestones with live synchronization across Customer, Advisor, and Admin portals.",
+                transcript: "The 10 milestones ensure full compliance with MNRE guidelines and DISCOM rules, culminating in the release of ₹78,000 Central + ₹60,000 State subsidies (₹1.38 Lakhs total).",
+                highlights: [
+                    { title: "Stage 1–5", sub: "Registration, KYC, Feasibility & Loan" },
+                    { title: "Stage 6–9", sub: "Dispatch, Installation & Net Metering" },
+                    { title: "Stage 10", sub: "₹1.38 Lakh DBT Subsidy Received" }
+                ],
+                speech: "Chapter 5 outlines the 10-stage solar project lifecycle. Every application is tracked from initial bill submission, through site feasibility, bank loan sanction, equipment dispatch, installation, DISCOM net-meter synchronization, and final receipt of the 1 lakh 38 thousand rupee dual DBT subsidy."
+            },
+            {
+                id: 6,
+                title: "CR80 PVC ID Card Generator",
+                badge: "CHAPTER 6 • ID CARD STUDIO",
+                desc: "Golden-standard CR80 ID cards for BOEs, Advisors, and Staff with client-side photo optimizer and live privacy QR code verification.",
+                subtitles: "Generate pixel-perfect duplex 54 × 85.6 mm ID cards matching the finalized golden design with dynamic QR scanning.",
+                transcript: "The ID Card Studio at /admin/id-cards allows managers to generate official cards with automatic photo compression under 200KB and privacy-preserving QR verification.",
+                highlights: [
+                    { title: "CR80 Size", sub: "54 × 85.6 mm Standard Duplex Format" },
+                    { title: "Photo Box", sub: "120 × 144 mm with 4-Corner Brackets" },
+                    { title: "Live QR", sub: "Instant Verification via suryavistaara.com" }
+                ],
+                speech: "In Chapter 6, we demonstrate the CR80 PVC identity card generation system. Cards are produced in double-sided portrait format with company branding, 120 by 144 pixel photo frames, flowing wave ribbons, and authorized signatory seals. The back side includes a dynamic QR code that allows anyone to verify credentials in real time."
+            },
+            {
+                id: 7,
+                title: "Company Double-Entry Ledger",
+                badge: "CHAPTER 7 • FINANCIAL BOOKS",
+                desc: "Daily cash & bank register, party-wise statements for advisors and vendors, UTR reconciliation, and CSV MIS exports.",
+                subtitles: "Complete financial transparency with automated receipt postings, voucher numbers, and running treasury balance.",
+                transcript: "Located at /admin/ledger, the ledger tracks every inflow and outflow with sequential voucher IDs (RCPT, PMT, CTR) and party attribution.",
+                highlights: [
+                    { title: "Daily Register", sub: "Real-Time Debits, Credits & Balance" },
+                    { title: "Party Ledger", sub: "Advisor, Customer & Vendor Statements" },
+                    { title: "Auto-Post", sub: "Triggered on Fee Confirmation" }
+                ],
+                speech: "Chapter 7 covers the Company Account Books and Double-Entry Ledger. Administrators can view chronological daily cash and bank journals, generate party statements for any advisor or vendor, record manual vouchers, and export audit-ready financial statements."
+            },
+            {
+                id: 8,
+                title: "Location Master & 51,804 Records",
+                badge: "CHAPTER 8 • ODISHA LOCATIONS",
+                desc: "Full state coverage across 30 districts with AJAX cascading from District to Block, GP, Village, and reverse PIN code auto-fill.",
+                subtitles: "Experience seamless location auto-selection across all 51,804 Odisha villages, panchayats, and pincodes.",
+                transcript: "The location engine dynamically cascades selections and allows instant reverse lookups from any 6-digit PIN code without manual searching.",
+                highlights: [
+                    { title: "51,804 Rows", sub: "Covering all 30 Odisha Districts" },
+                    { title: "Cascading", sub: "District → Block → GP → Village" },
+                    { title: "PIN Lookup", sub: "Auto-resolves Location from 6-Digit PIN" }
+                ],
+                speech: "Finally, Chapter 8 showcases our comprehensive Odisha location engine. With over 51,000 pre-loaded villages, selecting a district instantly populates blocks and panchayats. Furthermore, entering any 6-digit postal PIN code automatically fills the district and block details across all registration forms. Thank you for completing the Surya Vistaara operations guide."
+            }
+        ];
+
+        let currentChapterIndex = 0;
+        let isPlaying = false;
+        let speechSynth = window.speechSynthesis;
+        let currentUtterance = null;
+        let speechRate = 1.0;
+        let selectedVoice = null;
+
+        function loadVoices() {
+            if (!speechSynth) return;
+            const voices = speechSynth.getVoices();
+            const voiceSelect = document.getElementById('voiceSelect');
+            voiceSelect.innerHTML = '<option value="">Default AI Voice</option>';
+            
+            voices.forEach((v, idx) => {
+                if (v.lang.includes('en') || v.lang.includes('hi')) {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.textContent = `${v.name} (${v.lang})`;
+                    if (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('David') || v.name.includes('Zira')) {
+                        opt.selected = true;
+                        selectedVoice = v;
+                    }
+                    voiceSelect.appendChild(opt);
+                }
+            });
+        }
+
+        if (speechSynth) {
+            speechSynth.onvoiceschanged = loadVoices;
+            loadVoices();
+        }
+
+        function changeVoice(val) {
+            if (!val) { selectedVoice = null; return; }
+            const voices = speechSynth.getVoices();
+            selectedVoice = voices[val] || null;
+            if (isPlaying) {
+                stopSpeech();
+                speakCurrentChapter();
+            }
+        }
+
+        function updateRate(val) {
+            speechRate = parseFloat(val) || 1.0;
+            if (isPlaying) {
+                stopSpeech();
+                speakCurrentChapter();
+            }
+        }
+
+        function renderPlaylist() {
+            const listEl = document.getElementById('chapterList');
+            listEl.innerHTML = '';
+            chapters.forEach((ch, idx) => {
+                const item = document.createElement('div');
+                item.className = `chapter-item ${idx === currentChapterIndex ? 'active' : ''}`;
+                item.onclick = () => selectChapter(idx);
+                item.innerHTML = `
+                    <div class="chapter-badge">${ch.id}</div>
+                    <div class="flex-grow-1 min-w-0">
+                        <div class="fw-bold text-white small text-truncate">${ch.title}</div>
+                        <div class="text-secondary" style="font-size: 0.75rem;">${ch.badge.split('•')[1] || ''}</div>
+                    </div>
+                    <i class="bi bi-play-circle-fill text-warning fs-5"></i>
+                `;
+                listEl.appendChild(item);
+            });
+        }
+
+        function loadChapter(index) {
+            currentChapterIndex = index;
+            const ch = chapters[index];
+
+            document.getElementById('slideBadge').textContent = ch.badge;
+            document.getElementById('slideTitle').textContent = ch.title;
+            document.getElementById('slideDesc').textContent = ch.desc;
+            document.getElementById('subtitleBar').textContent = ch.subtitles;
+            document.getElementById('detailTitle').textContent = `${ch.id}. ${ch.title} — Transcript & Operations SOP`;
+            document.getElementById('detailChapterNum').textContent = `Chapter ${ch.id} of ${chapters.length}`;
+            document.getElementById('detailContent').innerHTML = `
+                <p class="mb-2 font-monospace text-warning"><i class="bi bi-megaphone-fill me-1"></i> Voiceover Script:</p>
+                <p class="p-3 bg-black rounded border border-secondary text-light">${ch.speech}</p>
+                <h6 class="fw-bold text-white mt-3"><i class="bi bi-list-check text-success me-1"></i> Key Operational Takeaways:</h6>
+                <p>${ch.transcript}</p>
+            `;
+
+            const hlEl = document.getElementById('slideHighlights');
+            hlEl.innerHTML = ch.highlights.map((h, i) => `
+                <div class="${i > 0 ? 'border-start ps-3 border-secondary' : ''}">
+                    <div class="text-warning fw-bold small">${h.title}</div>
+                    <div class="small text-light">${h.sub}</div>
+                </div>
+            `).join('');
+
+            renderPlaylist();
+        }
+
+        function selectChapter(idx) {
+            stopSpeech();
+            loadChapter(idx);
+            speakCurrentChapter();
+        }
+
+        function nextChapter() {
+            if (currentChapterIndex < chapters.length - 1) {
+                selectChapter(currentChapterIndex + 1);
+            } else {
+                selectChapter(0);
+            }
+        }
+
+        function prevChapter() {
+            if (currentChapterIndex > 0) {
+                selectChapter(currentChapterIndex - 1);
+            }
+        }
+
+        function stopSpeech() {
+            if (speechSynth) {
+                speechSynth.cancel();
+            }
+            document.getElementById('voiceWave').classList.remove('speaking');
+            isPlaying = false;
+            document.getElementById('playIcon').className = 'bi bi-play-fill fs-5';
+            document.getElementById('playText').textContent = 'Play Voice Guide';
+        }
+
+        function speakCurrentChapter() {
+            if (!speechSynth) {
+                alert('Web Speech Synthesis is not supported on this browser.');
+                return;
+            }
+
+            speechSynth.cancel();
+            const ch = chapters[currentChapterIndex];
+            currentUtterance = new SpeechSynthesisUtterance(ch.speech);
+            currentUtterance.rate = speechRate;
+            if (selectedVoice) {
+                currentUtterance.voice = selectedVoice;
+            }
+
+            currentUtterance.onstart = function() {
+                isPlaying = true;
+                document.getElementById('voiceWave').classList.add('speaking');
+                document.getElementById('playIcon').className = 'bi bi-pause-fill fs-5';
+                document.getElementById('playText').textContent = 'Pause Guide';
+            };
+
+            currentUtterance.onend = function() {
+                document.getElementById('voiceWave').classList.remove('speaking');
+                isPlaying = false;
+                document.getElementById('playIcon').className = 'bi bi-play-fill fs-5';
+                document.getElementById('playText').textContent = 'Play Voice Guide';
+                if (currentChapterIndex < chapters.length - 1) {
+                    setTimeout(() => {
+                        nextChapter();
+                    }, 1200);
+                }
+            };
+
+            currentUtterance.onerror = function() {
+                document.getElementById('voiceWave').classList.remove('speaking');
+                isPlaying = false;
+                document.getElementById('playIcon').className = 'bi bi-play-fill fs-5';
+                document.getElementById('playText').textContent = 'Play Voice Guide';
+            };
+
+            speechSynth.speak(currentUtterance);
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopSpeech();
+            } else {
+                speakCurrentChapter();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadChapter(0);
+        });
+    </script>
+</body>
+</html>

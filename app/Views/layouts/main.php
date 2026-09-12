@@ -135,9 +135,11 @@
                     <a href="<?= url('/register-advisor') ?>"><i class="bi bi-person-badge-fill me-2 text-warning"></i> Register as Advisor</a>
                     <a href="<?= url('/contact') ?>"><i class="bi bi-headset me-2 text-success"></i> Customer Solar Inquiry</a>
                     <a href="<?= url('/login') ?>"><i class="bi bi-shield-lock-fill me-2 text-info"></i> Advisor / Admin Login</a>
-                    <a href="<?= url('/login') ?>"><i class="bi bi-person-circle me-2 text-primary"></i> Customer Login</a>
+                    <a href="<?= url('/operations-guide') ?>"><i class="bi bi-play-circle-fill me-2 text-warning"></i> Video & Voice Guide</a>
+                    <a href="<?= url('/manual') ?>" target="_blank"><i class="bi bi-file-earmark-pdf-fill me-2 text-danger"></i> PDF Operations Manual</a>
                     <a href="<?= url('/verify') ?>"><i class="bi bi-patch-check-fill me-2 text-warning"></i> Verify Document / ID</a>
                 </div>
+
 
                 <div class="col-lg-3">
                     <h5>Office & Helpdesk</h5>

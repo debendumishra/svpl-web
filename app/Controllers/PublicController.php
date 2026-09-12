@@ -190,6 +190,20 @@ class PublicController
         $this->verifyQr();
     }
 
+    public function operationsManual(): void
+    {
+        Response::view('printable/operations_manual', [
+            'pageTitle' => 'Official Operational Manual — ' . company_name(),
+        ]);
+    }
+
+    public function operationsGuide(): void
+    {
+        Response::view('public/operations_guide', [
+            'pageTitle' => 'Interactive Operation Video & Voice Guide — ' . company_name(),
+        ]);
+    }
+
     public function install(): void
     {
         require_once dirname(__DIR__, 2) . '/database/setup.php';
@@ -200,3 +214,4 @@ class PublicController
         ]);
     }
 }
+

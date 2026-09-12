@@ -45,11 +45,19 @@ Router::get('/verify/advisor/{code}', [PublicController::class, 'verifyAdvisorCo
 Router::get('/verify/staff/{code}', [PublicController::class, 'verifyStaffCode']);
 Router::get('/verify/{code}', [PublicController::class, 'verifyQrCodeParam']);
 Router::get('/install', [PublicController::class, 'install']);
+Router::get('/manual', [PublicController::class, 'operationsManual']);
+Router::get('/operations-manual', [PublicController::class, 'operationsManual']);
+Router::get('/print/operations-manual', [PublicController::class, 'operationsManual']);
+Router::get('/operations-guide', [PublicController::class, 'operationsGuide']);
+Router::get('/video-guide', [PublicController::class, 'operationsGuide']);
+Router::get('/admin/operations-guide', [PublicController::class, 'operationsGuide']);
+Router::get('/admin/manual', [PublicController::class, 'operationsManual']);
 Router::get('/dispatches', function() { \App\Helpers\Response::redirect('/admin/dispatches'); });
 Router::get('/commissions', function() { \App\Helpers\Response::redirect('/admin/commissions'); });
 Router::get('/payments', function() { \App\Helpers\Response::redirect('/admin/payments'); });
 Router::get('/ledger', function() { \App\Helpers\Response::redirect('/admin/ledger'); });
 Router::get('/accounts', function() { \App\Helpers\Response::redirect('/admin/ledger'); });
+
 
 // ==========================================
 // 2. AUTHENTICATION & ONBOARDING ROUTES

@@ -3004,3 +3004,48 @@ Now the boe_id_card design is final. modify the custom_id_card and id_Card accor
    - Synchronized workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed to GitHub repository (`origin main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+A operational mannual required in pdf and operation video is required for the client. Can you design and generate with voice.
+</USER_REQUEST>
+
+## Assistant
+
+### Operational Manual (PDF) & Voice-Narrated Video Walkthrough Suite Summary:
+
+1. **Official Client Operational Manual (PDF-Ready Print View & Offline Package)**:
+   - Created [`app/Views/printable/operations_manual.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/operations_manual.php) accessible at `/manual`, `/operations-manual`, and `/print/operations-manual`.
+   - Created standalone offline printable file [`public/docs/SVPL_Operations_Manual.html`](file:///d:/DKM/SVPL-Web/public/docs/SVPL_Operations_Manual.html).
+   - Features:
+     - Executive cover page with corporate branding, scheme scope, headquarters, and document control metadata.
+     - Formatted `@page` print rules with A4 page breaks, running headers, section dividers, and one-click **"Print / Save as PDF"** button.
+     - 8 Comprehensive Chapters covering:
+       1. Platform Architecture & 5 Roles (Admin, Manager, BOE, Advisor, Citizen).
+       2. Back Office Executive (BOE) Daily SOP & 6 Core KYC Document Inspection.
+       3. 10-Stage Customer Solar Installation Pipeline (Lead to ₹1.38 Lakh Dual DBT Subsidies).
+       4. CR80 Duplex ID Card Generation & Dynamic QR Privacy Verification.
+       5. Company Double-Entry Financial Ledger, Daily Cash Register & MIS Reports.
+       6. Location Cascading & 51,804 Odisha Records.
+       7. Super Admin & Governance Desks.
+       8. Technical Specifications, Security Protocols & Helplines.
+
+2. **Interactive Video & Audio Voiceover Walkthrough Suite**:
+   - Created [`app/Views/public/operations_guide.php`](file:///d:/DKM/SVPL-Web/app/Views/public/operations_guide.php) accessible at `/operations-guide` and `/video-guide`.
+   - Created standalone offline player [`public/docs/SVPL_Interactive_Video_Guide.html`](file:///d:/DKM/SVPL-Web/public/docs/SVPL_Interactive_Video_Guide.html).
+   - Features:
+     - **Web Speech Synthesis AI Voiceover**: Real-time high-definition speech narration with natural voices, pitch control, 0.9x–1.25x speed adjusters, Play/Pause, Skip/Repeat, and animated speech visualizer wave.
+     - **Chapter-by-Chapter Guided Video Player**: 8 animated visual slides with live synced subtitles, key metrics, and actionable step highlights.
+     - **Direct Playlist Navigation**: Interactive 8-module playlist allowing clients and staff to jump directly to any topic.
+
+3. **System Navigation Integration**:
+   - Added direct links to the **Operations Manual (PDF)** and **Video & Voice Guide** in the main public footer, Admin desktop sidebar, and mobile drawer.
+
+4. **Testing, Synchronization & Git Push**:
+   - Verified live browser rendering with automated browser subagent tests and captured recording.
+   - Synchronized workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed to GitHub repository (`origin main`).
+
+

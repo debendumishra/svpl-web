@@ -213,6 +213,16 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="<?= url('/operations-guide') ?>" target="_blank">
+                                    <i class="bi bi-play-circle-fill text-warning"></i> <span>Video & Voice Guide</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= url('/manual') ?>" target="_blank">
+                                    <i class="bi bi-book-half text-info"></i> <span>Operations Manual (PDF)</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
                                     <i class="bi bi-graph-up-arrow"></i> <span>MIS Reports</span>
                                 </a>
@@ -229,6 +239,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             </li>
                         </ul>
                     </div>
+
                 </div>
 
                 <!-- User Profile & Sign Out in Drawer -->
@@ -351,10 +362,21 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link" href="<?= url('/operations-guide') ?>" target="_blank">
+                                    <i class="bi bi-play-circle-fill text-warning"></i> <span class="sidebar-text">Video & Voice Guide</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="<?= url('/manual') ?>" target="_blank">
+                                    <i class="bi bi-book-half text-info"></i> <span class="sidebar-text">Operations Manual (PDF)</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/boe') !== false ? 'active' : '' ?>" href="<?= url('/admin/boe') ?>">
                                     <i class="bi bi-person-badge-fill text-warning"></i> <span class="sidebar-text">BOE Staff Management</span>
                                 </a>
                             </li>
+
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
                                     <i class="bi bi-graph-up-arrow"></i> <span class="sidebar-text">MIS Reports</span>
