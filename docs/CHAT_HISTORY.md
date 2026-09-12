@@ -2836,5 +2836,38 @@ check all other differences and correct them. do not do any changes in the other
    - Card dimensions set to exact `320px × 507px`, `border-radius: 14px;`, and `padding: 16px 14px 8px 14px` on `.card-header-full` with gradient overlay.
    - Synced to live XAMPP (`D:\xampp\htdocs\SVPL-Web`) and pushed to GitHub (`origin main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+always use "https://suryavistaara.com" insteat of http://localhost in Identity Card Qr Code. Better keep it in settings to change it
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Features:
+
+1. **Configurable QR Verification Base Domain in Settings**:
+   - Added `qr_verify_base_url` to Admin System Settings ([`app/Views/admin/settings.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/settings.php)) with default `https://suryavistaara.com`.
+   - Administrators and Managers can customize the base verification domain dynamically at any time without code changes.
+
+2. **Universal QR Code Helper Functions ([`config/constants.php`](file:///d:/DKM/SVPL-Web/config/constants.php))**:
+   - Added `qr_base_url()`: Resolves the active base verification domain from `Setting::get('qr_verify_base_url', 'https://suryavistaara.com')`.
+   - Added `id_card_verify_url($type, $code)`: Generates production verification URLs: `https://suryavistaara.com/verify?type=STAFF&code=...`.
+
+3. **Updated Across All Printable ID Cards & Documents**:
+   - [`app/Views/printable/boe_id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/boe_id_card.php) (BOE Staff ID Card)
+   - [`app/Views/printable/custom_id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/custom_id_card.php) (Custom / On-Demand ID Card)
+   - [`app/Views/printable/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/id_card.php) (Printable Solar Advisor ID Card)
+   - [`app/Views/advisor/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/advisor/id_card.php) (Advisor Portal ID Card)
+   - [`app/Services/DocumentGenerator.php`](file:///d:/DKM/SVPL-Web/app/Services/DocumentGenerator.php) (PDF / Document QR code generator)
+
+4. **Testing, Synchronization & Git Push**:
+   - Verified PHP syntax with zero lint errors.
+   - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed updates to GitHub repository (`origin main`).
+
+
 
 

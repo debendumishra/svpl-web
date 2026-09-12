@@ -16,7 +16,7 @@ $jurisdiction = !empty($advisor['jurisdiction'])
 if (empty($jurisdiction)) {
     $jurisdiction = 'All Odisha / Headquarters';
 }
-$qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(function_exists('url') ? url('/verify/advisor/' . ($advisor['advisor_code'] ?? '')) : 'https://suryavistaara.com/verify/' . ($advisor['advisor_code'] ?? ''));
+$qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(id_card_verify_url('ADVISOR', $advisor['advisor_code'] ?? '')));
 ?>
 <!DOCTYPE html>
 <html lang="en">

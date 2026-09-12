@@ -215,6 +215,11 @@ $hasCustomSignature = !empty(company_setting('company_signature'));
                             <label class="form-label small fw-bold text-navy">Company CIN / Reg. No.</label>
                             <input type="text" name="cin" class="form-control font-monospace" value="<?= htmlspecialchars($settings['cin'] ?? '') ?>" placeholder="U40106OR2024PTC...">
                         </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-navy"><i class="bi bi-qr-code-scan text-primary me-1"></i> ID Card & Verification QR Code Base Domain / URL</label>
+                            <input type="url" name="qr_verify_base_url" class="form-control font-monospace fw-bold text-primary" value="<?= htmlspecialchars($settings['qr_verify_base_url'] ?? 'https://suryavistaara.com') ?>" placeholder="https://suryavistaara.com">
+                            <small class="text-muted" style="font-size: 0.74rem;">The base domain encoded into scannable QR codes on ID cards, certificates, and official documents (e.g. <code>https://suryavistaara.com</code>).</small>
+                        </div>
                     </div>
 
                 </div>

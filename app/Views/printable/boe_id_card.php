@@ -13,7 +13,7 @@ $jurisdiction = !empty($boe['jurisdiction']) ? htmlspecialchars($boe['jurisdicti
 $fullAddress = !empty($boe['address']) 
     ? htmlspecialchars($boe['address']) 
     : 'MIG-84, Pokhariput, BDA Colony, Phase-1, Bhubaneswar, Khorda – 751020, Odisha';
-$qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(function_exists('url') ? url('/verify?type=STAFF&code=' . $empCode) : 'https://suryavistaara.com/verify?type=STAFF&code=' . $empCode);
+$qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(id_card_verify_url('STAFF', $empCode)));
 ?>
 <!DOCTYPE html>
 <html lang="en">

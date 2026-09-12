@@ -15,10 +15,7 @@ $fullAddress = !empty($card['address'])
     ? htmlspecialchars($card['address']) 
     : 'MIG-84, Pokhariput, BDA Colony, Phase-1, Bhubaneswar, Khorda – 751020, Odisha';
 
-$qrVerifyUrl = function_exists('url') 
-    ? url('/verify?type=' . urlencode($cardType) . '&code=' . urlencode($cardCode))
-    : ('https://suryavistaara.com/verify?type=' . urlencode($cardType) . '&code=' . urlencode($cardCode));
-
+$qrVerifyUrl = id_card_verify_url($cardType, $cardCode);
 $qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($qrVerifyUrl));
 ?>
 <!DOCTYPE html>

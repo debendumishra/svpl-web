@@ -331,3 +331,20 @@ if (!function_exists('advisor_joining_fee')) {
         return (float) company_setting('advisor_joining_fee', 2700.00);
     }
 }
+
+if (!function_exists('qr_base_url')) {
+    function qr_base_url(): string {
+        $settingUrl = trim((string) company_setting('qr_verify_base_url', 'https://suryavistaara.com'));
+        if (empty($settingUrl)) {
+            $settingUrl = 'https://suryavistaara.com';
+        }
+        return rtrim($settingUrl, '/');
+    }
+}
+
+if (!function_exists('id_card_verify_url')) {
+    function id_card_verify_url(string $type, string $code): string {
+        $base = qr_base_url();
+        return $base . '/verify?type=' . urlencode($type) . '&code=' . urlencode($code);
+    }
+}

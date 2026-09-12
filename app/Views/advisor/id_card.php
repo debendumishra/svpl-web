@@ -10,7 +10,7 @@ $mobileNumbers = htmlspecialchars($advisor['mobile']) . (!empty($advisor['alt_mo
 $fullAddress = !empty($advisor['address_line']) 
     ? $advisor['address_line'] 
     : trim(($advisor['village'] ? $advisor['village'] . ', ' : '') . ($advisor['block'] ?? '') . ', ' . ($advisor['district'] ?? '') . ' – ' . ($advisor['pincode'] ?? ''));
-$qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(function_exists('url') ? url('/verify/advisor/' . ($advisor['advisor_code'] ?? '')) : 'https://suryavistaara.com/verify/' . ($advisor['advisor_code'] ?? ''));
+$qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode(id_card_verify_url('ADVISOR', $advisor['advisor_code'] ?? '')));
 ?>
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-2">

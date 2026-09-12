@@ -23,9 +23,9 @@ class DocumentGenerator
      */
     public static function getVerificationUrl(string $type, string $code): string
     {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $base = base_path_url();
-        return "{$protocol}{$host}{$base}/verify?type=" . urlencode($type) . "&code=" . urlencode($code);
+        if (function_exists('id_card_verify_url')) {
+            return id_card_verify_url($type, $code);
+        }
+        return "https://suryavistaara.com/verify?type=" . urlencode($type) . "&code=" . urlencode($code);
     }
 }

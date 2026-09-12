@@ -33,7 +33,8 @@ INSERT INTO `settings` (`setting_key`, `setting_value`, `category`, `data_type`,
 ('default_subsidy_3kw_state', '60000.00', 'subsidy', 'number', 'Odisha State Subsidy for 3kW'),
 ('solar_loan_interest_rate', '5.60', 'finance', 'number', 'Concessional Solar Loan Interest Rate (% p.a.)'),
 ('min_payout_threshold', '500.00', 'wallet', 'number', 'Minimum wallet balance required for withdrawal request'),
-('tds_percentage', '5.00', 'tax', 'number', 'TDS deduction percentage on commission payout')
+('tds_percentage', '5.00', 'tax', 'number', 'TDS deduction percentage on commission payout'),
+('qr_verify_base_url', 'https://suryavistaara.com', 'company', 'string', 'Base Domain for ID Card & Document QR Verification')
 ON DUPLICATE KEY UPDATE `setting_value` = VALUES(`setting_value`);
 
 -- 3. Default Commission Plan Slabs (9 Levels for PM Surya Ghar)
