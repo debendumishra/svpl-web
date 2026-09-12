@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\Advisor;
 use App\Models\Customer;
 use App\Models\Lead;
+use App\Models\User;
 use DatabaseSetup;
 
 class PublicController
@@ -132,22 +133,55 @@ class PublicController
 
     public function verifyQr(): void
     {
-        $type = $_GET['type'] ?? '';
-        $code = $_GET['code'] ?? '';
+        $type = strtoupper(trim($_GET['type'] ?? ''));
+        $code = trim($_GET['code'] ?? '');
 
         $record = null;
         if ($type === 'ADVISOR') {
             $record = Advisor::findByReferralCode($code);
         } elseif ($type === 'CUSTOMER') {
             $record = Customer::findById((int)$code);
+        } elseif ($type === 'STAFF' || $type === 'BOE') {
+            $record = User::findByEmployeeCode($code);
+        } else {
+            // Auto-detect based on code if type is omitted or ambiguous
+            $record = Advisor::findByReferralCode($code);
+            if ($record) {
+                $type = 'ADVISOR';
+            } else {
+                $record = User::findByEmployeeCode($code);
+                if ($record) {
+                    $type = 'STAFF';
+                }
+            }
         }
 
         Response::view('public/verify', [
-            'pageTitle' => 'QR Verification — SVPL Portal',
+            'pageTitle' => 'QR Verification — ' . company_name(),
             'type' => $type,
             'code' => $code,
             'record' => $record,
         ]);
+    }
+
+    public function verifyAdvisorCode(string $code): void
+    {
+        $_GET['type'] = 'ADVISOR';
+        $_GET['code'] = $code;
+        $this->verifyQr();
+    }
+
+    public function verifyStaffCode(string $code): void
+    {
+        $_GET['type'] = 'STAFF';
+        $_GET['code'] = $code;
+        $this->verifyQr();
+    }
+
+    public function verifyQrCodeParam(string $code): void
+    {
+        $_GET['code'] = $code;
+        $this->verifyQr();
     }
 
     public function install(): void

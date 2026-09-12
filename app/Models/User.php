@@ -33,6 +33,34 @@ class User
         return Database::fetchOne("SELECT * FROM users WHERE email = ?", [$email]);
     }
 
+    public static function findByEmployeeCode(string $code): ?array
+    {
+        $code = trim($code);
+        if (empty($code)) {
+            return null;
+        }
+        // Match employee_code directly
+        $user = Database::fetchOne("SELECT * FROM users WHERE employee_code = ?", [$code]);
+        if ($user) {
+            return $user;
+        }
+
+        // Match SVPL-BOE-{id} or extract numeric suffix
+        if (preg_match('/^SVPL-BOE-(\d+)$/i', $code, $m)) {
+            $user = Database::fetchOne("SELECT * FROM users WHERE employee_code = ? OR id = ?", [$code, (int)$m[1]]);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // Match by mobile or numeric ID
+        if (is_numeric($code)) {
+            return Database::fetchOne("SELECT * FROM users WHERE id = ? OR mobile = ?", [(int)$code, $code]);
+        }
+
+        return Database::fetchOne("SELECT * FROM users WHERE employee_code = ? OR mobile = ?", [$code, $code]);
+    }
+
     public static function create(array $data): int
     {
         $sql = "INSERT INTO users (role, email, mobile, password_hash, full_name, employee_code, designation, jurisdiction, blood_group, photo_url, address, is_active, created_at)

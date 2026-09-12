@@ -2655,6 +2655,40 @@ in all icard company logo is missing
    - Synced files to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed to GitHub repository (`main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+on scan the qr code of the icard and opened in chrome "http://192.168.29.213/svpl-web/verify?type=STAFF&code=SVPL-BOE-101"
+
+it is showing "No authentic record was found matching the scanned QR code parameter: SVPL-BOE-101"
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Fix:
+
+1. **Staff & BOE QR Verification Support**:
+   - Added `findByEmployeeCode(string $code): ?array` in [`app/Models/User.php`](file:///d:/DKM/SVPL-Web/app/Models/User.php) to search and authenticate staff by `employee_code`, `SVPL-BOE-{id}`, mobile, or user ID.
+   - Updated `verifyQr()` in [`app/Controllers/PublicController.php`](file:///d:/DKM/SVPL-Web/app/Controllers/PublicController.php) to authenticate `type=STAFF` and `type=BOE` requests, and automatically fallback to user lookup if type is omitted.
+   - Added friendly route aliases in [`routes/web.php`](file:///d:/DKM/SVPL-Web/routes/web.php) for direct verification paths (`/verify/staff/{code}`, `/verify/advisor/{code}`, `/verify/{code}`).
+
+2. **Official Verification View Enhancement**:
+   - Updated [`app/Views/public/verify.php`](file:///d:/DKM/SVPL-Web/app/Views/public/verify.php) to display full verified credentials for BOE Staff:
+     - Executive Name
+     - Employee Code
+     - Designation
+     - Assigned Jurisdiction
+     - Blood Group
+     - Employment Status (`AUTHENTICATED ACTIVE`)
+
+3. **Verification & Deployment**:
+   - Tested HTTP GET on `/verify?type=STAFF&code=SVPL-BOE-101` — returns **Verified Official Record** for `DEBASMITA MISHRA` (`SVPL-BOE-101`).
+   - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed updates to GitHub repository (`origin main`).
+
+
 
 
 
