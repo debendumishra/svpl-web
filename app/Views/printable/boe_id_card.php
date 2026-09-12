@@ -155,8 +155,8 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
 
         /* Photo Box */
         .photo-frame {
-            width: 96px;
-            height: 112px;
+            width: 90px;
+            height: 104px;
             border-radius: 10px;
             border: 2px dashed rgba(15, 45, 89, 0.35);
             background: rgba(255, 255, 255, 0.95);
@@ -290,10 +290,10 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                 </div>
 
                 <!-- Front Side Body -->
-                <div style="padding: 6px 14px 2px 14px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; z-index: 10;">
+                <div style="padding: 4px 14px 2px 14px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; z-index: 10;">
                     
                     <!-- 1. Photo Frame / Photo Display -->
-                    <div style="margin: 2px 0;">
+                    <div style="margin: 1px 0;">
                         <div class="photo-frame">
                             <div class="photo-corner corner-tl"></div>
                             <div class="photo-corner corner-tr"></div>
@@ -305,7 +305,7 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                             if (!empty($resolvedPhoto)): ?>
                                 <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="BOE Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             <?php else: ?>
-                                <i class="bi bi-person-badge-fill" style="font-size: 28px; color: #94a3b8; margin-bottom: 2px;"></i>
+                                <i class="bi bi-person-badge-fill" style="font-size: 26px; color: #94a3b8; margin-bottom: 2px;"></i>
                                 <span style="font-size: 8px; font-weight: 800; color: #64748b; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1;">OFFICIAL PHOTO</span>
                                 <span style="font-size: 7px; font-weight: 600; color: #94a3b8; margin-top: 2px;">CR80 Compliant</span>
                             <?php endif; ?>
@@ -314,7 +314,7 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
 
                     <!-- 2. Scaled Name, Designation, Phone & Center-Aligned Address -->
                     <div style="text-align: center; width: 100%;">
-                        <h3 style="font-size: 16px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 2px;">
+                        <h3 style="font-size: 15px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 2px;">
                             <?= htmlspecialchars($fullName) ?>
                         </h3>
                         <div style="display: inline-block; padding: 2px 10px; background: rgba(224, 242, 254, 0.95); border-radius: 9999px; border: 1px solid #7dd3fc;">
@@ -322,16 +322,16 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                                 <?= $designation ?>
                             </p>
                         </div>
-                        <div style="margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px; color: #0f2d59;">
-                            <i class="bi bi-telephone-fill" style="color: #0284c7; font-size: 10px;"></i>
-                            <span class="font-mono-num" style="font-weight: 800; font-size: 11px; letter-spacing: -0.2px;">
+                        <div style="margin-top: 2px; display: flex; align-items: center; justify-content: center; gap: 4px; color: #0f2d59;">
+                            <i class="bi bi-telephone-fill" style="color: #0284c7; font-size: 12px;"></i>
+                            <span class="font-mono-num" style="font-weight: 800; font-size: 14px; letter-spacing: -0.2px;">
                                 <?= $mobileNumber ?>
                             </span>
                         </div>
-                        <!-- Address just below mobile number, center aligned -->
+                        <!-- Address just below mobile number, center aligned with 10px font size -->
                         <?php if (!empty($boe['address'])): ?>
-                        <div style="margin-top: 3px; font-size: 8px; font-weight: 600; color: #334155; line-height: 1.25; text-align: center; padding: 0 2px;">
-                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 8px;"></i><?= htmlspecialchars($boe['address']) ?>
+                        <div style="margin-top: 2px; font-size: 10px; font-weight: 600; color: #334155; line-height: 1.25; text-align: center; padding: 0 2px;">
+                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 9px;"></i><?= htmlspecialchars($boe['address']) ?>
                         </div>
                         <?php endif; ?>
                     </div>
@@ -353,7 +353,7 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                     </div>
 
                     <!-- 4. Jurisdiction Block -->
-                    <div style="width: 100%; text-align: left; background: rgba(255, 255, 255, 0.95); padding: 5px 8px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; align-items: flex-start; z-index: 20;">
+                    <div style="width: 100%; text-align: left; background: rgba(255, 255, 255, 0.95); padding: 4px 8px; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; align-items: flex-start; z-index: 20;">
                         <div style="width: 16px; height: 16px; border-radius: 4px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; margin-right: 6px; flex-shrink: 0; color: #0284c7; margin-top: 1px;">
                             <i class="bi bi-geo-alt-fill" style="font-size: 9px;"></i>
                         </div>

@@ -2601,4 +2601,32 @@ add the autorised signature image to be replaced in the setting under admin
    - Synced to live XAMPP server (`D:\xampp\htdocs\svpl-web`).
    - Pushed updates to GitHub repository (`origin main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+1. the identity card should be as boe id card andshould contain the jurisdition section must.
+2. the font size of address in all icard should be 10px and mobile number should be 14px
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Enhancements:
+
+1. **Advisor ID Card Structure Aligned with BOE ID Card & Jurisdiction Section Added**:
+   - Updated [`app/Views/printable/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/id_card.php) with the dedicated **ASSIGNED JURISDICTION** section block identical in design, badge styling, and layout to the BOE Staff ID Card.
+   - Calculated dynamic jurisdiction from Advisor record (`block`, `district`, or fallback to `All Odisha / Headquarters`).
+
+2. **Typography Updates Across All ID Cards (`id_card.php` & `boe_id_card.php`)**:
+   - **Mobile Number**: Updated font size to **`14px`** (`font-weight: 800;`) with properly scaled icons.
+   - **Address**: Updated font size to **`10px`** (`font-weight: 600; line-height: 1.25; text-align: center; color: #334155;`) positioned directly below the mobile number.
+   - **Layout Stability**: Compacted photo box frame (`90px × 104px`) and vertical margins so all 4 sections (Photo, Scaled Profile+Phone 14px+Address 10px, Badges Grid, and Jurisdiction Section) fit cleanly inside the standard CR80 portrait frame without shifting or displacing the bottom wave banner.
+
+3. **Verification & Deployment**:
+   - Syntax linted with PHP CLI (`php -l`).
+   - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\svpl-web`).
+   - Committed and pushed changes to GitHub repository (`main`).
+
+
 
