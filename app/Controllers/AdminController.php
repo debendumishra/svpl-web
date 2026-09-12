@@ -486,7 +486,7 @@ class AdminController
         }
 
         // 1. Process Text Settings
-        $ignoredKeys = ['_csrf', '_csrf_token', 'company_logo_base64', 'remove_logo', 'remove_favicon'];
+        $ignoredKeys = ['_csrf', '_csrf_token', 'company_logo_base64', 'company_signature_base64', 'remove_logo', 'remove_favicon', 'remove_signature'];
         foreach ($_POST as $key => $val) {
             if (!in_array($key, $ignoredKeys, true) && is_string($val)) {
                 Setting::set($key, trim($val));
@@ -501,6 +501,11 @@ class AdminController
         // 3. Process Favicon Removal
         if (!empty($_POST['remove_favicon']) && $_POST['remove_favicon'] === '1') {
             Setting::remove('company_favicon');
+        }
+
+        // 3B. Process Signature Removal
+        if (!empty($_POST['remove_signature']) && $_POST['remove_signature'] === '1') {
+            Setting::remove('company_signature');
         }
 
         // 4. Process Company Logo Upload
@@ -527,6 +532,35 @@ class AdminController
                     $filename = 'company_logo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
                     if (file_put_contents($brandingDir . $filename, $decoded)) {
                         Setting::set('company_logo', 'public/uploads/branding/' . $filename, 'company');
+                    }
+                }
+            }
+        }
+
+        // 4C. Process Authorized Signature / Seal Upload
+        // File Upload
+        if (isset($_FILES['company_signature']) && $_FILES['company_signature']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['company_signature'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
+            if (in_array($ext, $allowedExts, true)) {
+                $filename = 'signature_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                if (move_uploaded_file($file['tmp_name'], $brandingDir . $filename)) {
+                    Setting::set('company_signature', 'public/uploads/branding/' . $filename, 'company');
+                }
+            }
+        }
+        // Base64 Signature / Camera Capture
+        elseif (!empty($_POST['company_signature_base64']) && strpos($_POST['company_signature_base64'], 'data:image/') === 0) {
+            $base64Str = $_POST['company_signature_base64'];
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Str, $type)) {
+                $data = substr($base64Str, strpos($base64Str, ',') + 1);
+                $decoded = base64_decode($data);
+                if ($decoded !== false) {
+                    $ext = strtolower($type[1]) === 'jpeg' ? 'jpg' : strtolower($type[1]);
+                    $filename = 'signature_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                    if (file_put_contents($brandingDir . $filename, $decoded)) {
+                        Setting::set('company_signature', 'public/uploads/branding/' . $filename, 'company');
                     }
                 }
             }

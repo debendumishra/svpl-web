@@ -6,6 +6,8 @@
 $title = "System Settings & Company Branding — " . company_short_name() . " Admin";
 $currentLogo = company_logo_url();
 $currentFavicon = company_favicon_url();
+$currentSignature = company_signature_url();
+$hasCustomSignature = !empty(company_setting('company_signature'));
 ?>
 
 <?php if (!empty($successMsg)): ?>
@@ -27,7 +29,7 @@ $currentFavicon = company_favicon_url();
         <h4 class="m-0 font-outfit fw-bold text-navy">
             <i class="bi bi-sliders2 me-2 text-primary"></i> System Settings & Company Branding
         </h4>
-        <p class="text-muted small mb-0">Change company logo, brand names, registered address, and business rules across all portals and documents.</p>
+        <p class="text-muted small mb-0">Change company logo, brand names, registered address, authorized signature, and business rules across all portals and documents.</p>
     </div>
 </div>
 
@@ -129,6 +131,50 @@ $currentFavicon = company_favicon_url();
                                             <span class="small text-muted">Current Favicon Active</span>
                                         </div>
                                     <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Authorized Signatory Seal & Signature Section -->
+                    <div class="row g-4 mb-4 pb-4 border-bottom align-items-center">
+                        <div class="col-lg-4 text-center">
+                            <label class="form-label small fw-bold text-navy d-block mb-2">Active Authorized Seal & Signature</label>
+                            
+                            <div class="border rounded-3 p-3 bg-light shadow-sm mb-2">
+                                <div class="p-3 rounded-2 d-flex align-items-center justify-content-center" style="background: #ffffff; min-height: 85px; border: 1px dashed #cbd5e1;">
+                                    <img id="signaturePreview" src="<?= htmlspecialchars($currentSignature) ?>" alt="Signature Preview" style="max-height: 55px; max-width: 100%; object-fit: contain;">
+                                </div>
+                            </div>
+
+                            <?php if (!empty($hasCustomSignature)): ?>
+                                <button type="button" class="btn btn-outline-danger btn-sm fw-bold w-100 mt-2" onclick="triggerRemoveSignature()">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset to Default Seal
+                                </button>
+                                <input type="hidden" name="remove_signature" id="inputRemoveSignature" value="0">
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="col-lg-8">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <h6 class="fw-bold text-navy mb-2"><i class="bi bi-pen-fill text-primary me-2"></i> Update Authorized Signatory Seal & Signature</h6>
+                                <p class="text-muted small mb-3">
+                                    This signature seal image is automatically rendered on <strong>Advisor ID Cards</strong>, <strong>BOE Staff ID Cards</strong>, and official business certificates.
+                                </p>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-7">
+                                        <label class="form-label small fw-semibold text-navy">Select Signature Image File</label>
+                                        <input type="file" name="company_signature" id="inputCompanySignature" class="form-control form-control-sm" accept="image/png,image/svg+xml,image/jpeg,image/webp" onchange="previewSignatureFile(this)">
+                                        <small class="text-muted" style="font-size: 0.72rem;">Recommended: Transparent PNG or JPG (approx. 260 × 85 px with signature & seal text).</small>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label small fw-semibold text-navy">Or Capture via Webcam</label>
+                                        <button type="button" class="btn btn-outline-success btn-sm w-100 fw-bold" onclick="openSignatureCamera()">
+                                            <i class="bi bi-camera-video me-1"></i> Capture via Camera
+                                        </button>
+                                        <input type="hidden" name="company_signature_base64" id="inputSignatureBase64" value="">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -283,8 +329,37 @@ $currentFavicon = company_favicon_url();
     </div>
 </div>
 
+<!-- Modal: Webcam Signature Capture -->
+<div class="modal fade" id="modalSignatureCamera" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-navy text-white py-2">
+                <h6 class="modal-title font-outfit fw-bold">
+                    <i class="bi bi-camera-video-fill me-2 text-warning"></i> Capture Authorized Seal & Signature
+                </h6>
+                <button type="button" class="btn-close btn-close-white" onclick="closeSignatureCamera()"></button>
+            </div>
+            <div class="modal-body text-center p-3 bg-dark">
+                <div style="width: 320px; height: 180px; margin: 0 auto; position: relative; overflow: hidden; border-radius: 8px; background: #000; border: 2px solid #38bdf8;">
+                    <video id="signatureWebcamVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                </div>
+                <div id="signatureCameraStatusText" class="text-light small mt-2">
+                    <span class="spinner-border spinner-border-sm me-1" role="status"></span> Accessing camera...
+                </div>
+            </div>
+            <div class="modal-footer bg-light justify-content-between">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeSignatureCamera()">Cancel</button>
+                <button type="button" class="btn btn-success fw-bold px-4" id="btnSnapSignature" onclick="captureSignatureSnapshot()" disabled>
+                    <i class="bi bi-camera-fill me-1"></i> Capture Signature
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 let logoMediaStream = null;
+let signatureMediaStream = null;
 
 function previewLogoFile(input) {
     if (input.files && input.files[0]) {
@@ -406,5 +481,95 @@ function captureLogoSnapshot() {
     if (removeInput) removeInput.value = '0';
 
     closeLogoCamera();
+}
+
+// Signature Upload & Webcam Functions
+function previewSignatureFile(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            updateSignaturePreview(e.target.result);
+            document.getElementById('inputSignatureBase64').value = '';
+            const removeInput = document.getElementById('inputRemoveSignature');
+            if (removeInput) removeInput.value = '0';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function updateSignaturePreview(src) {
+    const preview = document.getElementById('signaturePreview');
+    if (preview) {
+        preview.src = src;
+    }
+}
+
+function triggerRemoveSignature() {
+    if (confirm('Are you sure you want to reset the custom signature and revert to the default official seal?')) {
+        const removeInput = document.getElementById('inputRemoveSignature');
+        if (removeInput) removeInput.value = '1';
+        document.getElementById('inputCompanySignature').value = '';
+        document.getElementById('inputSignatureBase64').value = '';
+        updateSignaturePreview('<?= url('/assets/images/authorised_signatory.png') ?>');
+    }
+}
+
+function openSignatureCamera() {
+    const modalEl = document.getElementById('modalSignatureCamera');
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+
+    const video = document.getElementById('signatureWebcamVideo');
+    const btnSnap = document.getElementById('btnSnapSignature');
+    const statusText = document.getElementById('signatureCameraStatusText');
+
+    btnSnap.disabled = true;
+    statusText.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Accessing camera...';
+
+    navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 360 } },
+        audio: false
+    }).then(stream => {
+        signatureMediaStream = stream;
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+            video.play();
+            btnSnap.disabled = false;
+            statusText.innerHTML = '<i class="bi bi-check-circle text-success me-1"></i> Camera ready. Position signature/seal and click Capture Signature.';
+        };
+    }).catch(err => {
+        statusText.innerHTML = '<span class="text-danger"><i class="bi bi-exclamation-octagon me-1"></i> Camera error: ' + (err.message || 'Access denied') + '</span>';
+    });
+}
+
+function closeSignatureCamera() {
+    if (signatureMediaStream) {
+        signatureMediaStream.getTracks().forEach(track => track.stop());
+        signatureMediaStream = null;
+    }
+    const modalEl = document.getElementById('modalSignatureCamera');
+    const modalObj = bootstrap.Modal.getInstance(modalEl);
+    if (modalObj) modalObj.hide();
+}
+
+function captureSignatureSnapshot() {
+    const video = document.getElementById('signatureWebcamVideo');
+    if (!video || !signatureMediaStream) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 360;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const base64Data = canvas.toDataURL('image/png');
+    document.getElementById('inputSignatureBase64').value = base64Data;
+    document.getElementById('inputCompanySignature').value = '';
+    updateSignaturePreview(base64Data);
+
+    const removeInput = document.getElementById('inputRemoveSignature');
+    if (removeInput) removeInput.value = '0';
+
+    closeSignatureCamera();
 }
 </script>

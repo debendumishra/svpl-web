@@ -2532,3 +2532,35 @@ company logo change facility in setting and Company name should be effective eve
    - Synced all files to live XAMPP directory `D:\xampp\htdocs\svpl-web`.
    - Verified PHP lint syntax on all files.
    - Pushed updates to GitHub repository.
+
+---
+
+## User
+
+<USER_REQUEST>
+add the autorised signature image to be replaced in the setting under admin
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Enhancements:
+
+1. **Authorized Signatory Seal & Signature Settings in Admin**:
+   - Added a dedicated card **"Active Authorized Seal & Signature"** in [`app/Views/admin/settings.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/settings.php).
+   - **Upload Image File**: Supports uploading transparent PNG, JPG, WEBP, or SVG images.
+   - **Webcam Snapshot Capture**: Built-in modal (`#modalSignatureCamera`) to snap high-res seal or signature directly from an administrator's camera.
+   - **Live Preview Container**: Displays the active signature seal image with instant update upon file selection or snapshot.
+   - **Reset / Remove Action**: Single-click button (`triggerRemoveSignature()`) to reset any custom signature back to the default official seal.
+2. **Controller Storage & Processing**:
+   - Updated [`app/Controllers/AdminController.php`](file:///d:/DKM/SVPL-Web/app/Controllers/AdminController.php) (`updateSettings()`):
+     - Handles file upload `$_FILES['company_signature']` saved to `public/uploads/branding/`.
+     - Handles base64 camera snapshot `$_POST['company_signature_base64']`.
+     - Handles removal `$_POST['remove_signature']` using `Setting::remove('company_signature')`.
+3. **Synchronized Everywhere**:
+   - Global helper `company_signature_url()` in [`config/constants.php`](file:///d:/DKM/SVPL-Web/config/constants.php) resolves custom uploaded signatures dynamically, with fallback to default `/assets/images/authorised_signatory.png`.
+   - Applied instantly to Advisor ID Cards ([`id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/id_card.php)) and BOE ID Cards ([`boe_id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/boe_id_card.php)).
+4. **Verification & Deployment**:
+   - Syntax linted with PHP CLI.
+   - Synced to live XAMPP directory `D:\xampp\htdocs\svpl-web`.
+   - Committed and pushed to GitHub repository (`main`).
+
