@@ -384,11 +384,13 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     </nav>
 
     <!-- JS Scripts -->
+    <script>window.SVPL_BASE_URL = '<?= rtrim(url(''), '/') ?>';</script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= asset('assets/js/app.js') ?>"></script>
     <script src="<?= asset('assets/js/image-compressor.js') ?>"></script>
     <script src="<?= asset('assets/js/photo-crop-studio.js') ?>"></script>
+    <script src="<?= asset('assets/js/location-cascader.js') ?>"></script>
 </body>
 </html>
 

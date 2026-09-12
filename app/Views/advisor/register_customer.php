@@ -117,37 +117,30 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
             </div>
             <div class="col-md-3">
                 <label class="form-label small fw-bold text-navy">District <span class="text-danger">*</span></label>
-                <select name="district" class="form-select select-district" required>
+                <select name="district" id="selectAdvisorCustDistrict" class="form-select select-district" data-initial="<?= htmlspecialchars($post['district'] ?? $advisor['district'] ?? 'Khordha') ?>" required>
                     <option value="">-- Select District --</option>
-                    <?php
-                    $odishaDistricts = [
-                        "Angul", "Balangir", "Balasore", "Bargarh", "Bhadrak", "Boudh", "Cuttack", "Deogarh",
-                        "Dhenkanal", "Gajapati", "Ganjam", "Jagatsinghpur", "Jajpur", "Jharsuguda", "Kalahandi",
-                        "Kandhamal", "Kendrapara", "Kendujhar", "Khordha", "Koraput", "Malkangiri", "Mayurbhanj",
-                        "Nabarangpur", "Nayagarh", "Nuapada", "Puri", "Rayagada", "Sambalpur", "Subarnapur", "Sundargarh"
-                    ];
-                    $selectedDist = $post['district'] ?? $advisor['district'] ?? 'Khordha';
-                    foreach ($odishaDistricts as $d): ?>
-                        <option value="<?= $d ?>" <?= $selectedDist === $d ? 'selected' : '' ?>><?= $d ?></option>
-                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label small fw-bold text-navy">Block / Subdivision <span class="text-danger">*</span></label>
-                <input type="text" name="block" class="form-control" placeholder="e.g. Balianta, Jatni, Sadar" value="<?= htmlspecialchars($post['block'] ?? '') ?>" required>
+                <select name="block" id="selectAdvisorCustBlock" class="form-select select-block" data-initial="<?= htmlspecialchars($post['block'] ?? $advisor['block'] ?? '') ?>" required>
+                    <option value="">-- Select Block --</option>
+                </select>
             </div>
             <div class="col-md-3">
                 <label class="form-label small fw-bold text-navy">Gram Panchayat <span class="text-danger">*</span></label>
-                <input type="text" name="gram_panchayat" class="form-control" placeholder="e.g. Benupur GP" value="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>" required>
+                <input type="text" name="gram_panchayat" id="inputAdvisorCustGp" class="form-control select-gp" list="listAdvisorCustGps" placeholder="e.g. Benupur GP" data-initial="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>" value="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>" required>
+                <datalist id="listAdvisorCustGps"></datalist>
             </div>
 
             <div class="col-md-4">
                 <label class="form-label small fw-bold text-navy">Village / Town <span class="text-danger">*</span></label>
-                <input type="text" name="village" class="form-control" placeholder="e.g. Hanspal Village" value="<?= htmlspecialchars($post['village'] ?? '') ?>" required>
+                <input type="text" name="village" id="inputAdvisorCustVillage" class="form-control select-village" list="listAdvisorCustVillages" placeholder="e.g. Hanspal Village" data-initial="<?= htmlspecialchars($post['village'] ?? '') ?>" value="<?= htmlspecialchars($post['village'] ?? '') ?>" required>
+                <datalist id="listAdvisorCustVillages"></datalist>
             </div>
             <div class="col-md-2">
                 <label class="form-label small fw-bold text-navy">Pincode <span class="text-danger">*</span></label>
-                <input type="text" name="pincode" class="form-control font-monospace" placeholder="6-digit PIN" pattern="[0-9]{6}" maxlength="6" value="<?= htmlspecialchars($post['pincode'] ?? '751020') ?>" required>
+                <input type="text" name="pincode" id="inputAdvisorCustPincode" class="form-control input-pincode font-monospace" placeholder="6-digit PIN" pattern="[0-9]{6}" maxlength="6" data-initial="<?= htmlspecialchars($post['pincode'] ?? $advisor['pincode'] ?? '') ?>" value="<?= htmlspecialchars($post['pincode'] ?? $advisor['pincode'] ?? '') ?>" required>
             </div>
             <div class="col-md-6">
                 <label class="form-label small fw-bold text-navy">Full House / Plot / Street Address <span class="text-danger">*</span></label>

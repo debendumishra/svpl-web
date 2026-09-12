@@ -19,6 +19,7 @@ use App\Models\Lead;
 use App\Models\Setting;
 use App\Models\AuditLog;
 use App\Models\Payment;
+use App\Models\Location;
 use App\Helpers\Database;
 
 class AuthController
@@ -29,6 +30,8 @@ class AuthController
             $user = AuthService::user();
             if (in_array($user['role'], ['SUPER_ADMIN', 'ADMIN', 'ACCOUNTS', 'OPERATIONS'])) {
                 Response::redirect('/admin/dashboard');
+            } elseif ($user['role'] === 'BOE') {
+                Response::redirect('/boe/dashboard');
             } elseif ($user['role'] === 'ADVISOR') {
                 Response::redirect('/advisor/dashboard');
             } else {
@@ -37,46 +40,40 @@ class AuthController
         }
 
         Response::view('public/login', [
-            'pageTitle' => 'Account Login — Surya Vistaara Pvt. Ltd.',
+            'pageTitle' => 'Sign In — ' . company_name(),
+            'error' => $_SESSION['login_error'] ?? null,
+            'success' => $_SESSION['login_success'] ?? null,
         ]);
+        unset($_SESSION['login_error'], $_SESSION['login_success']);
     }
 
     public function login(): void
     {
-        $identifier = trim($_POST['identifier'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $captcha = trim($_POST['captcha'] ?? '');
+        $loginInput = trim($_POST['login_id'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $captchaInput = trim($_POST['captcha'] ?? '');
 
-        if (empty($identifier) || empty($password)) {
-            Response::view('public/login', [
-                'pageTitle' => 'Account Login — SVPL',
-                'error' => 'Please enter your Mobile number/Email and Password.',
-                'oldIdentifier' => $identifier,
-            ]);
+        // 1. CAPTCHA Security Validation
+        if (!Captcha::verify($captchaInput)) {
+            $_SESSION['login_error'] = 'Invalid or expired CAPTCHA code. Please type the characters shown in the security image.';
+            Response::redirect('/login');
             return;
         }
 
-        // Verify CAPTCHA
-        if (!Captcha::verify($captcha)) {
-            Response::view('public/login', [
-                'pageTitle' => 'Account Login — SVPL',
-                'error' => 'Invalid or expired Security CAPTCHA code. Please enter the characters shown in the image.',
-                'oldIdentifier' => $identifier,
-            ]);
+        if (empty($loginInput) || empty($password)) {
+            $_SESSION['login_error'] = 'Please enter both User ID / Mobile and Password.';
+            Response::redirect('/login');
             return;
         }
 
-        $res = AuthService::attempt($identifier, $password);
-        if (!$res['success']) {
-            Response::view('public/login', [
-                'pageTitle' => 'Account Login — SVPL',
-                'error' => $res['message'],
-                'oldIdentifier' => $identifier,
-            ]);
+        $user = AuthService::authenticate($loginInput, $password);
+        if (!$user) {
+            $_SESSION['login_error'] = 'Invalid credentials or account is pending administrator verification.';
+            Response::redirect('/login');
             return;
         }
 
-        $role = $res['user']['role'];
+        $role = $user['role'] ?? 'CUSTOMER';
         if (in_array($role, ['SUPER_ADMIN', 'ADMIN', 'ACCOUNTS', 'OPERATIONS'])) {
             Response::redirect('/admin/dashboard');
         } elseif ($role === 'BOE') {
@@ -101,11 +98,13 @@ class AuthController
         if (!empty($ref)) {
             $sponsor = Advisor::findByReferralCode($ref);
         }
+        $districts = Location::getDistricts();
 
         Response::view('public/register_advisor', [
             'pageTitle' => 'Join as Solar Advisor — SVPL Odisha Network',
             'sponsor' => $sponsor,
             'ref' => $ref,
+            'districts' => $districts,
         ]);
     }
 
@@ -128,6 +127,7 @@ class AuthController
                 'pageTitle' => 'Join as Solar Advisor — SVPL',
                 'error' => 'Please fill in all mandatory fields (*) including the ₹2,700 Onboarding Fee Transaction UTR/Ref number.',
                 'post' => $post,
+                'districts' => Location::getDistricts(),
             ]);
             return;
         }
@@ -138,6 +138,7 @@ class AuthController
                 'pageTitle' => 'Join as Solar Advisor — SVPL',
                 'error' => 'Invalid or expired Security CAPTCHA code. Please enter the characters shown in the image.',
                 'post' => $post,
+                'districts' => Location::getDistricts(),
             ]);
             return;
         }
@@ -147,6 +148,7 @@ class AuthController
                 'pageTitle' => 'Join as Solar Advisor — SVPL',
                 'error' => 'This mobile number is already registered. Please login.',
                 'post' => $post,
+                'districts' => Location::getDistricts(),
             ]);
             return;
         }

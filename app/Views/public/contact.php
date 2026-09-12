@@ -85,17 +85,8 @@ $title = "Contact Us — " . company_name();
                                 </div>
                                 <div class="col-md-12">
                                     <label class="form-label small fw-semibold">Your District in Odisha *</label>
-                                    <select name="district" class="form-select" required>
-                                        <option value="Khordha">Khordha</option>
-                                        <option value="Cuttack">Cuttack</option>
-                                        <option value="Puri">Puri</option>
-                                        <option value="Ganjam">Ganjam</option>
-                                        <option value="Sambalpur">Sambalpur</option>
-                                        <option value="Balasore">Balasore</option>
-                                        <option value="Bhadrak">Bhadrak</option>
-                                        <option value="Mayurbhanj">Mayurbhanj</option>
-                                        <option value="Sundargarh">Sundargarh</option>
-                                        <option value="Other">Other District</option>
+                                    <select name="district" class="form-select select-district" data-initial="<?= htmlspecialchars($post['district'] ?? 'Khordha') ?>" required>
+                                        <option value="">Select District</option>
                                     </select>
                                 </div>
                                 <div class="col-md-12">

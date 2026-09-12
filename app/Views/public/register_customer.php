@@ -131,34 +131,29 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                     <div class="row g-3 mb-4">
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">District *</label>
-                            <select name="district" id="selectDistrict" class="form-select" required>
-                                <option value="Khordha" selected>Khordha</option>
-                                <option value="Cuttack">Cuttack</option>
-                                <option value="Puri">Puri</option>
-                                <option value="Ganjam">Ganjam</option>
-                                <option value="Sambalpur">Sambalpur</option>
-                                <option value="Balasore">Balasore</option>
+                            <select name="district" id="selectDistrict" class="form-select select-district" data-initial="<?= htmlspecialchars($post['district'] ?? '') ?>" required>
+                                <option value="">Select District</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-semibold">Block *</label>
-                            <select name="block" id="selectBlock" class="form-select" required>
-                                <option value="Bhubaneswar" selected>Bhubaneswar</option>
-                                <option value="Jatni">Jatni</option>
-                                <option value="Balianta">Balianta</option>
+                            <label class="form-label fw-semibold">Block / Municipality *</label>
+                            <select name="block" id="selectBlock" class="form-select select-block" data-initial="<?= htmlspecialchars($post['block'] ?? '') ?>" required>
+                                <option value="">Select District first</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label fw-semibold">Gram Panchayat</label>
-                            <input type="text" name="gram_panchayat" class="form-control" placeholder="e.g. Mendhasala" value="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>">
+                            <label class="form-label fw-semibold">Gram Panchayat / Ward</label>
+                            <input type="text" name="gram_panchayat" id="inputGp" class="form-control select-gp" list="listCustomerGps" placeholder="e.g. Mendhasala" data-initial="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>" value="<?= htmlspecialchars($post['gram_panchayat'] ?? '') ?>">
+                            <datalist id="listCustomerGps"></datalist>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Village / Locality</label>
-                            <input type="text" name="village" class="form-control" placeholder="Village name" value="<?= htmlspecialchars($post['village'] ?? '') ?>">
+                            <input type="text" name="village" id="inputVillage" class="form-control select-village" list="listCustomerVillages" placeholder="Village name" data-initial="<?= htmlspecialchars($post['village'] ?? '') ?>" value="<?= htmlspecialchars($post['village'] ?? '') ?>">
+                            <datalist id="listCustomerVillages"></datalist>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Pincode *</label>
-                            <input type="text" name="pincode" class="form-control" value="751024" required>
+                            <input type="text" name="pincode" id="inputPincode" class="form-control input-pincode font-monospace" placeholder="6-digit PIN" maxlength="6" data-initial="<?= htmlspecialchars($post['pincode'] ?? '') ?>" value="<?= htmlspecialchars($post['pincode'] ?? '') ?>" required>
                         </div>
                         <div class="col-md-9">
                             <label class="form-label fw-semibold">Full House / Plot Address</label>

@@ -107,31 +107,30 @@ $error = $error ?? null;
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-navy small">District *</label>
-                        <select name="district" class="form-select" required>
-                            <?php 
-                            $districts = ['Angul', 'Balangir', 'Balasore', 'Bargarh', 'Bhadrak', 'Boudh', 'Cuttack', 'Deogarh', 'Dhenkanal', 'Gajapati', 'Ganjam', 'Jagatsinghpur', 'Jajpur', 'Jharsuguda', 'Kalahandi', 'Kandhamal', 'Kendrapara', 'Kendujhar', 'Khordha', 'Koraput', 'Malkangiri', 'Mayurbhanj', 'Nabarangpur', 'Nayagarh', 'Nuapada', 'Puri', 'Rayagada', 'Sambalpur', 'Subarnapur', 'Sundargarh'];
-                            $curDistrict = $customer['district'] ?? 'Khordha';
-                            foreach ($districts as $d): ?>
-                                <option value="<?= $d ?>" <?= $curDistrict === $d ? 'selected' : '' ?>><?= $d ?></option>
-                            <?php endforeach; ?>
+                        <select name="district" id="selectEditCustDistrict" class="form-select select-district" data-initial="<?= htmlspecialchars($customer['district'] ?? '') ?>" required>
+                            <option value="">Select District</option>
                         </select>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-navy small">Block / Municipality *</label>
-                        <input type="text" name="block" class="form-control" value="<?= htmlspecialchars($customer['block'] ?? '') ?>" required>
+                        <select name="block" id="selectEditCustBlock" class="form-select select-block" data-initial="<?= htmlspecialchars($customer['block'] ?? '') ?>" required>
+                            <option value="">Select Block</option>
+                        </select>
                     </div>
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-navy small">Gram Panchayat *</label>
-                        <input type="text" name="gram_panchayat" class="form-control" value="<?= htmlspecialchars($customer['gram_panchayat'] ?? '') ?>" required>
+                        <input type="text" name="gram_panchayat" id="inputEditCustGp" class="form-control select-gp" list="listAdminCustomerGps" data-initial="<?= htmlspecialchars($customer['gram_panchayat'] ?? '') ?>" value="<?= htmlspecialchars($customer['gram_panchayat'] ?? '') ?>" required>
+                        <datalist id="listAdminCustomerGps"></datalist>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-navy small">Village / Ward</label>
-                        <input type="text" name="village" class="form-control" value="<?= htmlspecialchars($customer['village'] ?? '') ?>">
+                        <input type="text" name="village" id="inputEditCustVillage" class="form-control select-village" list="listAdminCustomerVillages" data-initial="<?= htmlspecialchars($customer['village'] ?? '') ?>" value="<?= htmlspecialchars($customer['village'] ?? '') ?>">
+                        <datalist id="listAdminCustomerVillages"></datalist>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label fw-semibold text-navy small">Pincode (6-digit) *</label>
-                        <input type="text" name="pincode" class="form-control font-monospace" value="<?= htmlspecialchars($customer['pincode'] ?? '') ?>" required>
+                        <input type="text" name="pincode" id="inputEditCustPincode" class="form-control input-pincode font-monospace" data-initial="<?= htmlspecialchars($customer['pincode'] ?? '') ?>" value="<?= htmlspecialchars($customer['pincode'] ?? '') ?>" required>
                     </div>
 
                     <div class="col-12">

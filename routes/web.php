@@ -71,10 +71,13 @@ Router::post('/register/customer', [AuthController::class, 'registerCustomer']);
 Router::get('/api/validate-referral', [AuthController::class, 'validateReferralCode']);
 Router::post('/api/convert-customer', [AuthController::class, 'convertCustomer'], [AuthMiddleware::class]);
 
-// Location Cascading API
+// Location Cascading API (51,804 Odisha Locations)
 Router::get('/api/locations/districts', [LocationController::class, 'getDistricts']);
 Router::get('/api/locations/blocks', [LocationController::class, 'getBlocks']);
 Router::get('/api/locations/gps', [LocationController::class, 'getGPs']);
+Router::get('/api/locations/villages', [LocationController::class, 'getVillages']);
+Router::get('/api/locations/pincode', [LocationController::class, 'getByPincode']);
+Router::get('/api/locations/search', [LocationController::class, 'search']);
 
 // ==========================================
 // 3. ADMIN / MANAGER / ACCOUNTS / OPERATIONS ROUTES
