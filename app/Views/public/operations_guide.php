@@ -178,15 +178,15 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             margin-bottom: 12px;
         }
         .slide-title {
-            font-size: 1.9rem;
+            font-size: 1.85rem;
             font-weight: 900;
             color: #ffffff;
             margin-bottom: 12px;
         }
         .slide-desc {
-            font-size: 1rem;
+            font-size: 0.96rem;
             color: #cbd5e1;
-            max-width: 620px;
+            max-width: 650px;
             line-height: 1.5;
         }
 
@@ -267,7 +267,7 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
 
                         <!-- Subtitle Live Transcript -->
                         <div class="subtitle-bar" id="subtitleBar">
-                            Click "Play Audio Guide" below to begin the voice-narrated video operations tour.
+                            Click "Play Voice Guide" below to begin the voice-narrated video operations tour.
                         </div>
                     </div>
 
@@ -321,7 +321,7 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                 <div class="card bg-dark border-secondary text-light mt-4 p-4 shadow-sm">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="fw-bold text-warning mb-0" id="detailTitle">Chapter Transcript & Action Steps</h4>
-                        <span class="badge bg-secondary font-mono" id="detailChapterNum">Chapter 1 of 8</span>
+                        <span class="badge bg-secondary font-mono" id="detailChapterNum">Chapter 1 of 9</span>
                     </div>
                     <div class="text-secondary leading-relaxed" id="detailContent" style="font-size: 0.95rem;">
                         This module covers the end-to-end multi-tier access model designed for Surya Vistaara.
@@ -334,7 +334,7 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                 <div class="card bg-dark border-secondary p-3 shadow-sm h-100">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-bold text-white mb-0"><i class="bi bi-collection-play-fill text-warning me-2"></i> Guide Chapters</h5>
-                        <span class="badge bg-primary">8 Modules</span>
+                        <span class="badge bg-primary">9 Modules</span>
                     </div>
 
                     <div class="chapter-playlist" id="chapterList">
@@ -348,6 +348,9 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                         <div class="d-grid gap-2">
                             <a href="<?= url('/manual') ?>" target="_blank" class="btn btn-outline-warning btn-sm fw-bold">
                                 <i class="bi bi-printer-fill me-1"></i> Open Printable PDF Manual
+                            </a>
+                            <a href="<?= url('/admin/commissions') ?>" class="btn btn-outline-light btn-sm fw-bold">
+                                <i class="bi bi-cash-coin me-1"></i> 9-Level Commission Matrix
                             </a>
                             <a href="<?= url('/admin/id-cards') ?>" class="btn btn-outline-light btn-sm fw-bold">
                                 <i class="bi bi-person-badge-fill me-1"></i> ID Card Generator Studio
@@ -365,7 +368,7 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
         const chapters = [
             {
                 id: 1,
-                title: "Platform Overview & Roles",
+                title: "Platform Overview & Enterprise Roles",
                 badge: "CHAPTER 1 • ARCHITECTURE",
                 desc: "Explore the 5 unified enterprise roles: Super Admin, Management, Back Office Executive (BOE), Solar Advisors, and Citizens under PM Surya Ghar.",
                 subtitles: "Welcome to Surya Vistaara and Dhwajja Solar India. The platform coordinates solar onboarding across all 30 Odisha districts with 5 secure role-based portals.",
@@ -393,7 +396,7 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             },
             {
                 id: 3,
-                title: "Back Office Executive (BOE) Scrutiny",
+                title: "Back Office Executive (BOE) Scrutiny SOP",
                 badge: "CHAPTER 3 • BOE SCRUTINY",
                 desc: "Review daily customer application queues, inspect 6 mandatory KYC documents, advance stages, and request file replacements.",
                 subtitles: "BOE staff scrutinize customer electricity bills, Aadhaar cards, PAN, land pattas, bank passbooks, and rooftop photos.",
@@ -407,15 +410,15 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             },
             {
                 id: 4,
-                title: "Solar Advisor & 9-Level Tree",
-                badge: "CHAPTER 4 • ADVISOR ONBOARDING",
+                title: "Solar Advisor Onboarding & Hierarchy",
+                badge: "CHAPTER 4 • ADVISOR NETWORK",
                 desc: "Public registration, live sponsor lookup, ₹2,700 onboarding fee submission, 9-level genealogy tree, and commission wallet.",
                 subtitles: "New advisors register online with referral attribution. Upon fee approval, their digital wallet, 9-level tree, and ID card are active.",
-                transcript: "Advisors earn commissions across 9 tiers when their registered customer reaches Stage 7 (Installation) and Stage 10 (Subsidy). TDS is automatically deducted with instant wallet credits.",
+                transcript: "Advisors register prospective customers directly from their dashboard. The sponsor referral attribution is locked automatically to protect their commission lineage.",
                 highlights: [
                     { title: "₹2,700 Fee", sub: "Welcome Kit, ID Card & 9-Level License" },
                     { title: "Genealogy", sub: "9-Tier Closure Table Matrix" },
-                    { title: "Commissions", sub: "Auto-credited with 5% TDS Ledger" }
+                    { title: "Attribution", sub: "Locked Sponsor Referral Code" }
                 ],
                 speech: "In Chapter 4, we examine the Solar Advisor network. Aspiring advisors register through the portal with real-time sponsor verification. Once the onboarding fee is confirmed, the advisor gains access to their 9-level genealogy network tree, digital commission wallet, customer registration desk, and personalized marketing collateral."
             },
@@ -435,8 +438,22 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             },
             {
                 id: 6,
-                title: "CR80 PVC ID Card Generator",
-                badge: "CHAPTER 6 • ID CARD STUDIO",
+                title: "9-Level Commissioning & Payout Engine",
+                badge: "CHAPTER 6 • COMMISSIONING ENGINE",
+                desc: "Automatic multi-tier commission calculation, Level 1 to 9 payout slabs, ₹1,500 direct bonus, 5% TDS deduction, and bank withdrawals.",
+                subtitles: "When a project completes Stage 7 or 10, the Commission Engine distributes rewards across 9 levels with statutory 5% TDS.",
+                transcript: "The Commission Engine automatically executes upon Installation and Subsidy. Level 1 earns ₹1,000 + ₹500 Customer Bonus = ₹1,500 Gross. Level 2 earns ₹500, Level 3 earns ₹300, Level 4 earns ₹200, and Levels 5 to 9 receive ₹100 each. 5% TDS is deducted under Section 194H.",
+                highlights: [
+                    { title: "Level 1 Direct", sub: "₹1,000 Comm + ₹500 Customer Bonus (₹1,500 Gross)" },
+                    { title: "Levels 2 to 9", sub: "L2: ₹500 | L3: ₹300 | L4: ₹200 | L5-9: ₹100 each" },
+                    { title: "5% TDS & Bank", sub: "Auto-deducted Section 194H & UTR Bank Payout" }
+                ],
+                speech: "Chapter 6 provides a comprehensive deep dive into the 9-Level Commissioning and Payout System. When a customer solar project reaches Stage 7 Installation or Stage 10 Subsidy, the Commission Engine automatically calculates and distributes earnings across the 9-level sponsor tree. The direct sponsoring advisor receives 1,000 rupees commission plus a 500 rupee direct customer bonus, totaling 1,500 rupees gross. Level 2 mentors earn 500 rupees, Level 3 area supervisors earn 300 rupees, Level 4 earns 200 rupees, and Levels 5 through 9 earn 100 rupees each. Statutory 5% TDS is automatically deducted and net earnings are instantly credited to advisors' digital wallets for bank withdrawal."
+            },
+            {
+                id: 7,
+                title: "CR80 PVC ID Card Studio & Dynamic QR",
+                badge: "CHAPTER 7 • ID CARD STUDIO",
                 desc: "Golden-standard CR80 ID cards for BOEs, Advisors, and Staff with client-side photo optimizer and live privacy QR code verification.",
                 subtitles: "Generate pixel-perfect duplex 54 × 85.6 mm ID cards matching the finalized golden design with dynamic QR scanning.",
                 transcript: "The ID Card Studio at /admin/id-cards allows managers to generate official cards with automatic photo compression under 200KB and privacy-preserving QR verification.",
@@ -445,12 +462,12 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                     { title: "Photo Box", sub: "120 × 144 mm with 4-Corner Brackets" },
                     { title: "Live QR", sub: "Instant Verification via suryavistaara.com" }
                 ],
-                speech: "In Chapter 6, we demonstrate the CR80 PVC identity card generation system. Cards are produced in double-sided portrait format with company branding, 120 by 144 pixel photo frames, flowing wave ribbons, and authorized signatory seals. The back side includes a dynamic QR code that allows anyone to verify credentials in real time."
+                speech: "In Chapter 7, we demonstrate the CR80 PVC identity card generation system. Cards are produced in double-sided portrait format with company branding, 120 by 144 pixel photo frames, flowing wave ribbons, and authorized signatory seals. The back side includes a dynamic QR code that allows anyone to verify credentials in real time."
             },
             {
-                id: 7,
-                title: "Company Double-Entry Ledger",
-                badge: "CHAPTER 7 • FINANCIAL BOOKS",
+                id: 8,
+                title: "Company Double-Entry Financial Ledger",
+                badge: "CHAPTER 8 • FINANCIAL BOOKS",
                 desc: "Daily cash & bank register, party-wise statements for advisors and vendors, UTR reconciliation, and CSV MIS exports.",
                 subtitles: "Complete financial transparency with automated receipt postings, voucher numbers, and running treasury balance.",
                 transcript: "Located at /admin/ledger, the ledger tracks every inflow and outflow with sequential voucher IDs (RCPT, PMT, CTR) and party attribution.",
@@ -459,12 +476,12 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                     { title: "Party Ledger", sub: "Advisor, Customer & Vendor Statements" },
                     { title: "Auto-Post", sub: "Triggered on Fee Confirmation" }
                 ],
-                speech: "Chapter 7 covers the Company Account Books and Double-Entry Ledger. Administrators can view chronological daily cash and bank journals, generate party statements for any advisor or vendor, record manual vouchers, and export audit-ready financial statements."
+                speech: "Chapter 8 covers the Company Account Books and Double-Entry Ledger. Administrators can view chronological daily cash and bank journals, generate party statements for any advisor or vendor, record manual vouchers, and export audit-ready financial statements."
             },
             {
-                id: 8,
+                id: 9,
                 title: "Location Master & 51,804 Records",
-                badge: "CHAPTER 8 • ODISHA LOCATIONS",
+                badge: "CHAPTER 9 • ODISHA LOCATIONS",
                 desc: "Full state coverage across 30 districts with AJAX cascading from District to Block, GP, Village, and reverse PIN code auto-fill.",
                 subtitles: "Experience seamless location auto-selection across all 51,804 Odisha villages, panchayats, and pincodes.",
                 transcript: "The location engine dynamically cascades selections and allows instant reverse lookups from any 6-digit PIN code without manual searching.",
@@ -473,7 +490,7 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                     { title: "Cascading", sub: "District → Block → GP → Village" },
                     { title: "PIN Lookup", sub: "Auto-resolves Location from 6-Digit PIN" }
                 ],
-                speech: "Finally, Chapter 8 showcases our comprehensive Odisha location engine. With over 51,000 pre-loaded villages, selecting a district instantly populates blocks and panchayats. Furthermore, entering any 6-digit postal PIN code automatically fills the district and block details across all registration forms. Thank you for completing the Surya Vistaara operations guide."
+                speech: "Finally, Chapter 9 showcases our comprehensive Odisha location engine. With over 51,000 pre-loaded villages, selecting a district instantly populates blocks and panchayats. Furthermore, entering any 6-digit postal PIN code automatically fills the district and block details across all registration forms. Thank you for completing the Surya Vistaara operations guide."
             }
         ];
 
@@ -484,7 +501,6 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
         let speechRate = 1.0;
         let selectedVoice = null;
 
-        // Populate Voices
         function loadVoices() {
             if (!speechSynth) return;
             const voices = speechSynth.getVoices();
@@ -528,7 +544,6 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             }
         }
 
-        // Render Playlist
         function renderPlaylist() {
             const listEl = document.getElementById('chapterList');
             listEl.innerHTML = '';
@@ -548,7 +563,6 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             });
         }
 
-        // Load Chapter Slide & Details
         function loadChapter(index) {
             currentChapterIndex = index;
             const ch = chapters[index];
@@ -566,7 +580,6 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                 <p>${ch.transcript}</p>
             `;
 
-            // Highlight boxes
             const hlEl = document.getElementById('slideHighlights');
             hlEl.innerHTML = ch.highlights.map((h, i) => `
                 <div class="${i > 0 ? 'border-start ps-3 border-secondary' : ''}">
@@ -634,7 +647,6 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
                 isPlaying = false;
                 document.getElementById('playIcon').className = 'bi bi-play-fill fs-5';
                 document.getElementById('playText').textContent = 'Play Voice Guide';
-                // Auto-advance to next chapter
                 if (currentChapterIndex < chapters.length - 1) {
                     setTimeout(() => {
                         nextChapter();
@@ -660,7 +672,6 @@ $pageTitle = "Interactive Operation Video & Voice Guide — Surya Vistaara (SVPL
             }
         }
 
-        // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             loadChapter(0);
         });

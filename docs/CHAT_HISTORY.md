@@ -3048,4 +3048,45 @@ A operational mannual required in pdf and operation video is required for the cl
    - Synchronized workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed to GitHub repository (`origin main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+Add detail about commissioning system in the tour. do not test yourself i will do the test
+</USER_REQUEST>
+
+## Assistant
+
+### Commissioning System Integration Summary:
+
+1. **Dedicated 9-Level Commission Engine Architecture & Payout Module**:
+   - Integrated as a dedicated chapter in both the **Interactive Voice & Video Walkthrough Suite** and the **PDF Operations Manual**:
+     - **Level 1 (Direct Sponsoring Advisor)**: ₹1,000.00 Base Commission + ₹500.00 Direct Customer Bonus = **₹1,500.00 Gross** (TDS 5%: ₹75.00, Net Wallet Credit: **₹1,425.00**).
+     - **Level 2 (Direct Mentor / Sponsor)**: **₹500.00 Gross** (TDS: ₹25.00, Net: **₹475.00**).
+     - **Level 3 (Area Coordinator)**: **₹300.00 Gross** (TDS: ₹15.00, Net: **₹285.00**).
+     - **Level 4 (Block Lead)**: **₹200.00 Gross** (TDS: ₹10.00, Net: **₹190.00**).
+     - **Levels 5 to 9 (Regional Uplines)**: **₹100.00 Gross each** (TDS: ₹5.00, Net: **₹95.00 each**).
+   - **Automated Trigger Milestones**: Commissioning Engine (`CommissionEngine.php`) executes automatically when a customer solar project reaches **Stage 7 (`INSTALLATION_COMPLETED`)** or **Stage 10 (`SUBSIDY_RECEIVED`)**.
+   - **Statutory Compliance**: Automated 5% Section 194H TDS ledger logging.
+   - **Digital Wallet & Banking**: Real-time wallet credit with bank NEFT/IMPS withdrawal requests and UTR confirmation workflows.
+
+2. **Technical Plant Commissioning Milestones**:
+   - Detailed solar project commissioning stages:
+     - Stage 7: Technical Installation Completed (Structure, 550W panels, inverters, earthing pits, AC/DC boxes).
+     - Stage 8: DISCOM Net-Meter Inspection & Testing.
+     - Stage 9: Grid Synchronization & Clean Energy Feed.
+     - Stage 10: Final Disbursement of ₹1,38,000 Dual DBT Subsidies (₹78k Central + ₹60k State).
+
+3. **Updated Across All Documentation & Walkthrough Files**:
+   - [`app/Views/public/operations_guide.php`](file:///d:/DKM/SVPL-Web/app/Views/public/operations_guide.php)
+   - [`public/docs/SVPL_Interactive_Video_Guide.html`](file:///d:/DKM/SVPL-Web/public/docs/SVPL_Interactive_Video_Guide.html)
+   - [`app/Views/printable/operations_manual.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/operations_manual.php)
+   - [`public/docs/SVPL_Operations_Manual.html`](file:///d:/DKM/SVPL-Web/public/docs/SVPL_Operations_Manual.html)
+
+4. **Synchronization & Deployment**:
+   - Synchronized workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed to GitHub repository (`origin main`).
+
+
 
