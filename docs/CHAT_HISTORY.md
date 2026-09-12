@@ -2801,4 +2801,40 @@ keep the link under governance of admin / manager login
    - Synced files to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed to GitHub repository (`origin main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+the custom icard is not exactly equal to the other icard. the major differences are
+1. background texure is not available in the custom icard
+2. line around the photo is not equal
+3. the box of id code and blood group not same
+4. bottom wave design heigh difference
+
+check all other differences and correct them. do not do any changes in the other icards, only change the custom icard
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Pixel-Perfect Parity Adjustments on Custom ID Card (`app/Views/printable/custom_id_card.php`):
+
+1. **Background Solar Texture Restored**:
+   - Applied the exact `linear-gradient` and `repeating-linear-gradient` photovoltaic micro-texture on `.solar-bg-pattern` matching `boe_id_card.php`.
+
+2. **Photo Frame & Corner Accents Matched**:
+   - Replaced solid border with `border: 2px dashed rgba(15, 45, 89, 0.35)` and `90px × 104px` dimensions.
+   - Positioned `.photo-corner` brackets with exact `3px` inset and `#0f2d59` navy borders.
+
+3. **ID Code & Blood Group Badge Grid Synchronized**:
+   - Updated `.grid-badge-box` to `background: rgba(255, 255, 255, 0.95)`, `padding: 6px 8px`, and `gap: 8px` with 13px mono font styling.
+
+4. **Bottom Wave SVG Banner Height & Curvature Aligned**:
+   - Set `.bottom-wave-banner` to exact `48px` height with `margin-bottom: -1px; overflow: hidden;` and dual gradient wave ribbon paths.
+
+5. **Full Header, Card Dimensions & Spacing Unified**:
+   - Card dimensions set to exact `320px × 507px`, `border-radius: 14px;`, and `padding: 16px 14px 8px 14px` on `.card-header-full` with gradient overlay.
+   - Synced to live XAMPP (`D:\xampp\htdocs\SVPL-Web`) and pushed to GitHub (`origin main`).
+
+
 

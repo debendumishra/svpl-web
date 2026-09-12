@@ -2,25 +2,24 @@
 /**
  * Surya Vistaara Pvt. Ltd. (SVPL) - Dhwajja Solar India (P) Ltd.
  * Official CR80 Duplex Printable Custom / Staff / Advisor ID Card
- * Pixel-Perfect CR80 Standard Layout (3.375" x 2.125" / 85.6mm x 54mm @ 300 DPI)
+ * Design: Exact Match to Gold Standard CR80 Format (Stitch Project 8666082930423354696)
  */
 $bloodGroup = !empty($card['blood_group']) ? $card['blood_group'] : 'O+ve';
 $fullName = trim($card['full_name'] ?? '');
 $mobileNumber = htmlspecialchars($card['mobile'] ?? '');
-$designation = htmlspecialchars($card['designation'] ?? 'Official Representative');
-$cardCode = htmlspecialchars($card['card_code'] ?? 'SVPL-ID-101');
+$designation = htmlspecialchars($card['designation'] ?? 'Back Office Executive');
+$cardCode = htmlspecialchars($card['card_code'] ?? 'SVPL-BOE-101');
 $cardType = strtoupper($card['card_type'] ?? 'BOE');
 $jurisdiction = !empty($card['jurisdiction']) ? htmlspecialchars($card['jurisdiction']) : 'Headquarters / All Odisha';
-$fullAddress = !empty($card['address']) ? htmlspecialchars($card['address']) : company_address();
-$issueDate = !empty($card['issue_date']) ? date('d-m-Y', strtotime($card['issue_date'])) : date('d-m-Y');
-$validThru = !empty($card['valid_thru']) ? htmlspecialchars($card['valid_thru']) : '31-12-2027';
-$emergencyContact = !empty($card['emergency_contact']) ? htmlspecialchars($card['emergency_contact']) : company_phone();
+$fullAddress = !empty($card['address']) 
+    ? htmlspecialchars($card['address']) 
+    : 'MIG-84, Pokhariput, BDA Colony, Phase-1, Bhubaneswar, Khorda – 751020, Odisha';
 
 $qrVerifyUrl = function_exists('url') 
     ? url('/verify?type=' . urlencode($cardType) . '&code=' . urlencode($cardCode))
     : ('https://suryavistaara.com/verify?type=' . urlencode($cardType) . '&code=' . urlencode($cardCode));
 
-$qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($qrVerifyUrl);
+$qrUrl = !empty($qrUrl) ? $qrUrl : ('https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($qrVerifyUrl));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -106,174 +105,151 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
             align-items: center;
         }
         .side-badge {
-            margin-bottom: 8px;
             font-size: 0.72rem;
             font-weight: 800;
-            letter-spacing: 0.08em;
             text-transform: uppercase;
+            letter-spacing: 0.08em;
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
         }
-        .badge-front {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
-        }
-        .badge-back {
-            background: #fef3c7;
-            color: #92400e;
-            border: 1px solid #fde68a;
-        }
+        .badge-front { background: #0f2d59; color: #ffffff; }
+        .badge-back { background: #065f46; color: #ffffff; }
 
-        /* Standard CR80 Card Dimensions: 53.98mm x 85.6mm (Portrait: 85.6mm Height x 53.98mm Width) */
+        /* CR80 Standard Proportions: 54mm x 85.6mm (Aspect Ratio approx 1 : 1.585) */
         .id-card {
             width: 320px;
-            height: 508px;
-            background: #ffffff;
-            border-radius: 16px;
+            height: 507px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 16px 36px -8px rgba(15, 45, 89, 0.2), 0 0 0 1px rgba(15, 45, 89, 0.08);
+            border-radius: 14px;
+            box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.2), 0 0 0 1px rgba(15, 23, 42, 0.08);
+            background: #FFFFFF;
             display: flex;
             flex-direction: column;
-            border: 1px solid #cbd5e1;
+            justify-content: space-between;
+            user-select: none;
         }
 
-        /* Lanyard Slot Hole */
         .lanyard-slot {
-            width: 38px;
-            height: 6px;
-            background: #e2e8f0;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            margin: 0 auto;
+            width: 44px;
+            height: 5.5px;
+            background: #cbd5e1;
+            border-radius: 9999px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
         }
 
-        /* Solar Background Watermark */
         .solar-bg-pattern {
             position: absolute;
             inset: 0;
-            background-image: 
-                radial-gradient(circle at 100% 0%, rgba(2, 132, 199, 0.04) 0%, transparent 50%),
-                radial-gradient(circle at 0% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 45%);
+            z-index: 0;
+            background: 
+                linear-gradient(135deg, rgba(15,45,89,0.03) 0%, rgba(14,165,233,0.03) 100%),
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(15,45,89,0.015) 10px, rgba(15,45,89,0.015) 20px);
             pointer-events: none;
-            z-index: 1;
         }
 
-        /* Full Width Corporate Header */
+        /* Full Width Header */
         .card-header-full {
-            width: 100%;
-            background: #ffffff;
-            padding: 10px 14px 8px 14px;
-            border-bottom: 2px solid #f59e0b;
             position: relative;
             z-index: 10;
+            padding: 16px 14px 8px 14px;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.95) 80%, rgba(255,255,255,0.7) 100%);
+            border-bottom: 1px solid rgba(224, 231, 255, 0.7);
         }
 
-        /* Passport Photo Container */
-        .photo-wrapper {
-            position: relative;
-            width: 86px;
-            height: 104px;
-            margin: 0 auto;
-        }
+        /* Photo Box */
         .photo-frame {
-            width: 100%;
-            height: 100%;
+            width: 90px;
+            height: 104px;
             border-radius: 10px;
+            border: 2px dashed rgba(15, 45, 89, 0.35);
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
             overflow: hidden;
-            border: 2px solid #0f2d59;
-            background: #f8fafc;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 10px rgba(15, 45, 89, 0.15);
-            position: relative;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
         .photo-corner {
             position: absolute;
             width: 8px;
             height: 8px;
-            border-color: #f59e0b;
+            border-color: #0f2d59;
             border-style: solid;
-            pointer-events: none;
-            z-index: 5;
         }
-        .corner-tl { top: -2px; left: -2px; border-width: 2px 0 0 2px; border-top-left-radius: 4px; }
-        .corner-tr { top: -2px; right: -2px; border-width: 2px 2px 0 0; border-top-right-radius: 4px; }
-        .corner-bl { bottom: -2px; left: -2px; border-width: 0 0 2px 2px; border-bottom-left-radius: 4px; }
-        .corner-br { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; border-bottom-right-radius: 4px; }
+        .corner-tl { top: 3px; left: 3px; border-width: 2px 0 0 2px; }
+        .corner-tr { top: 3px; right: 3px; border-width: 2px 2px 0 0; }
+        .corner-bl { bottom: 3px; left: 3px; border-width: 0 0 2px 2px; }
+        .corner-br { bottom: 3px; right: 3px; border-width: 0 2px 2px 0; }
 
-        /* Badge Box Grid */
+        /* Grid Badge */
         .grid-badge-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 8px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 6px;
-            background: #f8fafc;
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            gap: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         }
 
-        /* Bottom Dynamic Wave Ribbon */
+        /* Wave SVG at bottom */
         .bottom-wave-banner {
             width: 100%;
-            height: 38px;
+            height: 48px;
             position: relative;
+            z-index: 20;
+            overflow: hidden;
             margin-top: auto;
-            z-index: 10;
+            margin-bottom: -1px;
         }
 
-        /* Print Media Styles */
         @media print {
             body {
-                background: #ffffff !important;
-                padding: 0 !important;
-                margin: 0 !important;
+                background: #ffffff;
+                padding: 0;
+                margin: 0;
             }
-            .no-print-bar, .side-badge, .btn-print, .print-specification-note {
+            .no-print-bar {
                 display: none !important;
             }
             .cards-wrapper {
-                gap: 20px !important;
+                gap: 20mm;
             }
             .id-card {
-                box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
+                box-shadow: none;
+                border: 1px solid #cbd5e1;
                 page-break-inside: avoid;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Print Navigation Bar -->
+    <!-- Top Action Bar (Screen Only) -->
     <div class="no-print-bar">
-        <div style="display: flex; align-items: center; gap: 10px;">
-            <a href="<?= url('/admin/id-cards') ?>" style="text-decoration: none; color: #0f2d59; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
-                <i class="bi bi-arrow-left"></i> Back to ID Cards
-            </a>
-            <span style="color: #cbd5e1;">|</span>
-            <span style="font-weight: 800; color: #0f2d59; font-size: 0.95rem;">
-                <?= $cardCode ?> • <?= htmlspecialchars($fullName) ?>
-            </span>
-            <span class="badge" style="background: #e0f2fe; color: #0369a1; font-size: 0.72rem; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                <?= $cardType ?>
-            </span>
+        <div>
+            <div style="font-weight: 800; color: #0f2d59; font-size: 1.05rem;">Surya Vistaara / Dhwajja Solar — Official Identity Card</div>
+            <div style="font-size: 0.78rem; color: #64748b;">Standard CR80 54 × 85.6 mm • Double Sided PVC Card Print Layout</div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="btn-print" onclick="window.print()">
-                <i class="bi bi-printer-fill"></i> Print ID Card (CR80)
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <a href="<?= url('/admin/id-cards') ?>" style="text-decoration: none; color: #0f2d59; font-weight: 700; font-size: 0.85rem; padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc;">
+                <i class="bi bi-arrow-left me-1"></i> Back to Manager
+            </a>
+            <button onclick="window.print()" class="btn-print">
+                <i class="bi bi-printer-fill"></i> Print ID Card (Duplex)
             </button>
         </div>
     </div>
 
-    <!-- Container for Duplex Cards -->
+    <!-- Cards Wrapper -->
     <div class="cards-wrapper">
-
+        
         <!-- ==================== FRONT SIDE ==================== -->
         <div class="card-column">
             <span class="side-badge badge-front">Front Side • CR80 Portrait</span>
@@ -287,7 +263,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                 <!-- Photovoltaic Pattern Overlay -->
                 <div class="solar-bg-pattern"></div>
 
-                <!-- Full Width Top Corporate Header -->
+                <!-- Top Full-Width Header -->
                 <div class="card-header-full">
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
                         <?php if ($cLogo = company_logo_url()): ?>
@@ -295,10 +271,12 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                                 <img src="<?= htmlspecialchars($cLogo) ?>" alt="Logo" style="max-height: 46px; max-width: 90px; object-fit: contain;">
                             </div>
                         <?php else: ?>
+                            <!-- Logo Mark -->
                             <div style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f2d59 0%, #1e3a8a 100%); border-radius: 10px; color: #f59e0b; font-size: 1.6rem; font-weight: 900; box-shadow: 0 2px 8px rgba(15,45,89,0.25);">
                                 ☀
                             </div>
                         <?php endif; ?>
+                        
                         <!-- Header Text & Tagline -->
                         <div style="flex: 1; min-width: 0; text-align: left;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
@@ -320,11 +298,11 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                     </div>
                 </div>
 
-                <!-- Front Content Body -->
-                <div style="padding: 6px 14px 2px 14px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; z-index: 10;">
+                <!-- Front Side Body -->
+                <div style="padding: 4px 14px 2px 14px; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: space-between; position: relative; z-index: 10;">
                     
-                    <!-- 1. Official Passport Photograph -->
-                    <div class="photo-wrapper">
+                    <!-- 1. Photo Frame / Photo Display -->
+                    <div style="margin: 1px 0;">
                         <div class="photo-frame">
                             <div class="photo-corner corner-tl"></div>
                             <div class="photo-corner corner-tr"></div>
@@ -334,7 +312,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                             <?php 
                             $resolvedPhoto = !empty($card['photo_url']) ? resolve_photo_url($card['photo_url']) : null;
                             if (!empty($resolvedPhoto)): ?>
-                                <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                <img src="<?= htmlspecialchars($resolvedPhoto) ?>" alt="Official Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             <?php else: ?>
                                 <i class="bi bi-person-badge-fill" style="font-size: 26px; color: #94a3b8; margin-bottom: 2px;"></i>
                                 <span style="font-size: 8px; font-weight: 800; color: #64748b; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1;">OFFICIAL PHOTO</span>
@@ -360,17 +338,17 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                             </span>
                         </div>
                         <!-- Address just below mobile number, center aligned with 10px font size -->
-                        <?php if (!empty($fullAddress)): ?>
+                        <?php if (!empty($card['address'])): ?>
                         <div style="margin-top: 2px; font-size: 10px; font-weight: 600; color: #334155; line-height: 1.25; text-align: center; padding: 0 2px;">
-                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 9px;"></i><?= htmlspecialchars($fullAddress) ?>
+                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 9px;"></i><?= htmlspecialchars($card['address']) ?>
                         </div>
                         <?php endif; ?>
                     </div>
 
-                    <!-- 3. Badges Grid: ID Code & Blood Group -->
+                    <!-- 3. Badges Grid: Employee / Card Code & Blood Group -->
                     <div style="width: 100%;" class="grid-badge-box">
                         <div style="border-right: 1px solid #e2e8f0; padding-right: 4px; text-align: left;">
-                            <span style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; display: block;">ID CODE</span>
+                            <span style="font-size: 8px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; display: block;">EMPLOYEE / ID CODE</span>
                             <span class="font-mono-num" style="font-size: 13px; font-weight: 900; color: #0f2d59; letter-spacing: 0.3px; line-height: 1.1; display: block;">
                                 <?= $cardCode ?>
                             </span>
@@ -480,7 +458,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                                 </div>
                                 <div style="margin-bottom: 2px;">
                                     <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">HELPLINE:</span>
-                                    <span class="font-mono-num" style="font-weight: 900; color: #0f2d59;"><?= htmlspecialchars($emergencyContact) ?></span>
+                                    <span class="font-mono-num" style="font-weight: 900; color: #0f2d59;"><?= htmlspecialchars(!empty($card['emergency_contact']) ? $card['emergency_contact'] : company_phone()) ?></span>
                                 </div>
                                 <div>
                                     <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">SUPPORT:</span>
@@ -496,9 +474,9 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
                         </div>
 
                         <div style="margin-top: 6px; padding-top: 4px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 8.5px; font-weight: 900; color: #0f2d59; text-transform: uppercase;">VALIDITY:</span>
+                            <span style="font-size: 8.5px; font-weight: 900; color: #0f2d59; text-transform: uppercase;">ROLE / DESIGNATION:</span>
                             <span class="font-mono-num" style="font-size: 9px; font-weight: 900; color: #0f2d59; background: #eff6ff; padding: 1px 6px; border-radius: 4px; border: 1px solid #bfdbfe;">
-                                <?= $issueDate ?> TO <?= $validThru ?>
+                                <?= htmlspecialchars(strtoupper($designation)) ?>
                             </span>
                         </div>
                     </div>
@@ -547,7 +525,7 @@ $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urle
     </div>
 
     <!-- Print Specification Note -->
-    <div class="print-specification-note" style="margin-top: 24px; text-align: center; font-size: 0.75rem; color: #64748b;">
+    <div style="margin-top: 24px; text-align: center; font-size: 0.75rem; color: #64748b;">
         <strong>Print Specification:</strong> CR80 Standard (85.6 mm × 54 mm) • 300 DPI Duplex PVC Card Printing • Full-Width Header & Scaled Typography
     </div>
 
