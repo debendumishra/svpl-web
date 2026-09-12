@@ -18,11 +18,11 @@ $title = "Become a Solar Advisor — Business Opportunity & 9-Level Rewards | SV
                     Become an Authorized <span style="color: var(--svpl-gold-bright);">Solar Advisor Partner</span>
                 </h1>
                 <p class="lead text-light mb-4" style="font-size: 1.1rem; max-width: 680px;">
-                    Join Surya Vistaara's mission to power 1 Lakh+ Odisha homes under PM Surya Ghar Muft Bijli Yojana. Earn direct customer commissions, 9-level network overrides, and lifetime passive rewards.
+                    Join <?= htmlspecialchars(company_name()) ?>'s mission to power 1 Lakh+ Odisha homes under PM Surya Ghar Muft Bijli Yojana. Earn direct customer commissions, 9-level network overrides, and lifetime passive rewards.
                 </p>
                 <div class="d-flex gap-2 flex-wrap">
                     <a href="<?= url('/register-advisor') ?>" class="btn btn-svpl-solar btn-lg shadow-sm">
-                        <i class="bi bi-shield-check me-1"></i> Register as Advisor (₹2,700)
+                        <i class="bi bi-shield-check me-1"></i> Register as Advisor (₹<?= number_format(advisor_joining_fee()) ?>)
                     </a>
                     <a href="#compensationPlan" class="btn btn-outline-light btn-lg">
                         <i class="bi bi-graph-up-arrow me-1"></i> 9-Level Commission Plan
@@ -33,7 +33,7 @@ $title = "Become a Solar Advisor — Business Opportunity & 9-Level Rewards | SV
                 <div class="card p-4 border-2 border-warning shadow-lg text-dark" style="background: #FFFFFF; border-radius: 16px;">
                     <div class="text-center mb-3">
                         <span class="badge bg-success text-white px-3 py-1">ONBOARDING KIT</span>
-                        <h4 class="font-heading fw-bold text-navy mt-2">₹2,700 One-Time Fee</h4>
+                        <h4 class="font-heading fw-bold text-navy mt-2">₹<?= number_format(advisor_joining_fee()) ?> One-Time Fee</h4>
                         <p class="text-muted small mb-0">Complete Digital License & Marketing Kit</p>
                     </div>
                     <ul class="list-unstyled small text-secondary mb-3">
@@ -204,7 +204,7 @@ $title = "Become a Solar Advisor — Business Opportunity & 9-Level Rewards | SV
                     </div>
 
                     <a href="<?= url('/register-advisor') ?>" class="btn btn-svpl-solar w-100 py-3 fw-bold">
-                        <i class="bi bi-person-plus-fill me-1"></i> Register as Advisor (₹2,700)
+                        <i class="bi bi-person-plus-fill me-1"></i> Register as Advisor (₹<?= number_format(advisor_joining_fee()) ?>)
                     </a>
                 </div>
             </div>

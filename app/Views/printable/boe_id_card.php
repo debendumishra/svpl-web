@@ -312,22 +312,28 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                         </div>
                     </div>
 
-                    <!-- 2. Scaled Name, Designation & Phone -->
+                    <!-- 2. Scaled Name, Designation, Phone & Center-Aligned Address -->
                     <div style="text-align: center; width: 100%;">
-                        <h3 style="font-size: 16.5px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 3px;">
+                        <h3 style="font-size: 16px; font-weight: 900; color: #0f2d59; text-transform: uppercase; letter-spacing: -0.3px; line-height: 1.15; margin-bottom: 2px;">
                             <?= htmlspecialchars($fullName) ?>
                         </h3>
-                        <div style="display: inline-block; padding: 3px 12px; background: rgba(224, 242, 254, 0.95); border-radius: 9999px; border: 1px solid #7dd3fc;">
-                            <p style="font-size: 9.5px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">
+                        <div style="display: inline-block; padding: 2px 10px; background: rgba(224, 242, 254, 0.95); border-radius: 9999px; border: 1px solid #7dd3fc;">
+                            <p style="font-size: 9px; font-weight: 800; color: #0369a1; text-transform: uppercase; letter-spacing: 0.06em; line-height: 1;">
                                 <?= $designation ?>
                             </p>
                         </div>
-                        <div style="margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 5px; color: #0f2d59;">
-                            <i class="bi bi-telephone-fill" style="color: #0284c7; font-size: 11px;"></i>
-                            <span class="font-mono-num" style="font-weight: 800; font-size: 11.5px; letter-spacing: -0.2px;">
+                        <div style="margin-top: 3px; display: flex; align-items: center; justify-content: center; gap: 4px; color: #0f2d59;">
+                            <i class="bi bi-telephone-fill" style="color: #0284c7; font-size: 10px;"></i>
+                            <span class="font-mono-num" style="font-weight: 800; font-size: 11px; letter-spacing: -0.2px;">
                                 <?= $mobileNumber ?>
                             </span>
                         </div>
+                        <!-- Address just below mobile number, center aligned -->
+                        <?php if (!empty($boe['address'])): ?>
+                        <div style="margin-top: 3px; font-size: 8px; font-weight: 600; color: #334155; line-height: 1.25; text-align: center; padding: 0 2px;">
+                            <i class="bi bi-geo-alt-fill text-danger me-1" style="font-size: 8px;"></i><?= htmlspecialchars($boe['address']) ?>
+                        </div>
+                        <?php endif; ?>
                     </div>
 
                     <!-- 3. Badges Grid: Employee Code & Blood Group -->

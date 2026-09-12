@@ -17,7 +17,7 @@ $pendingCount = count($pendingPayments ?? []);
                 <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1"><i class="bi bi-check2-circle"></i> All Clear</span>
             <?php endif; ?>
         </div>
-        <p class="text-secondary small mb-0">Review ₹2,700 advisor joining fee UTRs, verified customer payments, and wallet audit ledgers</p>
+        <p class="text-secondary small mb-0">Review advisor joining fee UTRs, verified customer payments, and wallet audit ledgers</p>
     </div>
     <div class="d-flex gap-2">
         <a href="<?= url('/admin/export/csv?type=payments') ?>" class="btn btn-outline-success btn-sm">
@@ -47,7 +47,7 @@ $pendingCount = count($pendingPayments ?? []);
     <li class="nav-item" role="presentation">
         <button class="nav-link active fw-semibold d-flex align-items-center gap-2" id="tab-pending-btn" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab">
             <i class="bi bi-shield-exclamation text-warning"></i>
-            Pending Advisor Onboarding Fees (₹2,700)
+            Pending Advisor Onboarding Fees
             <?php if ($pendingCount > 0): ?>
                 <span class="badge bg-danger text-white rounded-pill px-2"><?= $pendingCount ?></span>
             <?php endif; ?>
@@ -74,7 +74,7 @@ $pendingCount = count($pendingPayments ?? []);
         <div class="card card-svpl p-4 bg-white border-0 shadow-sm">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="font-heading fw-bold text-navy mb-0">
-                    <i class="bi bi-clock-history text-warning me-2"></i> Advisor ₹2,700 Fee Verification Queue
+                    <i class="bi bi-clock-history text-warning me-2"></i> Advisor Fee Verification Queue
                 </h5>
                 <span class="text-secondary small">Confirming payment activates advisor login and enables digital ID card generation</span>
             </div>
@@ -136,7 +136,7 @@ $pendingCount = count($pendingPayments ?? []);
                                     <td class="text-end">
                                         <div class="d-flex gap-2 justify-content-end">
                                             <!-- CONFIRM PAYMENT FORM -->
-                                            <form method="POST" action="<?= url('/admin/payments/confirm') ?>" onsubmit="return confirm('Confirm receipt of ₹2,700 for <?= htmlspecialchars($p['first_name']) ?> (<?= htmlspecialchars($p['advisor_code']) ?>)? This will activate their advisor account immediately.');">
+                                            <form method="POST" action="<?= url('/admin/payments/confirm') ?>" onsubmit="return confirm('Confirm receipt of ₹<?= number_format((float)$p['amount'], 2) ?> for <?= htmlspecialchars($p['first_name']) ?> (<?= htmlspecialchars($p['advisor_code']) ?>)? This will activate their advisor account immediately.');">
                                                 <?= csrf_field() ?>
                                                 <input type="hidden" name="payment_id" value="<?= $p['id'] ?>">
                                                 <button type="submit" class="btn btn-sm btn-success fw-bold px-3 shadow-sm">

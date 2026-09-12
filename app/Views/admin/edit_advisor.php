@@ -266,9 +266,9 @@ $error = $error ?? null;
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold text-navy small">Onboarding Fee Status (₹2,700) *</label>
+                        <label class="form-label fw-semibold text-navy small">Onboarding Fee Status (₹<?= number_format((float)($advisor['joining_fee'] ?? advisor_joining_fee())) ?>) *</label>
                         <select name="joining_fee_paid" class="form-select fw-bold">
-                            <option value="1" <?= ((int)($advisor['joining_fee_paid'] ?? 0)) === 1 ? 'selected' : '' ?>>✅ Paid & Reconciled (₹2,700)</option>
+                            <option value="1" <?= ((int)($advisor['joining_fee_paid'] ?? 0)) === 1 ? 'selected' : '' ?>>✅ Paid & Reconciled (₹<?= number_format((float)($advisor['joining_fee'] ?? advisor_joining_fee())) ?>)</option>
                             <option value="0" <?= ((int)($advisor['joining_fee_paid'] ?? 0)) === 0 ? 'selected' : '' ?>>⏳ Fee Unpaid / Pending</option>
                         </select>
                     </div>

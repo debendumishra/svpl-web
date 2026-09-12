@@ -46,7 +46,7 @@ $title = "Registration Submitted — Awaiting Verification — SVPL";
                         <div class="col-12"><hr class="my-1"></div>
                         <div class="col-sm-4">
                             <span class="text-secondary small d-block">Onboarding Fee</span>
-                            <strong class="text-success fs-6">₹2,700.00</strong>
+                            <strong class="text-success fs-6">₹<?= number_format((float)($advisor['joining_fee'] ?? advisor_joining_fee()), 2) ?></strong>
                         </div>
                         <div class="col-sm-4">
                             <span class="text-secondary small d-block">Payment Mode</span>
@@ -66,7 +66,7 @@ $title = "Registration Submitted — Awaiting Verification — SVPL";
                         <div>
                             <strong>What happens next?</strong>
                             <ol class="mb-0 ps-3 mt-1">
-                                <li>The SVPL Finance / Superadmin team will verify your ₹2,700 UTR reference with bank records.</li>
+                                <li>The <?= htmlspecialchars(company_short_name()) ?> Finance / Superadmin team will verify your ₹<?= number_format((float)($advisor['joining_fee'] ?? advisor_joining_fee())) ?> UTR reference with bank records.</li>
                                 <li>Upon confirmation, your advisor portal access and ID Card generation will be activated automatically.</li>
                                 <li>You will then be able to log in using your registered mobile number and password.</li>
                             </ol>

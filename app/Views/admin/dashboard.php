@@ -35,7 +35,7 @@ $title = "Executive Command Center — SVPL Admin";
             </div>
             <div>
                 <h6 class="fw-bold text-navy mb-0">
-                    <?= $pendingPaymentsCount ?> Advisor Onboarding Payment(s) Awaiting Confirmation (₹2,700 each)
+                    <?= $pendingPaymentsCount ?> Advisor Onboarding Payment(s) Awaiting Confirmation (₹<?= number_format(advisor_joining_fee()) ?> each)
                 </h6>
                 <p class="small text-secondary mb-0">Newly registered advisors cannot log in until their UTR payment details are confirmed by Manager/Superadmin.</p>
             </div>

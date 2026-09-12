@@ -88,7 +88,7 @@ class Advisor
             $data['account_number'] ?? null,
             $data['ifsc_code'] ?? null,
             $data['status'] ?? 'PENDING_APPROVAL',
-            $data['joining_fee'] ?? 2700.00,
+            $data['joining_fee'] ?? (function_exists('advisor_joining_fee') ? advisor_joining_fee() : 2700.00),
             $data['joining_fee_paid'] ?? 0,
         ]);
 

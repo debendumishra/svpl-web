@@ -235,7 +235,7 @@ class AuthController
                 'account_number' => trim($post['account_number'] ?? ''),
                 'ifsc_code' => trim($post['ifsc_code'] ?? ''),
                 'status' => 'PENDING_APPROVAL',
-                'joining_fee' => 2700.00,
+                'joining_fee' => advisor_joining_fee(),
                 'joining_fee_paid' => 0,
             ]);
 
@@ -253,11 +253,12 @@ class AuthController
             }
 
             // 4. Create Payment record for Admin Verification
+            $currentFee = advisor_joining_fee();
             $paymentId = Payment::create([
                 'entity_type' => 'ADVISOR',
                 'entity_id' => $advId,
                 'purpose' => 'JOINING_FEE',
-                'amount' => 2700.00,
+                'amount' => $currentFee,
                 'payment_method' => $paymentMethod,
                 'transaction_ref' => $transactionRef,
                 'status' => 'PENDING',
@@ -277,7 +278,7 @@ class AuthController
             ]);
 
             // 7. Log Audit Trail
-            AuditLog::log($userId, 'ADVISOR_REGISTERED', 'ADVISOR', $advId, "Advisor {$advCode} registered with fee ₹2,700 pending verification (UTR: {$transactionRef})");
+            AuditLog::log($userId, 'ADVISOR_REGISTERED', 'ADVISOR', $advId, "Advisor {$advCode} registered with fee ₹" . number_format($currentFee) . " pending verification (UTR: {$transactionRef})");
 
             Database::commit();
 

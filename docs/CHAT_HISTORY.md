@@ -2564,3 +2564,41 @@ add the autorised signature image to be replaced in the setting under admin
    - Synced to live XAMPP directory `D:\xampp\htdocs\svpl-web`.
    - Committed and pushed to GitHub repository (`main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+1. even after changing the advisor joining fee in settings, it is not effected in the advisor registrator form. it should effect every where, even in the accounting system also.
+2. In the identity card the address of the person should appear just below the mobile number with center aligned and the bottom structure should not change or shift.
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Enhancements:
+
+1. **Dynamic Advisor Joining Fee Universal System**:
+   - **Global Helper**: Added `advisor_joining_fee(): float` in [`config/constants.php`](file:///d:/DKM/SVPL-Web/config/constants.php) that queries `Setting::get('advisor_joining_fee')` dynamically with fallback.
+   - **Public Registration & Info Pages**:
+     - Advisor Registration View ([`app/Views/public/register_advisor.php`](file:///d:/DKM/SVPL-Web/app/Views/public/register_advisor.php)): Updated fee badge and payment instructions to use dynamic `advisor_joining_fee()`.
+     - Become an Advisor Public Page ([`app/Views/public/become_advisor.php`](file:///d:/DKM/SVPL-Web/app/Views/public/become_advisor.php)): Dynamic fee in hero banner, induction kit card, and bottom CTA button.
+     - Registration Pending View ([`app/Views/public/advisor_registered_pending.php`](file:///d:/DKM/SVPL-Web/app/Views/public/advisor_registered_pending.php)): Dynamic fee display and UTR verification notice.
+   - **Controller & Models**:
+     - [`app/Controllers/AuthController.php`](file:///d:/DKM/SVPL-Web/app/Controllers/AuthController.php): Assigns dynamic `advisor_joining_fee()` to newly created `advisors.joining_fee` and `payments.amount`.
+     - [`app/Models/Advisor.php`](file:///d:/DKM/SVPL-Web/app/Models/Advisor.php) & [`app/Models/Payment.php`](file:///d:/DKM/SVPL-Web/app/Models/Payment.php): Default create amounts now resolve `advisor_joining_fee()`.
+   - **Accounting & Ledger Auto-Posting**:
+     - Confirmation in [`app/Models/Payment.php`](file:///d:/DKM/SVPL-Web/app/Models/Payment.php) passes the exact recorded fee amount to `CompanyLedger::autoPostAdvisorFee()`.
+     - Admin Payments Queue ([`app/Views/admin/payments.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/payments.php)), Admin Dashboard ([`app/Views/admin/dashboard.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/dashboard.php)), Edit Advisor ([`app/Views/admin/edit_advisor.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/edit_advisor.php)), Advisor List ([`app/Views/admin/advisors.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/advisors.php)), and Company Ledger ([`app/Views/admin/ledger.php`](file:///d:/DKM/SVPL-Web/app/Views/admin/ledger.php)) now reflect the dynamic configured fee everywhere.
+     - Printable Advisor Receipt ([`app/Views/printable/receipt.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/receipt.php)) displays the dynamic joining fee.
+
+2. **Identity Card Address Placement**:
+   - **Advisor ID Card** ([`app/Views/printable/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/id_card.php)): Positioned the personal address directly below the mobile number with center alignment.
+   - **BOE Staff ID Card** ([`app/Views/printable/boe_id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/boe_id_card.php)): Positioned the executive address directly below the mobile number with center alignment.
+   - **Layout Stability**: Removed duplicate bottom boxes and streamlined typography so the bottom structure (`bottom-wave-banner`) remains anchored without shifting.
+
+3. **Deployment & Verification**:
+   - Passed PHP syntax lint checks across all modified files.
+   - Synced to live XAMPP server (`D:\xampp\htdocs\svpl-web`).
+   - Pushed updates to GitHub repository (`origin main`).
+
+

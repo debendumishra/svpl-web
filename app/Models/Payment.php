@@ -36,7 +36,7 @@ class Payment
             $data['entity_type'],
             $data['entity_id'],
             $data['purpose'] ?? 'JOINING_FEE',
-            $data['amount'] ?? 2700.00,
+            $data['amount'] ?? (function_exists('advisor_joining_fee') ? advisor_joining_fee() : 2700.00),
             $data['payment_method'] ?? 'UPI',
             $data['transaction_ref'] ?? null,
             $data['status'] ?? 'PENDING',
@@ -120,9 +120,10 @@ class Payment
             Database::execute("UPDATE users SET is_active = 1, updated_at = NOW() WHERE id = ?", [$advisor['user_id']]);
 
             // 4. Auto-post to Company Account Ledger
+            $confirmedAmount = (float) ($payment['amount'] ?? (function_exists('advisor_joining_fee') ? advisor_joining_fee() : 2700.00));
             CompanyLedger::autoPostAdvisorFee(
                 $advisorId,
-                (float) ($payment['amount'] ?? 2700.00),
+                $confirmedAmount,
                 $payment['payment_method'] ?? 'UPI',
                 $payment['transaction_ref'] ?? 'N/A',
                 $adminUserId
@@ -134,7 +135,7 @@ class Payment
                 'PAYMENT_CONFIRMED',
                 'ADVISOR',
                 $advisorId,
-                "Onboarding fee ₹2,700 confirmed for Advisor {$advisor['advisor_code']} (UTR: {$payment['transaction_ref']})"
+                "Onboarding fee ₹" . number_format($confirmedAmount, 2) . " confirmed for Advisor {$advisor['advisor_code']} (UTR: {$payment['transaction_ref']})"
             );
 
             Database::commit();

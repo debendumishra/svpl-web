@@ -35,7 +35,7 @@
             <div><strong>Date:</strong> <?= date('d M Y') ?></div>
         </div>
 
-        <p class="small">Received with thanks from <strong><?= htmlspecialchars(($advisor['first_name'] ?? '') . ' ' . ($advisor['last_name'] ?? '')) ?></strong> (ID: <code><?= htmlspecialchars($advisor['advisor_code'] ?? 'N/A') ?></code>) a sum of <strong>₹<?= number_format((float)company_setting('advisor_joining_fee', 1500), 2) ?></strong> towards Advisor Induction & Welcome Kit Fee.</p>
+        <p class="small">Received with thanks from <strong><?= htmlspecialchars(($advisor['first_name'] ?? '') . ' ' . ($advisor['last_name'] ?? '')) ?></strong> (ID: <code><?= htmlspecialchars($advisor['advisor_code'] ?? 'N/A') ?></code>) a sum of <strong>₹<?= number_format((float)($advisor['joining_fee'] ?? advisor_joining_fee()), 2) ?></strong> towards Advisor Induction & Welcome Kit Fee.</p>
 
         <div class="text-end mt-4 pt-3 border-top small">
             <strong>For <?= htmlspecialchars(company_name()) ?></strong><br>

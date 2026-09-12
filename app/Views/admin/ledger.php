@@ -587,7 +587,7 @@ $partyStatement = $partyStatement ?? null;
                             <label class="form-label fw-semibold small">Account Head / Category *</label>
                             <select name="account_head" id="accountHeadSelect" class="form-select" required>
                                 <optgroup label="Revenue & Inflows" id="inflowGroup">
-                                    <option value="Advisor Joining / Induction Fee">Advisor Joining / Induction Fee (₹2,700)</option>
+                                    <option value="Advisor Joining / Induction Fee">Advisor Joining / Induction Fee (₹<?= number_format(advisor_joining_fee()) ?>)</option>
                                     <option value="Customer Solar Project Payment">Customer Solar Project Payment</option>
                                     <option value="Government DBT / Subsidy Receipt">Government DBT / Subsidy Receipt</option>
                                     <option value="Capital / Equity Reserve">Capital / Equity Reserve</option>

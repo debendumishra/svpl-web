@@ -311,8 +311,12 @@ if (!function_exists('company_gstin')) {
 
 if (!function_exists('company_cin')) {
     function company_cin(): string {
-        return (string) company_setting('cin', '');
+        return (string) company_setting('cin', 'U40106OR2024PTC045890');
     }
 }
 
-
+if (!function_exists('advisor_joining_fee')) {
+    function advisor_joining_fee(): float {
+        return (float) company_setting('advisor_joining_fee', 2700.00);
+    }
+}

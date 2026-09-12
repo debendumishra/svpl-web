@@ -107,7 +107,7 @@ $title = "Advisor Network Management — SVPL Admin";
                                         <i class="bi bi-pencil-square"></i> Edit
                                     </a>
                                     <?php if ($adv['status'] === 'PENDING_APPROVAL'): ?>
-                                        <a href="<?= url('/admin/payments') ?>" class="btn btn-sm btn-warning text-dark fw-bold py-1 px-2 shadow-sm" title="Verify ₹2,700 Onboarding Fee">
+                                        <a href="<?= url('/admin/payments') ?>" class="btn btn-sm btn-warning text-dark fw-bold py-1 px-2 shadow-sm" title="Verify Onboarding Fee (₹<?= number_format((float)($adv['joining_fee'] ?? advisor_joining_fee())) ?>)">
                                             <i class="bi bi-shield-check"></i>
                                         </a>
                                     <?php else: ?>

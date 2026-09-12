@@ -263,13 +263,13 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
                             <div>
                                 <span class="badge bg-warning text-dark fw-bold px-2 py-1">MANDATORY ONBOARDING FEE</span>
-                                <h5 class="font-heading fw-bold text-navy mb-0 mt-1">Advisor Registration & ID License: ₹2,700</h5>
+                                <h5 class="font-heading fw-bold text-navy mb-0 mt-1">Advisor Registration & ID License: ₹<?= number_format(advisor_joining_fee()) ?></h5>
                             </div>
                             <span class="badge bg-dark text-white px-3 py-2"><i class="bi bi-shield-lock-fill text-warning me-1"></i> Admin Verification Required</span>
                         </div>
                         
                         <p class="small text-secondary mb-3">
-                            Please transfer the one-time registration fee of <strong>₹2,700</strong> to the official SVPL corporate account below via UPI, IMPS, NEFT, or Cash, and submit the <strong>UTR / Transaction Reference Number</strong>. Your account will be activated by the Manager/Admin upon payment confirmation.
+                            Please transfer the one-time registration fee of <strong>₹<?= number_format(advisor_joining_fee()) ?></strong> to the official <?= htmlspecialchars(company_short_name()) ?> corporate account below via UPI, IMPS, NEFT, or Cash, and submit the <strong>UTR / Transaction Reference Number</strong>. Your account will be activated by the Manager/Admin upon payment confirmation.
                         </p>
 
                         <!-- Official Payment Bank & UPI Details -->
