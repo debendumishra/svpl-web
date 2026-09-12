@@ -104,8 +104,11 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                                     <span style="font-size: 0.72rem;" class="fw-bold">ID PHOTO</span>
                                 </div>
                             </div>
-                            <div class="mt-1">
-                                <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.68rem;">CR80 3:4 Ratio</span>
+                            <div class="mt-1 d-flex justify-content-center gap-1">
+                                <button type="button" class="btn btn-outline-warning btn-sm py-0 px-2 fw-semibold" style="font-size: 0.68rem;" onclick="triggerPhotoStudio('imgPhotoPreview', 'placeholderPhotoText', 'inputPhotoBase64', 'inputPhotoFile')">
+                                    <i class="bi bi-crop me-1"></i> Crop / BG
+                                </button>
+                                <span class="badge bg-secondary-subtle text-secondary align-self-center" style="font-size: 0.68rem;">3:4 Ratio</span>
                             </div>
                         </div>
 
@@ -116,7 +119,7 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                                     <div class="col-12 col-lg-6">
                                         <label class="form-label small fw-semibold text-navy"><i class="bi bi-upload text-primary me-1"></i> Option A: Upload Passport Photo</label>
                                         <input type="file" name="advisor_photo" id="inputPhotoFile" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" onchange="previewUploadedPhoto(this)">
-                                        <small class="text-muted" style="font-size: 0.72rem;">JPG, PNG, or WEBP (Passport format).</small>
+                                        <small class="text-muted" style="font-size: 0.72rem;">JPG, PNG, or WEBP (Auto-opens Studio).</small>
                                     </div>
                                     <div class="col-12 col-lg-6">
                                         <label class="form-label small fw-semibold text-navy"><i class="bi bi-camera-fill text-success me-1"></i> Option B: Live Camera Capture</label>
@@ -130,6 +133,9 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                                 </div>
                                 
                                 <input type="hidden" name="advisor_photo_base64" id="inputPhotoBase64" value="">
+                                <small class="text-muted mt-2 d-block" style="font-size: 0.72rem;">
+                                    <i class="bi bi-magic text-primary me-1"></i> Auto-launches Photo Studio to crop (3:4 standard) and remove background with 1-click studio backdrop.
+                                </small>
 
                                 <div class="row g-2 mt-2 pt-2 border-top">
                                     <div class="col-md-6">
@@ -477,6 +483,29 @@ function switchLiveCamera() {
     startLiveCamera();
 }
 
+function triggerPhotoStudio(previewId, placeholderId, base64InputId, fileInputId) {
+    const preview = document.getElementById(previewId);
+    const fileInput = document.getElementById(fileInputId);
+    let src = (preview && preview.src && preview.src.length > 50) ? preview.src : null;
+
+    if (!src && fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (typeof window.openPhotoStudio === 'function') {
+                window.openPhotoStudio(e.target.result, previewId, placeholderId, base64InputId);
+            }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+        return;
+    }
+
+    if (src && typeof window.openPhotoStudio === 'function') {
+        window.openPhotoStudio(src, previewId, placeholderId, base64InputId);
+    } else {
+        alert('Please choose or capture a photo first, then use Crop / BG to adjust.');
+    }
+}
+
 function captureLiveSnapshot() {
     const video = document.getElementById('liveCameraVideo');
     const canvas = document.getElementById('liveCameraCanvas');
@@ -518,7 +547,7 @@ function captureLiveSnapshot() {
 
     ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
 
-    const base64Data = canvas.toDataURL('image/jpeg', 0.90);
+    const base64Data = canvas.toDataURL('image/jpeg', 0.92);
     
     // Set to hidden input and update preview
     document.getElementById('inputPhotoBase64').value = base64Data;
@@ -544,6 +573,13 @@ function captureLiveSnapshot() {
         const bsModal = new bootstrap.Modal(modalEl);
         bsModal.hide();
     }
+
+    // Auto-open Photo Studio to refine crop & background
+    if (typeof window.openPhotoStudio === 'function') {
+        setTimeout(() => {
+            window.openPhotoStudio(base64Data, 'imgPhotoPreview', 'placeholderPhotoText', 'inputPhotoBase64');
+        }, 300);
+    }
 }
 
 function previewUploadedPhoto(input) {
@@ -556,8 +592,10 @@ function previewUploadedPhoto(input) {
             imgPreview.style.display = 'block';
             if (placeholderText) placeholderText.style.display = 'none';
 
-            // Clear live camera base64 so file input is prioritized
-            document.getElementById('inputPhotoBase64').value = '';
+            // Auto-open Photo Studio for 3:4 cropping and background removal
+            if (typeof window.openPhotoStudio === 'function') {
+                window.openPhotoStudio(e.target.result, 'imgPhotoPreview', 'placeholderPhotoText', 'inputPhotoBase64');
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }

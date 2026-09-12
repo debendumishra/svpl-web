@@ -388,6 +388,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= asset('assets/js/app.js') ?>"></script>
     <script src="<?= asset('assets/js/image-compressor.js') ?>"></script>
+    <script src="<?= asset('assets/js/photo-crop-studio.js') ?>"></script>
 </body>
 </html>
 

@@ -92,15 +92,25 @@ $error = $error ?? null;
                             <?php endif; ?>
                         </div>
 
+                        <div class="d-flex justify-content-center gap-1 mb-2">
+                            <button type="button" class="btn btn-outline-warning btn-sm py-0 px-2 fw-semibold" style="font-size: 0.68rem;" onclick="triggerPhotoStudio('imgPhotoPreview', 'placeholderPhotoText', 'inputPhotoBase64', 'inputPhotoFile')">
+                                <i class="bi bi-crop me-1"></i> Crop / BG
+                            </button>
+                            <span class="badge bg-secondary-subtle text-secondary align-self-center" style="font-size: 0.68rem;">3:4 Ratio</span>
+                        </div>
+
                         <div>
                             <input type="file" name="advisor_photo" id="inputPhotoFile" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp" onchange="previewUploadedPhoto(this)">
-                            <small class="text-muted d-block mt-1" style="font-size: 0.70rem;">Upload passport photo (JPG/PNG)</small>
+                            <small class="text-muted d-block mt-1" style="font-size: 0.70rem;">Upload passport photo (Auto-opens Studio)</small>
                             
                             <button type="button" class="btn btn-outline-success btn-sm w-100 mt-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#modalLiveCamera" onclick="startLiveCamera()">
                                 <i class="bi bi-camera-fill me-1"></i> Capture Live Photo
                             </button>
                         </div>
                         <input type="hidden" name="advisor_photo_base64" id="inputPhotoBase64" value="">
+                        <small class="text-muted d-block mt-2" style="font-size: 0.70rem;">
+                            <i class="bi bi-magic text-primary me-1"></i> Auto-crops 3:4 & replaces backdrop with 1-click Studio white or sky-blue.
+                        </small>
                     </div>
 
                     <!-- Personal Inputs -->
@@ -406,6 +416,29 @@ function switchLiveCamera() {
     startLiveCamera();
 }
 
+function triggerPhotoStudio(previewId, placeholderId, base64InputId, fileInputId) {
+    const preview = document.getElementById(previewId);
+    const fileInput = document.getElementById(fileInputId);
+    let src = (preview && preview.src && preview.src.length > 50) ? preview.src : null;
+
+    if (!src && fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (typeof window.openPhotoStudio === 'function') {
+                window.openPhotoStudio(e.target.result, previewId, placeholderId, base64InputId);
+            }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+        return;
+    }
+
+    if (src && typeof window.openPhotoStudio === 'function') {
+        window.openPhotoStudio(src, previewId, placeholderId, base64InputId);
+    } else {
+        alert('Please choose or capture a photo first, then use Crop / BG to adjust.');
+    }
+}
+
 function captureLiveSnapshot() {
     const video = document.getElementById('liveCameraVideo');
     const canvas = document.getElementById('liveCameraCanvas');
@@ -442,7 +475,7 @@ function captureLiveSnapshot() {
 
     ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
 
-    const base64Data = canvas.toDataURL('image/jpeg', 0.90);
+    const base64Data = canvas.toDataURL('image/jpeg', 0.92);
     document.getElementById('inputPhotoBase64').value = base64Data;
     
     const fileInput = document.getElementById('inputPhotoFile');
@@ -464,6 +497,13 @@ function captureLiveSnapshot() {
         const bsModal = new bootstrap.Modal(modalEl);
         bsModal.hide();
     }
+
+    // Auto-open Photo Studio to refine crop & background
+    if (typeof window.openPhotoStudio === 'function') {
+        setTimeout(() => {
+            window.openPhotoStudio(base64Data, 'imgPhotoPreview', 'placeholderPhotoText', 'inputPhotoBase64');
+        }, 300);
+    }
 }
 
 function previewUploadedPhoto(input) {
@@ -476,7 +516,10 @@ function previewUploadedPhoto(input) {
             imgPreview.style.display = 'block';
             if (placeholderText) placeholderText.style.display = 'none';
 
-            document.getElementById('inputPhotoBase64').value = '';
+            // Auto-open Photo Studio for 3:4 cropping and background removal
+            if (typeof window.openPhotoStudio === 'function') {
+                window.openPhotoStudio(e.target.result, 'imgPhotoPreview', 'placeholderPhotoText', 'inputPhotoBase64');
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }

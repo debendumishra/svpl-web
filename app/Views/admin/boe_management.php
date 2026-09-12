@@ -246,6 +246,9 @@
                                         <span class="d-block" style="font-size: 0.68rem;">Passport Size</span>
                                     </div>
                                 </div>
+                                <button type="button" class="btn btn-outline-warning btn-sm mt-1 py-0 px-2 fw-semibold" style="font-size: 0.68rem;" onclick="triggerPhotoStudio('createPhotoPreview', 'createPhotoPlaceholder', 'createPhotoBase64', 'createFileInput')">
+                                    <i class="bi bi-crop me-1"></i> Crop / BG
+                                </button>
                             </div>
                             <div class="col-sm-9">
                                 <div class="row g-2">
@@ -261,7 +264,9 @@
                                     </div>
                                 </div>
                                 <input type="hidden" name="boe_photo_base64" id="createPhotoBase64" value="">
-                                <small class="text-muted mt-1 d-block" style="font-size: 0.72rem;">Accepts JPG, PNG, WEBP. Photo will appear automatically on the printed CR80 duplex ID card.</small>
+                                <small class="text-muted mt-1 d-block" style="font-size: 0.72rem;">
+                                    <i class="bi bi-magic text-primary me-1"></i> Auto-launches Photo Studio to crop (3:4 ratio) and remove background with 1-click studio backdrop.
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -371,6 +376,9 @@
                                         <span class="d-block" style="font-size: 0.68rem;">Passport Size</span>
                                     </div>
                                 </div>
+                                <button type="button" class="btn btn-outline-warning btn-sm mt-1 py-0 px-2 fw-semibold" style="font-size: 0.68rem;" onclick="triggerPhotoStudio('editPhotoPreview', 'editPhotoPlaceholder', 'editPhotoBase64', 'editFileInput')">
+                                    <i class="bi bi-crop me-1"></i> Crop / BG
+                                </button>
                             </div>
                             <div class="col-sm-9">
                                 <div class="row g-2">
@@ -386,7 +394,9 @@
                                     </div>
                                 </div>
                                 <input type="hidden" name="boe_photo_base64" id="editPhotoBase64" value="">
-                                <small class="text-muted mt-1 d-block" style="font-size: 0.72rem;">Leave empty if you wish to retain the existing photo.</small>
+                                <small class="text-muted mt-1 d-block" style="font-size: 0.72rem;">
+                                    <i class="bi bi-magic text-primary me-1"></i> Auto-launches Photo Studio to crop (3:4 ratio) and remove background with 1-click studio backdrop.
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -468,6 +478,29 @@ let activePlaceholderId = null;
 let activeBase64InputId = null;
 let mediaStream = null;
 
+function triggerPhotoStudio(previewId, placeholderId, base64InputId, fileInputId) {
+    const preview = document.getElementById(previewId);
+    const fileInput = document.getElementById(fileInputId);
+    let src = (preview && preview.src && preview.src.length > 50) ? preview.src : null;
+
+    if (!src && fileInput && fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            if (typeof window.openPhotoStudio === 'function') {
+                window.openPhotoStudio(e.target.result, previewId, placeholderId, base64InputId);
+            }
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+        return;
+    }
+
+    if (src && typeof window.openPhotoStudio === 'function') {
+        window.openPhotoStudio(src, previewId, placeholderId, base64InputId);
+    } else {
+        alert('Please choose or capture a photo first, then use Crop / BG to adjust.');
+    }
+}
+
 function previewFilePhoto(input, previewId, placeholderId, base64InputId) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
@@ -477,8 +510,11 @@ function previewFilePhoto(input, previewId, placeholderId, base64InputId) {
             preview.src = e.target.result;
             preview.style.display = 'block';
             if (placeholder) placeholder.style.display = 'none';
-            // Clear hidden base64 so uploaded file takes precedence
-            document.getElementById(base64InputId).value = '';
+
+            // Automatically open Photo Studio for 3:4 crop and background removal
+            if (typeof window.openPhotoStudio === 'function') {
+                window.openPhotoStudio(e.target.result, previewId, placeholderId, base64InputId);
+            }
         };
         reader.readAsDataURL(input.files[0]);
     }
@@ -531,13 +567,13 @@ function captureLiveSnapshot() {
     if (!video || !mediaStream) return;
 
     const canvas = document.createElement('canvas');
-    canvas.width = 400;
-    canvas.height = 500;
+    canvas.width = 480;
+    canvas.height = 640;
     const ctx = canvas.getContext('2d');
 
     const vWidth = video.videoWidth || 640;
     const vHeight = video.videoHeight || 480;
-    const targetAspect = 400 / 500;
+    const targetAspect = 480 / 640;
 
     let sx, sy, sWidth, sHeight;
     if (vWidth / vHeight > targetAspect) {
@@ -552,7 +588,7 @@ function captureLiveSnapshot() {
         sy = (vHeight - sHeight) / 2;
     }
 
-    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, 400, 500);
+    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, 480, 640);
     const base64Data = canvas.toDataURL('image/jpeg', 0.92);
 
     if (activePreviewImgId) {
@@ -575,7 +611,18 @@ function captureLiveSnapshot() {
         if (f) f.value = '';
     }
 
+    const previewId = activePreviewImgId;
+    const placeholderId = activePlaceholderId;
+    const base64Id = activeBase64InputId;
+
     closeLiveCamera();
+
+    // Auto-launch Photo Studio to refine crop & background
+    if (typeof window.openPhotoStudio === 'function') {
+        setTimeout(() => {
+            window.openPhotoStudio(base64Data, previewId, placeholderId, base64Id);
+        }, 300);
+    }
 }
 
 function openEditBoeModal(b) {

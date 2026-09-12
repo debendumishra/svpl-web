@@ -2713,6 +2713,46 @@ verify should also show the photo of the person also
 
 2. **Verification & Deployment**:
    - Tested HTTP GET on `/verify?type=STAFF&code=SVPL-BOE-101` and `/verify?type=ADVISOR&code=SVPL1001` — verified that photos render clearly with HTTP `200 OK`.
-   - Synced workspace to live XAMPP directory (`D:
-mpp\htdocs\SVPL-Web`).
+   - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed updates to GitHub repository (`origin main`).
+
+---
+
+## User
+
+<USER_REQUEST>
+while uploading photo for identity card means boe and other registration, one provision for crop the image and remove background option should be there.
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Features:
+
+1. **Universal Photo Studio Engine (`public/assets/js/photo-crop-studio.js`)**:
+   - **Interactive Crop & Orientation Engine**: Integrated Cropper.js with default standard **3:4 CR80 portrait aspect ratio**, 1:1 square, and free ratio presets; rotate ±90°, flip horizontal/vertical, zoom in/out, and reset.
+   - **1-Click Smart Background Removal**: Edge-aware floodfill and sample-based adaptive segmentation with one-click backdrop replacement:
+     - **Studio White Backdrop** (`#FFFFFF` clean passport standard).
+     - **Studio Sky-Blue Backdrop** (`#DCEBFF` official ID standard).
+     - **Transparent PNG Backdrop** (cutout mode).
+   - **Lighting & Photo Tuning Sliders**: Brightness, Contrast, and Saturation adjustments.
+   - **300 DPI Passport Canvas Export**: High-resolution 480×640 px canvas output direct to base64 hidden inputs.
+
+2. **Integration Across All Registration & Management Forms**:
+   - **BOE Staff Management (`app/Views/admin/boe_management.php`)**:
+     - Auto-opens Photo Studio on image file upload or live webcam capture.
+     - Added dedicated `Crop / BG` button under photo preview for both New BOE Registration and Edit BOE modals.
+   - **Public Advisor Registration (`app/Views/public/register_advisor.php`)**:
+     - Auto-opens Photo Studio upon file upload and webcam snapshot.
+     - Added dedicated `Crop / BG` button under ID photo container.
+   - **Admin Edit Advisor (`app/Views/admin/edit_advisor.php`)**:
+     - Auto-opens Photo Studio upon selecting new photo or snapping live photo.
+     - Added dedicated `Crop / BG` button for easy fine-tuning.
+
+3. **Layout Scripts Inclusion**:
+   - Included `<script src="<?= asset('assets/js/photo-crop-studio.js') ?>"></script>` across `main.php`, `admin.php`, `advisor.php`, and `boe.php` layouts.
+
+4. **Testing & Deployment**:
+   - PHP lint checks passed on all modified views without syntax errors.
+   - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed updates to GitHub repository (`origin main`).
+
