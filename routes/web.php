@@ -165,6 +165,16 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/manager/withdrawals/approve/{id}', [AdminController::class, 'approveWithdrawal']);
     Router::post('/admin/withdrawals/reject/{id}', [AdminController::class, 'rejectWithdrawal']);
     Router::post('/manager/withdrawals/reject/{id}', [AdminController::class, 'rejectWithdrawal']);
+
+    // ID Card Generator & Registry Governance (Admin & Manager)
+    Router::get('/admin/id-cards', [AdminController::class, 'idCards']);
+    Router::get('/manager/id-cards', [AdminController::class, 'idCards']);
+    Router::post('/admin/id-cards/create', [AdminController::class, 'createCustomIdCard']);
+    Router::post('/manager/id-cards/create', [AdminController::class, 'createCustomIdCard']);
+    Router::post('/admin/id-cards/update/{id}', [AdminController::class, 'updateCustomIdCard']);
+    Router::post('/manager/id-cards/update/{id}', [AdminController::class, 'updateCustomIdCard']);
+    Router::post('/admin/id-cards/delete/{id}', [AdminController::class, 'deleteCustomIdCard']);
+    Router::post('/manager/id-cards/delete/{id}', [AdminController::class, 'deleteCustomIdCard']);
 });
 
 // ==========================================
@@ -215,6 +225,7 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('CUSTO
 // ==========================================
 Router::get('/print/id-card/{id}', [DocumentController::class, 'printIdCard']);
 Router::get('/print/boe-id-card/{id}', [DocumentController::class, 'printBoeIdCard']);
+Router::get('/print/custom-id-card/{id}', [AdminController::class, 'printCustomIdCard']);
 Router::get('/print/appointment/{id}', [DocumentController::class, 'printAppointment']);
 Router::get('/print/receipt/{id}', [DocumentController::class, 'printReceipt']);
 Router::get('/print/quotation/{id}', [DocumentController::class, 'printQuotation']);

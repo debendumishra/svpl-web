@@ -208,6 +208,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     <div class="collapse show" id="mobMenuGovernance">
                         <ul class="nav flex-column mb-2">
                             <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/id-cards') !== false ? 'active' : '' ?>" href="<?= url('/admin/id-cards') ?>">
+                                    <i class="bi bi-person-vcard-fill text-warning"></i> <span>ID Card Generator</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/reports') !== false ? 'active' : '' ?>" href="<?= url('/admin/reports') ?>">
                                     <i class="bi bi-graph-up-arrow"></i> <span>MIS Reports</span>
                                 </a>
@@ -340,6 +345,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     </div>
                     <div class="collapse show" id="menuGovernance">
                         <ul class="nav flex-column mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/id-cards') !== false ? 'active' : '' ?>" href="<?= url('/admin/id-cards') ?>">
+                                    <i class="bi bi-person-vcard-fill text-warning"></i> <span class="sidebar-text">ID Card Generator</span>
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/boe') !== false ? 'active' : '' ?>" href="<?= url('/admin/boe') ?>">
                                     <i class="bi bi-person-badge-fill text-warning"></i> <span class="sidebar-text">BOE Staff Management</span>

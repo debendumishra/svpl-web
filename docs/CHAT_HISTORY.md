@@ -2756,3 +2756,49 @@ while uploading photo for identity card means boe and other registration, one pr
    - Synced workspace to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
    - Committed and pushed updates to GitHub repository (`origin main`).
 
+---
+
+## User
+
+<USER_REQUEST>
+generate an "Icard Form" to print any new identity card in theexiting format. ask the user for the data required to print the Icard. keep the temporary data in a table. also save the photo in less kb.
+
+keep the link under governance of admin / manager login
+</USER_REQUEST>
+
+## Assistant
+
+### Summary of Implemented Features:
+
+1. **Dedicated Database Table for On-Demand Custom ID Cards (`custom_id_cards`)**:
+   - Stores all generated ID card records with fields: `id`, `card_type` (BOE, ADVISOR, OFFICER, ENGINEER, CUSTOM), `card_code`, `full_name`, `designation`, `jurisdiction`, `blood_group`, `mobile`, `email`, `address`, `photo_url`, `issue_date`, `valid_thru`, `emergency_contact`, `created_by_user_id`, `print_count`, `last_printed_at`, `status`, `created_at`, `updated_at`.
+   - Created model [`app/Models/CustomIdCard.php`](file:///d:/DKM/SVPL-Web/app/Models/CustomIdCard.php).
+
+2. **Ultra Low-KB Photo Compression Engine (`app/Helpers/ImageCompressor.php`)**:
+   - Added `ImageCompressor::compressPassportPhoto()` to optimize uploaded/captured passport photos into crisp, 30–65 KB standard 480×640 px files with 75% quality JPEG compression.
+
+3. **Admin / Manager Governed ID Card Generator & Management UI (`app/Views/admin/id_cards.php`)**:
+   - Added `ID Card Generator` under Governance in Admin navigation sidebar ([`app/Views/layouts/admin.php`](file:///d:/DKM/SVPL-Web/app/Views/layouts/admin.php)).
+   - Protected under Admin and Manager roles.
+   - Interactive modal form prompting for required identity card data:
+     - Card Category / Designation (BOE, Solar Advisor, Officer, Solar Engineer, Custom)
+     - Card / Employee Code with auto-generator suggestion
+     - Full Name, Designation, Assigned Jurisdiction
+     - Blood Group, Mobile No., Emergency Contact, Address, Issue Date, Valid Thru
+     - Passport Photo with integrated Crop 3:4 and Background Removal Photo Studio
+   - Management table with search filter, type filter, direct Print Duplex ID Card button, Edit modal, and Delete actions.
+
+4. **Pixel-Perfect CR80 Duplex Printable ID Card (`app/Views/printable/custom_id_card.php`)**:
+   - Strict standard ISO 7810 CR80 dimensions (85.6mm × 54mm / 3.37" × 2.125") @ 300 DPI.
+   - Front side: Company branding, authorized signature, gold border, 14px mobile number, 10px center-aligned address, and jurisdiction section.
+   - Back side: Terms of use, authorized helpline, emergency contacts, and live scannable QR code linking to verification URL.
+
+5. **Integrated QR Code Verification (`app/Controllers/PublicController.php` & `app/Views/public/verify.php`)**:
+   - QR code scanner directly authenticates custom ID card records and displays the verified cardholder details and photo.
+
+6. **Testing, Synchronization & Git Push**:
+   - PHP lint checks passed across all controllers, models, and views with zero syntax errors.
+   - Synced files to live XAMPP directory (`D:\xampp\htdocs\SVPL-Web`).
+   - Committed and pushed to GitHub repository (`origin main`).
+
+

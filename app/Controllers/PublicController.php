@@ -12,6 +12,7 @@ use App\Models\Advisor;
 use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\User;
+use App\Models\CustomIdCard;
 use DatabaseSetup;
 
 class PublicController
@@ -138,11 +139,11 @@ class PublicController
 
         $record = null;
         if ($type === 'ADVISOR') {
-            $record = Advisor::findByReferralCode($code);
+            $record = Advisor::findByReferralCode($code) ?? CustomIdCard::findByCode($code);
         } elseif ($type === 'CUSTOMER') {
             $record = Customer::findById((int)$code);
-        } elseif ($type === 'STAFF' || $type === 'BOE') {
-            $record = User::findByEmployeeCode($code);
+        } elseif ($type === 'STAFF' || $type === 'BOE' || $type === 'OFFICER' || $type === 'ENGINEER' || $type === 'CUSTOM') {
+            $record = User::findByEmployeeCode($code) ?? CustomIdCard::findByCode($code);
         } else {
             // Auto-detect based on code if type is omitted or ambiguous
             $record = Advisor::findByReferralCode($code);
@@ -152,6 +153,11 @@ class PublicController
                 $record = User::findByEmployeeCode($code);
                 if ($record) {
                     $type = 'STAFF';
+                } else {
+                    $record = CustomIdCard::findByCode($code);
+                    if ($record) {
+                        $type = $record['card_type'] ?? 'STAFF';
+                    }
                 }
             }
         }

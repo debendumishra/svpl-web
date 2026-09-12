@@ -84,4 +84,75 @@ class ImageCompressor
 
         return true;
     }
+
+    /**
+     * Resizes and compresses a passport photo from base64 string or file path to high-efficiency low-KB output (30-65 KB).
+     * Standard dimensions: 480x640 px (3:4 ratio), Quality: 75%.
+     */
+    public static function compressPassportPhoto(string $inputDataOrPath, string $targetDirectory, string $prefix = 'id_card_photo', int $quality = 75): ?string
+    {
+        if (!is_dir($targetDirectory)) {
+            mkdir($targetDirectory, 0777, true);
+        }
+
+        $imageData = null;
+        if (strpos($inputDataOrPath, 'data:image') === 0) {
+            $parts = explode(',', $inputDataOrPath);
+            if (count($parts) === 2) {
+                $imageData = base64_decode($parts[1]);
+            }
+        } elseif (file_exists($inputDataOrPath)) {
+            $imageData = file_get_contents($inputDataOrPath);
+        }
+
+        if (!$imageData || !function_exists('imagecreatefromstring')) {
+            return null;
+        }
+
+        $srcImage = @imagecreatefromstring($imageData);
+        if (!$srcImage) {
+            return null;
+        }
+
+        $origWidth = imagesx($srcImage);
+        $origHeight = imagesy($srcImage);
+
+        // Standard passport CR80 resolution: 480x640 px
+        $targetWidth = 480;
+        $targetHeight = 640;
+
+        $dstImage = imagecreatetruecolor($targetWidth, $targetHeight);
+        
+        // Fill clean white background
+        $white = imagecolorallocate($dstImage, 255, 255, 255);
+        imagefilledrectangle($dstImage, 0, 0, $targetWidth, $targetHeight, $white);
+
+        // Aspect ratio fit/crop calculation
+        $origAspect = $origWidth / $origHeight;
+        $targetAspect = $targetWidth / $targetHeight;
+
+        if ($origAspect > $targetAspect) {
+            $sWidth = (int)round($origHeight * $targetAspect);
+            $sHeight = $origHeight;
+            $sx = (int)round(($origWidth - $sWidth) / 2);
+            $sy = 0;
+        } else {
+            $sWidth = $origWidth;
+            $sHeight = (int)round($origWidth / $targetAspect);
+            $sx = 0;
+            $sy = (int)round(($origHeight - $sHeight) / 2);
+        }
+
+        imagecopyresampled($dstImage, $srcImage, 0, 0, $sx, $sy, $targetWidth, $targetHeight, $sWidth, $sHeight);
+
+        $filename = $prefix . '_' . time() . '_' . rand(1000, 9999) . '.jpg';
+        $fullPath = rtrim($targetDirectory, '/\\') . DIRECTORY_SEPARATOR . $filename;
+
+        imagejpeg($dstImage, $fullPath, $quality);
+
+        imagedestroy($srcImage);
+        imagedestroy($dstImage);
+
+        return $filename;
+    }
 }

@@ -1160,4 +1160,160 @@ class AdminController
 
         Response::redirect($_SERVER['HTTP_REFERER'] ?? '/admin/withdrawals');
     }
+
+    public function idCards(): void
+    {
+        $search = $_GET['q'] ?? null;
+        $type = $_GET['type'] ?? 'ALL';
+        $cards = \App\Models\CustomIdCard::getAll(200, 0, $search, $type);
+
+        $nextBoe = \App\Models\CustomIdCard::getNextCode('BOE');
+        $nextAdv = \App\Models\CustomIdCard::getNextCode('ADVISOR');
+        $nextOff = \App\Models\CustomIdCard::getNextCode('OFFICER');
+
+        Response::view('admin/id_cards', [
+            'pageTitle' => 'On-Demand ID Card Generator & Registry — SVPL Admin',
+            'cards' => $cards,
+            'search' => $search,
+            'selectedType' => $type,
+            'nextBoeCode' => $nextBoe,
+            'nextAdvCode' => $nextAdv,
+            'nextOffCode' => $nextOff,
+            'success' => $_SESSION['success_msg'] ?? null,
+            'error' => $_SESSION['error_msg'] ?? null,
+        ]);
+        unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+    }
+
+    public function createCustomIdCard(): void
+    {
+        $post = $_POST;
+        $currentUser = AuthService::user();
+
+        $fullName = trim($post['full_name'] ?? '');
+        $cardCode = trim($post['card_code'] ?? '');
+        $mobile = trim($post['mobile'] ?? '');
+
+        if (empty($fullName) || empty($cardCode) || empty($mobile)) {
+            $_SESSION['error_msg'] = "Full Legal Name, ID Code, and Mobile Number are required.";
+            Response::redirect(url('/admin/id-cards'));
+            return;
+        }
+
+        $photoUrl = null;
+        $uploadDir = dirname(dirname(__DIR__)) . '/public/uploads/id_cards';
+
+        // 1. Process Base64 Photo from live camera / Photo Studio
+        if (!empty($post['card_photo_base64']) && strpos($post['card_photo_base64'], 'data:image') === 0) {
+            $filename = \App\Helpers\ImageCompressor::compressPassportPhoto($post['card_photo_base64'], $uploadDir, 'id_card', 75);
+            if ($filename) {
+                $photoUrl = 'public/uploads/id_cards/' . $filename;
+            }
+        }
+        // 2. Process File Upload Photo
+        elseif (isset($_FILES['card_photo']) && $_FILES['card_photo']['error'] === UPLOAD_ERR_OK) {
+            $tmpPath = $_FILES['card_photo']['tmp_name'];
+            $filename = \App\Helpers\ImageCompressor::compressPassportPhoto($tmpPath, $uploadDir, 'id_card', 75);
+            if ($filename) {
+                $photoUrl = 'public/uploads/id_cards/' . $filename;
+            }
+        }
+
+        $cardId = \App\Models\CustomIdCard::create([
+            'card_type' => $post['card_type'] ?? 'BOE',
+            'card_code' => $cardCode,
+            'full_name' => $fullName,
+            'designation' => trim($post['designation'] ?? 'Official Representative'),
+            'jurisdiction' => trim($post['jurisdiction'] ?? 'Headquarters / All Odisha'),
+            'blood_group' => trim($post['blood_group'] ?? 'O+ve'),
+            'mobile' => $mobile,
+            'email' => trim($post['email'] ?? ''),
+            'address' => trim($post['address'] ?? ''),
+            'photo_url' => $photoUrl,
+            'issue_date' => $post['issue_date'] ?? date('Y-m-d'),
+            'valid_thru' => trim($post['valid_thru'] ?? '31-12-2027'),
+            'emergency_contact' => trim($post['emergency_contact'] ?? company_phone()),
+            'created_by_user_id' => $currentUser['id'] ?? null,
+            'status' => 'ACTIVE'
+        ]);
+
+        if ($cardId) {
+            $_SESSION['success_msg'] = "ID Card for {$fullName} ({$cardCode}) generated successfully! Opening print preview...";
+            Response::redirect(url('/print/custom-id-card/' . $cardId));
+        } else {
+            $_SESSION['error_msg'] = "Failed to create ID Card record.";
+            Response::redirect(url('/admin/id-cards'));
+        }
+    }
+
+    public function updateCustomIdCard(string $id): void
+    {
+        $cardId = (int)$id;
+        $card = \App\Models\CustomIdCard::findById($cardId);
+        if (!$card) {
+            $_SESSION['error_msg'] = "ID Card #{$id} not found.";
+            Response::redirect(url('/admin/id-cards'));
+            return;
+        }
+
+        $post = $_POST;
+        $data = [
+            'card_type' => $post['card_type'] ?? $card['card_type'],
+            'card_code' => trim($post['card_code'] ?? $card['card_code']),
+            'full_name' => trim($post['full_name'] ?? $card['full_name']),
+            'designation' => trim($post['designation'] ?? $card['designation']),
+            'jurisdiction' => trim($post['jurisdiction'] ?? $card['jurisdiction']),
+            'blood_group' => trim($post['blood_group'] ?? $card['blood_group']),
+            'mobile' => trim($post['mobile'] ?? $card['mobile']),
+            'email' => trim($post['email'] ?? $card['email']),
+            'address' => trim($post['address'] ?? $card['address']),
+            'issue_date' => $post['issue_date'] ?? $card['issue_date'],
+            'valid_thru' => trim($post['valid_thru'] ?? $card['valid_thru']),
+            'emergency_contact' => trim($post['emergency_contact'] ?? $card['emergency_contact']),
+        ];
+
+        $uploadDir = dirname(dirname(__DIR__)) . '/public/uploads/id_cards';
+
+        if (!empty($post['card_photo_base64']) && strpos($post['card_photo_base64'], 'data:image') === 0) {
+            $filename = \App\Helpers\ImageCompressor::compressPassportPhoto($post['card_photo_base64'], $uploadDir, 'id_card', 75);
+            if ($filename) {
+                $data['photo_url'] = 'public/uploads/id_cards/' . $filename;
+            }
+        } elseif (isset($_FILES['card_photo']) && $_FILES['card_photo']['error'] === UPLOAD_ERR_OK) {
+            $tmpPath = $_FILES['card_photo']['tmp_name'];
+            $filename = \App\Helpers\ImageCompressor::compressPassportPhoto($tmpPath, $uploadDir, 'id_card', 75);
+            if ($filename) {
+                $data['photo_url'] = 'public/uploads/id_cards/' . $filename;
+            }
+        }
+
+        \App\Models\CustomIdCard::update($cardId, $data);
+        $_SESSION['success_msg'] = "ID Card #{$card['card_code']} updated successfully!";
+        Response::redirect(url('/admin/id-cards'));
+    }
+
+    public function deleteCustomIdCard(string $id): void
+    {
+        $cardId = (int)$id;
+        \App\Models\CustomIdCard::delete($cardId);
+        $_SESSION['success_msg'] = "ID Card record deleted successfully.";
+        Response::redirect(url('/admin/id-cards'));
+    }
+
+    public function printCustomIdCard(string $id): void
+    {
+        $cardId = (int)$id;
+        $card = \App\Models\CustomIdCard::findById($cardId);
+        if (!$card) {
+            Response::notFound("ID Card #{$id} not found.");
+            return;
+        }
+
+        \App\Models\CustomIdCard::incrementPrintCount($cardId);
+
+        Response::view('printable/custom_id_card', [
+            'pageTitle' => "Official ID Card - {$card['card_code']} - {$card['full_name']}",
+            'card' => $card,
+        ]);
+    }
 }

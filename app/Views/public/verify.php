@@ -37,15 +37,15 @@ $title = "Official Verification — Surya Vistaara";
                         <?php if ($type === 'ADVISOR'): ?>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
                                 <span class="text-muted">Advisor Name:</span>
-                                <strong><?= htmlspecialchars(trim(($record['first_name'] ?? '') . ' ' . ($record['last_name'] ?? ''))) ?></strong>
+                                <strong><?= htmlspecialchars($record['full_name'] ?? trim(($record['first_name'] ?? '') . ' ' . ($record['last_name'] ?? ''))) ?></strong>
                             </div>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
                                 <span class="text-muted">Advisor ID:</span>
-                                <code class="fw-bold text-primary"><?= htmlspecialchars($record['advisor_code'] ?? '') ?></code>
+                                <code class="fw-bold text-primary"><?= htmlspecialchars($record['advisor_code'] ?? $record['card_code'] ?? '') ?></code>
                             </div>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
-                                <span class="text-muted">Assigned Region:</span>
-                                <span><?= htmlspecialchars(($record['block'] ? $record['block'] . ', ' : '') . ($record['district'] ?? '')) ?></span>
+                                <span class="text-muted">Assigned Region / Jurisdiction:</span>
+                                <span><?= htmlspecialchars($record['jurisdiction'] ?? (($record['block'] ? $record['block'] . ', ' : '') . ($record['district'] ?? ''))) ?></span>
                             </div>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
                                 <span class="text-muted">Blood Group:</span>
@@ -55,18 +55,18 @@ $title = "Official Verification — Surya Vistaara";
                                 <span class="text-muted">Current Status:</span>
                                 <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i><?= htmlspecialchars($record['status'] ?? 'ACTIVE') ?></span>
                             </div>
-                        <?php elseif ($type === 'STAFF' || $type === 'BOE'): ?>
+                        <?php elseif ($type === 'STAFF' || $type === 'BOE' || $type === 'OFFICER' || $type === 'ENGINEER' || $type === 'CUSTOM'): ?>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
-                                <span class="text-muted">Executive Name:</span>
+                                <span class="text-muted">Executive / Cardholder Name:</span>
                                 <strong><?= htmlspecialchars($record['full_name'] ?? '') ?></strong>
                             </div>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
-                                <span class="text-muted">Employee Code:</span>
-                                <code class="fw-bold text-primary"><?= htmlspecialchars($record['employee_code'] ?? ('SVPL-BOE-' . $record['id'])) ?></code>
+                                <span class="text-muted">Official ID / Employee Code:</span>
+                                <code class="fw-bold text-primary"><?= htmlspecialchars($record['card_code'] ?? $record['employee_code'] ?? ('SVPL-BOE-' . ($record['id'] ?? ''))) ?></code>
                             </div>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
                                 <span class="text-muted">Designation:</span>
-                                <span class="badge bg-info-subtle text-dark border"><?= htmlspecialchars($record['designation'] ?? 'Back Office Executive') ?></span>
+                                <span class="badge bg-info-subtle text-dark border"><?= htmlspecialchars($record['designation'] ?? 'Executive') ?></span>
                             </div>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
                                 <span class="text-muted">Assigned Jurisdiction:</span>
@@ -77,16 +77,16 @@ $title = "Official Verification — Surya Vistaara";
                                 <span class="badge bg-danger"><i class="bi bi-droplet-fill me-1"></i><?= htmlspecialchars($record['blood_group'] ?? 'O+ve') ?></span>
                             </div>
                             <div class="d-flex justify-content-between">
-                                <span class="text-muted">Employment Status:</span>
-                                <span class="badge <?= !empty($record['is_active']) ? 'bg-success' : 'bg-danger' ?>">
-                                    <i class="bi <?= !empty($record['is_active']) ? 'bi-patch-check-fill' : 'bi-x-circle-fill' ?> me-1"></i>
-                                    <?= !empty($record['is_active']) ? 'AUTHENTICATED ACTIVE' : 'INACTIVE' ?>
+                                <span class="text-muted">Status:</span>
+                                <span class="badge <?= (!isset($record['is_active']) || !empty($record['is_active'])) && (($record['status'] ?? 'ACTIVE') === 'ACTIVE') ? 'bg-success' : 'bg-danger' ?>">
+                                    <i class="bi <?= (!isset($record['is_active']) || !empty($record['is_active'])) && (($record['status'] ?? 'ACTIVE') === 'ACTIVE') ? 'bi-patch-check-fill' : 'bi-x-circle-fill' ?> me-1"></i>
+                                    <?= (!isset($record['is_active']) || !empty($record['is_active'])) && (($record['status'] ?? 'ACTIVE') === 'ACTIVE') ? 'AUTHENTICATED ACTIVE' : 'INACTIVE' ?>
                                 </span>
                             </div>
                         <?php else: ?>
                             <div class="d-flex justify-content-between mb-2 pb-1 border-bottom">
                                 <span class="text-muted">Record Code:</span>
-                                <strong><?= htmlspecialchars($record['customer_code'] ?? $code) ?></strong>
+                                <strong><?= htmlspecialchars($record['customer_code'] ?? $record['card_code'] ?? $code) ?></strong>
                             </div>
                             <div class="d-flex justify-content-between">
                                 <span class="text-muted">Status:</span>
