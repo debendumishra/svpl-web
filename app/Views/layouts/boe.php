@@ -24,6 +24,11 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
+    <!-- Dynamic Favicon -->
+    <?php if ($favUrl = company_favicon_url()): ?>
+        <link rel="icon" href="<?= htmlspecialchars($favUrl) ?>">
+    <?php endif; ?>
+
     <!-- Bootstrap 5 CSS & Solar Theme -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css') ?>">
@@ -196,13 +201,18 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     <!-- DESKTOP SIDEBAR -->
     <aside class="boe-sidebar shadow d-none d-lg-block">
         <div class="brand-header d-flex align-items-center gap-2">
-            <div style="background: #FFFFFF; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0284C7; font-weight: 900; font-size: 1.1rem;">
-                ☀
-            </div>
-            <div>
-                <h6 class="m-0 text-white font-outfit fw-bold" style="letter-spacing: 0.5px;">SURYA VISTAARA</h6>
-                <span class="badge bg-warning text-dark style-tag" style="font-size: 0.65rem; padding: 2px 6px;">BOE PORTAL</span>
-            </div>
+            <?php if ($logoUrl = company_logo_url()): ?>
+                <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 34px; width: auto; max-width: 140px; object-fit: contain;">
+                <span class="badge bg-warning text-dark style-tag" style="font-size: 0.65rem; padding: 2px 6px;">BOE</span>
+            <?php else: ?>
+                <div style="background: #FFFFFF; width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0284C7; font-weight: 900; font-size: 1.1rem;">
+                    ☀
+                </div>
+                <div>
+                    <h6 class="m-0 text-white font-outfit fw-bold" style="letter-spacing: 0.5px;"><?= htmlspecialchars(company_short_name()) ?></h6>
+                    <span class="badge bg-warning text-dark style-tag" style="font-size: 0.65rem; padding: 2px 6px;">BOE PORTAL</span>
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="px-3 py-3 border-bottom border-secondary border-opacity-25">
@@ -253,13 +263,17 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     <div class="offcanvas offcanvas-start offcanvas-boe" tabindex="-1" id="boeMobileDrawer" aria-labelledby="boeMobileDrawerLabel">
         <div class="offcanvas-header text-white d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center gap-2">
-                <div style="background: #FFFFFF; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0284C7; font-weight: 900; font-size: 1rem;">
-                    ☀
-                </div>
-                <div>
-                    <h6 class="offcanvas-title font-outfit fw-bold text-white mb-0" id="boeMobileDrawerLabel">SURYA VISTAARA</h6>
-                    <small class="badge bg-warning text-dark" style="font-size: 0.65rem;">BOE MOBILE</small>
-                </div>
+                <?php if ($logoUrl = company_logo_url()): ?>
+                    <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 30px; width: auto; max-width: 130px; object-fit: contain;">
+                <?php else: ?>
+                    <div style="background: #FFFFFF; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #0284C7; font-weight: 900; font-size: 1rem;">
+                        ☀
+                    </div>
+                    <div>
+                        <h6 class="offcanvas-title font-outfit fw-bold text-white mb-0" id="boeMobileDrawerLabel"><?= htmlspecialchars(company_short_name()) ?></h6>
+                        <small class="badge bg-warning text-dark" style="font-size: 0.65rem;">BOE MOBILE</small>
+                    </div>
+                <?php endif; ?>
             </div>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>

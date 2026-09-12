@@ -272,15 +272,15 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                             Please transfer the one-time registration fee of <strong>₹2,700</strong> to the official SVPL corporate account below via UPI, IMPS, NEFT, or Cash, and submit the <strong>UTR / Transaction Reference Number</strong>. Your account will be activated by the Manager/Admin upon payment confirmation.
                         </p>
 
-                        <!-- SVPL Official Payment Bank & UPI Details -->
+                        <!-- Official Payment Bank & UPI Details -->
                         <div class="row g-3 p-3 bg-white rounded-3 border mb-3">
                             <div class="col-md-6 border-end-md">
                                 <div class="d-flex align-items-center gap-2 mb-2">
                                     <i class="bi bi-bank fs-4 text-primary"></i>
-                                    <strong class="text-navy">SVPL Official Bank Account</strong>
+                                    <strong class="text-navy"><?= htmlspecialchars(company_short_name()) ?> Official Bank Account</strong>
                                 </div>
                                 <div class="small">
-                                    <div><strong>Account Name:</strong> Surya Vistaara Pvt. Ltd.</div>
+                                    <div><strong>Account Name:</strong> <?= htmlspecialchars(company_name()) ?></div>
                                     <div><strong>Bank:</strong> State Bank of India (SBI)</div>
                                     <div><strong>Account No:</strong> <span class="font-monospace fw-bold text-primary">42398712345</span></div>
                                     <div><strong>IFSC Code:</strong> <span class="font-monospace fw-bold text-primary">SBIN0001234</span></div>

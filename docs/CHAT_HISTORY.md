@@ -2469,7 +2469,66 @@ The current local time is: 2026-09-11T21:47:25+05:30.
    - Verified PHP syntax and test flows.
    - Pushed updates to GitHub (`main`).
 
+---
 
+## User
 
+<USER_REQUEST>
+company logo change facility in setting and Company name should be effective every where
+</USER_REQUEST>
 
+## Assistant
 
+### Summary of Enhancements Implemented:
+
+1. **Dynamic Branding & Key-Value Settings Architecture**:
+   - **`app/Models/Setting.php`**: Upgraded with in-memory static caching (`$cache`), `remove(string $key)` support, and key-value persistence.
+   - **`config/constants.php`**: Introduced universal dynamic company branding helpers:
+     - `company_name()` (Default: `"Surya Vistaara Pvt. Ltd."`)
+     - `company_short_name()` (Default: `"SVPL"`)
+     - `company_promoter()` (Default: `"Dhwajja Solar India Pvt. Ltd."`)
+     - `company_tagline()` (Default: `"PM Surya Ghar Muft Bijli Yojana"`)
+     - `company_logo_url()` (Resolves uploaded branding logo or `null`)
+     - `company_favicon_url()` (Resolves uploaded favicon or `null`)
+     - `company_phone()` (Default: `"9040999899"`)
+     - `company_whatsapp()` (Default: `"9040999899"`)
+     - `company_email()` (Default: `"support@suryavistaara.com"`)
+     - `company_address()` (Default: `"MIG-84, Pokhariput, BDA Colony, Phase-1, Bhubaneswar, Odisha - 751020"`)
+     - `company_gstin()` (Default: `"21AAMCD5948B1ZU"`)
+     - `company_cin()` (Default: `"U40106OR2024PTC045890"`)
+
+2. **Company Logo Management in Admin Settings**:
+   - **Logo Upload**: Supports file uploads (`PNG`, `SVG`, `JPG`, `WEBP`) saved into `public/uploads/branding/`.
+   - **Webcam Snapshot Capture**: Live camera modal allowing administrators to capture high-res snapshots directly from a webcam.
+   - **Favicon Upload**: Custom browser favicon icon uploads.
+   - **Revert / Remove**: Single-click removal to revert back to default solar emblem branding.
+   - **Live Preview Cards**: Dual light-mode and dark-mode real-time preview boxes for inspecting logo readability before saving.
+   - **Controller Updates**: [`app/Controllers/AdminController.php`](file:///d:/DKM/SVPL-Web/app/Controllers/AdminController.php) now processes and stores branding settings with audit trails.
+
+3. **Universal Dynamic Application Everywhere**:
+   - **Layouts**:
+     - Main Public Layout ([`app/Views/layouts/main.php`](file:///d:/DKM/SVPL-Web/app/Views/layouts/main.php))
+     - Admin & Manager Layout ([`app/Views/layouts/admin.php`](file:///d:/DKM/SVPL-Web/app/Views/layouts/admin.php))
+     - Advisor Portal Layout ([`app/Views/layouts/advisor.php`](file:///d:/DKM/SVPL-Web/app/Views/layouts/advisor.php))
+     - BOE Staff Layout ([`app/Views/layouts/boe.php`](file:///d:/DKM/SVPL-Web/app/Views/layouts/boe.php))
+     - Customer Portal Layout ([`app/Views/layouts/customer.php`](file:///d:/DKM/SVPL-Web/app/Views/layouts/customer.php))
+   - **Printable Documents**:
+     - Advisor Stitch ID Card ([`app/Views/printable/id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/id_card.php))
+     - BOE Executive ID Card ([`app/Views/printable/boe_id_card.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/boe_id_card.php))
+     - Official Advisor Fee Receipt ([`app/Views/printable/receipt.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/receipt.php))
+     - Formal Appointment Letter ([`app/Views/printable/appointment_letter.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/appointment_letter.php))
+     - Customer Solar Quotation Proposal ([`app/Views/printable/quotation.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/quotation.php))
+     - DISCOM JE Commissioning Report ([`app/Views/printable/je_report.php`](file:///d:/DKM/SVPL-Web/app/Views/printable/je_report.php))
+   - **Public Pages & Forms**:
+     - Login Page ([`app/Views/public/login.php`](file:///d:/DKM/SVPL-Web/app/Views/public/login.php))
+     - About Us ([`app/Views/public/about.php`](file:///d:/DKM/SVPL-Web/app/Views/public/about.php))
+     - Contact Us ([`app/Views/public/contact.php`](file:///d:/DKM/SVPL-Web/app/Views/public/contact.php))
+     - Terms & Conditions ([`app/Views/public/terms.php`](file:///d:/DKM/SVPL-Web/app/Views/public/terms.php))
+     - Privacy Policy ([`app/Views/public/privacy.php`](file:///d:/DKM/SVPL-Web/app/Views/public/privacy.php))
+     - Disclaimer ([`app/Views/public/disclaimer.php`](file:///d:/DKM/SVPL-Web/app/Views/public/disclaimer.php))
+     - Advisor Registration ([`app/Views/public/register_advisor.php`](file:///d:/DKM/SVPL-Web/app/Views/public/register_advisor.php))
+
+4. **Sync & Git Push**:
+   - Synced all files to live XAMPP directory `D:\xampp\htdocs\svpl-web`.
+   - Verified PHP lint syntax on all files.
+   - Pushed updates to GitHub repository.

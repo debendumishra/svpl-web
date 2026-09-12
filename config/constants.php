@@ -216,3 +216,93 @@ if (!function_exists('csrf_field')) {
     }
 }
 
+// =========================================================================
+// Universal Company Branding, Logo & Settings Helpers
+// =========================================================================
+if (!function_exists('company_setting')) {
+    function company_setting(string $key, $default = null) {
+        if (class_exists('App\Models\Setting')) {
+            return \App\Models\Setting::get($key, $default);
+        }
+        return $default;
+    }
+}
+
+if (!function_exists('company_name')) {
+    function company_name(): string {
+        return (string) company_setting('company_name', 'Surya Vistaara Pvt. Ltd.');
+    }
+}
+
+if (!function_exists('company_short_name')) {
+    function company_short_name(): string {
+        return (string) company_setting('company_short_name', 'SVPL');
+    }
+}
+
+if (!function_exists('company_promoter')) {
+    function company_promoter(): string {
+        return (string) company_setting('promoter_entity', 'Dhwajja Solar India Pvt. Ltd.');
+    }
+}
+
+if (!function_exists('company_tagline')) {
+    function company_tagline(): string {
+        return (string) company_setting('company_tagline', 'PM Surya Ghar Odisha Rooftop Solar Scheme & Portal');
+    }
+}
+
+if (!function_exists('company_logo_url')) {
+    function company_logo_url(): ?string {
+        $logo = company_setting('company_logo');
+        return !empty($logo) ? resolve_photo_url($logo) : null;
+    }
+}
+
+if (!function_exists('company_favicon_url')) {
+    function company_favicon_url(): ?string {
+        $fav = company_setting('company_favicon');
+        if (!empty($fav)) {
+            return resolve_photo_url($fav);
+        }
+        return company_logo_url();
+    }
+}
+
+if (!function_exists('company_phone')) {
+    function company_phone(): string {
+        return (string) company_setting('support_phone', '9040999899');
+    }
+}
+
+if (!function_exists('company_whatsapp')) {
+    function company_whatsapp(): string {
+        return (string) company_setting('support_whatsapp', company_phone());
+    }
+}
+
+if (!function_exists('company_email')) {
+    function company_email(): string {
+        return (string) company_setting('support_email', 'dhwajjasolarsupport@gmail.com');
+    }
+}
+
+if (!function_exists('company_address')) {
+    function company_address(): string {
+        return (string) company_setting('head_office_address', 'MIG-84, Pokhariput, BDA Colony, Phase-1, Bhubaneswar, Khorda – 751020, Odisha');
+    }
+}
+
+if (!function_exists('company_gstin')) {
+    function company_gstin(): string {
+        return (string) company_setting('gstin', '21AAMCD5948B1ZU');
+    }
+}
+
+if (!function_exists('company_cin')) {
+    function company_cin(): string {
+        return (string) company_setting('cin', '');
+    }
+}
+
+

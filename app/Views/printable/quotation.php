@@ -21,13 +21,24 @@
     </div>
 
     <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4">
-        <div>
-            <h3 class="fw-bold mb-0" style="color: #0B2545;">SURYA VISTAARA PVT. LTD.</h3>
-            <small class="text-muted">PM Surya Ghar Rooftop Solar Proposal | Dhwajja Solar Promoter</small>
+        <div class="d-flex align-items-center gap-3">
+            <?php if (company_logo_url()): ?>
+                <img src="<?= htmlspecialchars(company_logo_url()) ?>" alt="Company Logo" style="height: 52px; max-width: 140px; object-fit: contain;">
+            <?php else: ?>
+                <div style="width: 48px; height: 48px; border-radius: 10px; background: #0B2545; color: #F59E0B; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold;">☀</div>
+            <?php endif; ?>
+            <div>
+                <h3 class="fw-bold mb-0" style="color: #0B2545;"><?= htmlspecialchars(strtoupper(company_name())) ?></h3>
+                <small class="text-muted">PM Surya Ghar Rooftop Solar Proposal | <?= htmlspecialchars(company_promoter()) ?></small><br>
+                <small class="text-muted" style="font-size: 11px;"><?= htmlspecialchars(company_address()) ?> | Tel: <?= htmlspecialchars(company_phone()) ?> | <?= htmlspecialchars(company_email()) ?></small>
+            </div>
         </div>
         <div class="text-end">
             <h6 class="mb-0"><strong>Quote #:</strong> <?= htmlspecialchars($quotation['quotation_number'] ?? ('SVPL-QTN-' . $lead['id'])) ?></h6>
-            <small class="text-muted">Date: <?= date('d M Y') ?></small>
+            <small class="text-muted">Date: <?= date('d M Y') ?></small><br>
+            <?php if (company_gstin()): ?>
+                <small class="text-muted" style="font-size: 11px;">GSTIN: <?= htmlspecialchars(company_gstin()) ?></small>
+            <?php endif; ?>
         </div>
     </div>
 

@@ -61,7 +61,7 @@
             </div>
             <div class="col-6 text-end">
                 ___________________________<br>
-                <strong>Surya Vistaara Site Engineer</strong>
+                <strong><?= htmlspecialchars(company_name()) ?> Site Engineer</strong>
             </div>
         </div>
     </div>

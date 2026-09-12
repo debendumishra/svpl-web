@@ -3,7 +3,7 @@
  * Surya Vistaara Pvt. Ltd. (SVPL)
  * Contact Us Page
  */
-$title = "Contact Us — Surya Vistaara Pvt. Ltd.";
+$title = "Contact Us — " . company_name();
 ?>
 
 <div class="container py-5">
@@ -11,42 +11,49 @@ $title = "Contact Us — Surya Vistaara Pvt. Ltd.";
         <div class="col-lg-10">
             <div class="text-center mb-5">
                 <span class="badge bg-warning text-dark px-3 py-2 fw-bold mb-2">GET IN TOUCH</span>
-                <h1 class="fw-bold" style="color: #0B2545;">Connect with SVPL Central Office</h1>
+                <h1 class="fw-bold" style="color: #0B2545;">Connect with <?= htmlspecialchars(company_short_name()) ?> Central Office</h1>
                 <p class="text-muted">We are here to assist customers, advisors, and corporate partners across Odisha.</p>
             </div>
 
             <div class="row g-4">
                 <div class="col-md-5">
                     <div class="card card-svpl p-4 h-100 bg-white border-0 shadow-sm">
-                        <h4 class="fw-bold mb-4" style="color: #0B2545;">Dhwajja Solar & SVPL Head Office</h4>
+                        <?php if (company_logo_url()): ?>
+                            <div class="mb-3">
+                                <img src="<?= htmlspecialchars(company_logo_url()) ?>" alt="Company Logo" style="max-height: 50px; max-width: 170px; object-fit: contain;">
+                            </div>
+                        <?php endif; ?>
+                        <h4 class="fw-bold mb-4" style="color: #0B2545;"><?= htmlspecialchars(company_name()) ?></h4>
                         <div class="d-flex align-items-start gap-3 mb-3">
                             <i class="bi bi-geo-alt-fill text-danger fs-4"></i>
                             <div>
                                 <strong class="d-block text-dark">Office Address:</strong>
-                                <span class="text-muted small">MIG-84, Pokhariput, BDA Colony, Phase-1 Pokhariput, Bhubaneswar, Odisha - 751020</span>
+                                <span class="text-muted small"><?= htmlspecialchars(company_address()) ?></span>
                             </div>
                         </div>
                         <div class="d-flex align-items-start gap-3 mb-3">
                             <i class="bi bi-telephone-fill text-success fs-4"></i>
                             <div>
                                 <strong class="d-block text-dark">Helpline Mobile:</strong>
-                                <span class="text-muted small"><a href="tel:9040999899" class="text-decoration-none fw-bold text-success">9040999899</a></span>
+                                <span class="text-muted small"><a href="tel:<?= preg_replace('/[^0-9+]/', '', company_phone()) ?>" class="text-decoration-none fw-bold text-success"><?= htmlspecialchars(company_phone()) ?></a></span>
                             </div>
                         </div>
                         <div class="d-flex align-items-start gap-3 mb-3">
                             <i class="bi bi-envelope-fill text-primary fs-4"></i>
                             <div>
                                 <strong class="d-block text-dark">Support Email:</strong>
-                                <span class="text-muted small">dhwajjasolarsupport@gmail.com / support@suryavistaara.com</span>
+                                <span class="text-muted small"><?= htmlspecialchars(company_email()) ?></span>
                             </div>
                         </div>
+                        <?php if (company_gstin()): ?>
                         <div class="d-flex align-items-start gap-3">
                             <i class="bi bi-patch-check-fill text-warning fs-4"></i>
                             <div>
                                 <strong class="d-block text-dark">GSTIN:</strong>
-                                <span class="text-muted small"><code>21AAMCD5948B1ZU</code></span>
+                                <span class="text-muted small"><code><?= htmlspecialchars(company_gstin()) ?></code></span>
                             </div>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 

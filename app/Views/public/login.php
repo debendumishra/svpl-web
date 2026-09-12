@@ -3,7 +3,7 @@
  * Surya Vistaara Pvt. Ltd. (SVPL)
  * Unified Login Page
  */
-$title = "Login — Surya Vistaara Pvt. Ltd.";
+$title = "Login — " . company_name();
 ?>
 
 <div class="container py-5">
@@ -11,11 +11,17 @@ $title = "Login — Surya Vistaara Pvt. Ltd.";
         <div class="col-md-5">
             <div class="card card-svpl p-4 shadow-sm border-0" style="border-radius: 16px;">
                 <div class="text-center mb-4">
-                    <div style="background: linear-gradient(135deg, #0B2545 0%, #133E6E 100%); width: 50px; height: 50px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #F59E0B; font-size: 1.5rem;" class="mb-2">
-                        ☀
-                    </div>
+                    <?php if (company_logo_url()): ?>
+                        <div class="mb-3">
+                            <img src="<?= htmlspecialchars(company_logo_url()) ?>" alt="Company Logo" style="max-height: 55px; max-width: 180px; object-fit: contain;">
+                        </div>
+                    <?php else: ?>
+                        <div style="background: linear-gradient(135deg, #0B2545 0%, #133E6E 100%); width: 50px; height: 50px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; color: #F59E0B; font-size: 1.5rem;" class="mb-2">
+                            ☀
+                        </div>
+                    <?php endif; ?>
                     <h3 class="fw-bold" style="color: #0B2545;">Account Login</h3>
-                    <p class="text-muted small">Sign in to access your SVPL Dashboard</p>
+                    <p class="text-muted small">Sign in to access your <?= htmlspecialchars(company_short_name()) ?> Dashboard</p>
                 </div>
 
                 <?php if (!empty($error)): ?>

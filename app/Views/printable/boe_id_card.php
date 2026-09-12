@@ -257,19 +257,24 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                 <!-- Top Full-Width Header -->
                 <div class="card-header-full">
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
-                        <!-- Logo Mark -->
-                        <div style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f2d59 0%, #1e3a8a 100%); border-radius: 10px; color: #f59e0b; font-size: 1.6rem; font-weight: 900; box-shadow: 0 2px 8px rgba(15,45,89,0.25);">
-                            ☀
-                        </div>
+                        <?php if ($cLogo = company_logo_url()): ?>
+                            <div style="max-width: 90px; max-height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <img src="<?= htmlspecialchars($cLogo) ?>" alt="Logo" style="max-height: 46px; max-width: 90px; object-fit: contain;">
+                            </div>
+                        <?php else: ?>
+                            <!-- Logo Mark -->
+                            <div style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f2d59 0%, #1e3a8a 100%); border-radius: 10px; color: #f59e0b; font-size: 1.6rem; font-weight: 900; box-shadow: 0 2px 8px rgba(15,45,89,0.25);">
+                                ☀
+                            </div>
+                        <?php endif; ?>
                         
                         <!-- Header Text & Tagline -->
                         <div style="flex: 1; min-width: 0; text-align: left;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
-                                <span style="font-size: 18px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;">SURYA</span>
-                                <span style="font-size: 18px; font-weight: 900; color: #f59e0b; letter-spacing: -0.5px;">VISTAARA</span>
+                                <span style="font-size: 17px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
                             </div>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px; line-height: 1;">
-                                <h3 style="font-size: 11px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;">DHWAJJA SOLAR (P) LTD.</h3>
+                                <h3 style="font-size: 10px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars(company_promoter()) ?></h3>
                                 <div style="display: flex; align-items: center; gap: 3px;">
                                     <span style="height: 5px; width: 10px; background: #0284c7; border-radius: 9999px;"></span>
                                     <span style="height: 5px; width: 14px; background: #10b981; border-radius: 9999px;"></span>
@@ -395,16 +400,21 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                 <!-- Top Header Matching Front -->
                 <div class="card-header-full">
                     <div style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
-                        <div style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f2d59 0%, #1e3a8a 100%); border-radius: 10px; color: #f59e0b; font-size: 1.6rem; font-weight: 900; box-shadow: 0 2px 8px rgba(15,45,89,0.25);">
-                            ☀
-                        </div>
+                        <?php if ($cLogo = company_logo_url()): ?>
+                            <div style="max-width: 90px; max-height: 48px; display: flex; align-items: center; justify-content: center;">
+                                <img src="<?= htmlspecialchars($cLogo) ?>" alt="Logo" style="max-height: 46px; max-width: 90px; object-fit: contain;">
+                            </div>
+                        <?php else: ?>
+                            <div style="width: 48px; height: 48px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #0f2d59 0%, #1e3a8a 100%); border-radius: 10px; color: #f59e0b; font-size: 1.6rem; font-weight: 900; box-shadow: 0 2px 8px rgba(15,45,89,0.25);">
+                                ☀
+                            </div>
+                        <?php endif; ?>
                         <div style="flex: 1; min-width: 0; text-align: left;">
                             <div style="display: flex; align-items: baseline; gap: 4px; line-height: 1;">
-                                <span style="font-size: 18px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;">SURYA</span>
-                                <span style="font-size: 18px; font-weight: 900; color: #f59e0b; letter-spacing: -0.5px;">VISTAARA</span>
+                                <span style="font-size: 17px; font-weight: 900; color: #0f2d59; letter-spacing: -0.5px;"><?= htmlspecialchars(strtoupper(company_name())) ?></span>
                             </div>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 3px; line-height: 1;">
-                                <h3 style="font-size: 11px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;">DHWAJJA SOLAR (P) LTD.</h3>
+                                <h3 style="font-size: 10px; font-weight: 800; color: #0f2d59; text-transform: uppercase; letter-spacing: 0.5px;"><?= htmlspecialchars(company_promoter()) ?></h3>
                                 <div style="display: flex; align-items: center; gap: 3px;">
                                     <span style="height: 5px; width: 10px; background: #0284c7; border-radius: 9999px;"></span>
                                     <span style="height: 5px; width: 14px; background: #10b981; border-radius: 9999px;"></span>
@@ -423,15 +433,15 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                             <div style="flex: 1; font-size: 9px; line-height: 1.35; color: #334155;">
                                 <div style="margin-bottom: 2px;">
                                     <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">HEAD OFFICE:</span>
-                                    <span style="font-weight: 600;">MIG-84, Pokhariput, BDA Colony, Phase-1, Bhubaneswar, Khorda – 751020, Odisha</span>
+                                    <span style="font-weight: 600;"><?= htmlspecialchars(company_address()) ?></span>
                                 </div>
                                 <div style="margin-bottom: 2px;">
                                     <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">HELPLINE:</span>
-                                    <span class="font-mono-num" style="font-weight: 900; color: #0f2d59;">9040999899</span>
+                                    <span class="font-mono-num" style="font-weight: 900; color: #0f2d59;"><?= htmlspecialchars(company_phone()) ?></span>
                                 </div>
                                 <div>
                                     <span style="font-weight: 900; color: #0f2d59; font-size: 8.5px; text-transform: uppercase;">SUPPORT:</span>
-                                    <span style="font-weight: 700; color: #0891b2; font-size: 8px; word-break: break-all;">support@suryavistaara.com</span>
+                                    <span style="font-weight: 700; color: #0891b2; font-size: 8px; word-break: break-all;"><?= htmlspecialchars(company_email()) ?></span>
                                 </div>
                             </div>
                             
@@ -456,7 +466,7 @@ $qrUrl = !empty($qrUrl) ? $qrUrl : 'https://api.qrserver.com/v1/create-qr-code/?
                             <i class="bi bi-shield-lock-fill me-1"></i> TERMS & CONDITIONS
                         </p>
                         <p style="font-weight: 600;">• This identity card is strictly non-transferable and remains company property.</p>
-                        <p style="font-weight: 600; margin-top: 1px;">• If found, please return to Surya Vistaara Pvt. Ltd. Corporate Office.</p>
+                        <p style="font-weight: 600; margin-top: 1px;">• If found, please return to <?= htmlspecialchars(company_name()) ?> Corporate Office.</p>
                     </div>
 
                     <!-- Signatures Section: Authorised Signatory -->

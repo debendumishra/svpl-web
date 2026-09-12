@@ -22,13 +22,16 @@
     </div>
 
     <div class="letterhead text-center">
-        <h2 class="fw-bold mb-1" style="color: #0B2545;">SURYA VISTAARA PVT. LTD.</h2>
-        <p class="small text-muted mb-0">Authorized Corporate Promoter for Dhwajja Solar India Pvt. Ltd. in Odisha</p>
-        <p class="small text-muted mb-0">Plot No. 402, DLF Cybercity, Patia, Bhubaneswar, Odisha - 751024 | support@suryavistaara.com</p>
+        <?php if ($logoUrl = company_logo_url()): ?>
+            <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 54px; width: auto; max-width: 220px; object-fit: contain; margin-bottom: 8px;">
+        <?php endif; ?>
+        <h2 class="fw-bold mb-1" style="color: #0B2545;"><?= htmlspecialchars(strtoupper(company_name())) ?></h2>
+        <p class="small text-muted mb-0">Authorized Corporate Promoter for <?= htmlspecialchars(company_promoter()) ?> in Odisha</p>
+        <p class="small text-muted mb-0"><?= htmlspecialchars(company_address()) ?> | <?= htmlspecialchars(company_email()) ?> | Tel: <?= htmlspecialchars(company_phone()) ?></p>
     </div>
 
     <div class="d-flex justify-content-between mb-4">
-        <div><strong>Ref:</strong> SVPL/APPT/<?= date('Y') ?>/<?= htmlspecialchars($advisor['advisor_code']) ?></div>
+        <div><strong>Ref:</strong> <?= htmlspecialchars(company_short_name()) ?>/APPT/<?= date('Y') ?>/<?= htmlspecialchars($advisor['advisor_code']) ?></div>
         <div><strong>Date:</strong> <?= date('d F, Y') ?></div>
     </div>
 
@@ -41,24 +44,24 @@
 
     <p>Dear <?= htmlspecialchars($advisor['first_name']) ?>,</p>
 
-    <p>We are pleased to appoint you as an <strong>Authorized Solar Advisor</strong> for Surya Vistaara Pvt. Ltd. (SVPL), promoting the Government of India's <em>PM Surya Ghar: Muft Bijli Yojana</em> across your designated territory in Odisha.</p>
+    <p>We are pleased to appoint you as an <strong>Authorized Solar Advisor</strong> for <?= htmlspecialchars(company_name()) ?> (<?= htmlspecialchars(company_short_name()) ?>), promoting the Government of India's <em>PM Surya Ghar: Muft Bijli Yojana</em> across your designated territory in Odisha.</p>
 
     <h6 class="fw-bold">Terms of Appointment:</h6>
     <ol>
         <li><strong>Role & Mandate:</strong> You are authorized to survey residential rooftops, counsel consumers regarding Central DBT Subsidies, and assist with document uploads.</li>
-        <li><strong>Compensation:</strong> You will be compensated according to the official SVPL 9-Level Multi-Tier Commission Structure upon successful DISCOM synchronization.</li>
-        <li><strong>3-Customer Rule:</strong> Completing 3 direct customer rooftop installations will grant you full QUALIFIED Advisor standing.</li>
+        <li><strong>Compensation:</strong> You will be compensated according to the official <?= htmlspecialchars(company_short_name()) ?> Multi-Tier Commission Structure upon successful DISCOM synchronization.</li>
+        <li><strong>Qualification Target:</strong> Completing <?= htmlspecialchars(company_setting('advisor_required_customers', '3')) ?> direct customer rooftop installations will grant you full QUALIFIED Advisor standing.</li>
     </ol>
 
     <div class="row mt-5 pt-5">
         <div class="col-6">
             ___________________________<br>
             <strong>Authorized Signatory</strong><br>
-            Surya Vistaara Pvt. Ltd.
+            <?= htmlspecialchars(company_name()) ?>
         </div>
         <div class="col-6 text-end">
             ___________________________<br>
-            <strong>Advisor Acceptance Signature</strong><br>
+            <strong>Advisor Signature</strong><br>
             <?= htmlspecialchars($advisor['first_name'] . ' ' . $advisor['last_name']) ?>
         </div>
     </div>

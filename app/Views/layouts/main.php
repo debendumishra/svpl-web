@@ -16,6 +16,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Dynamic Favicon -->
+    <?php if ($favUrl = company_favicon_url()): ?>
+        <link rel="icon" href="<?= htmlspecialchars($favUrl) ?>">
+    <?php endif; ?>
+
     <!-- Bootstrap 5 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -32,11 +37,11 @@
     <div class="live-ticker-bar px-3">
         <div class="container d-flex justify-content-between align-items-center flex-wrap">
             <div>
-                <i class="bi bi-shield-check text-warning me-1"></i> Corporate Promoter for <strong>Dhwajja Solar India Pvt. Ltd.</strong> | PM Surya Ghar Odisha Hub
+                <i class="bi bi-shield-check text-warning me-1"></i> Corporate Promoter for <strong><?= htmlspecialchars(company_promoter()) ?></strong> | PM Surya Ghar Odisha Hub
             </div>
             <div class="d-none d-md-flex align-items-center gap-3">
                 <span><i class="bi bi-geo-alt-fill text-danger me-1"></i> Bhubaneswar, Odisha</span>
-                <span><i class="bi bi-telephone-fill text-success me-1"></i> +91 90409 99899</span>
+                <span><i class="bi bi-telephone-fill text-success me-1"></i> <?= htmlspecialchars(company_phone()) ?></span>
             </div>
         </div>
     </div>
@@ -45,13 +50,17 @@
     <nav class="navbar navbar-expand-lg navbar-dark navbar-svpl sticky-top">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="<?= url('/') ?>">
-                <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1.25rem; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">
-                    ☀
-                </div>
-                <div>
-                    <span style="font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px; color: #ffffff;" class="font-heading">SURYA VISTAARA</span>
-                    <span class="badge bg-warning text-dark ms-1 fw-bold" style="font-size: 0.65rem;">ODISHA</span>
-                </div>
+                <?php if ($logoUrl = company_logo_url()): ?>
+                    <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 42px; width: auto; max-width: 170px; object-fit: contain;">
+                <?php else: ?>
+                    <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1.25rem; box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);">
+                        ☀
+                    </div>
+                    <div>
+                        <span style="font-weight: 800; font-size: 1.25rem; letter-spacing: -0.5px; color: #ffffff;" class="font-heading"><?= htmlspecialchars(company_short_name() ?: 'SURYA VISTAARA') ?></span>
+                        <span class="badge bg-warning text-dark ms-1 fw-bold" style="font-size: 0.65rem;">ODISHA</span>
+                    </div>
+                <?php endif; ?>
             </a>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                 <span class="navbar-toggler-icon"></span>
@@ -59,7 +68,7 @@
             <div class="collapse navbar-collapse" id="navbarMain">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a class="nav-link <?= $_SERVER['REQUEST_URI'] === url('/') ? 'active' : '' ?>" href="<?= url('/') ?>">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?= url('/about') ?>">About SVPL</a></li>
+                    <li class="nav-item"><a class="nav-link" href="<?= url('/about') ?>">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/pm-surya-ghar') ?>">PM Surya Ghar</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/solar-solutions') ?>">Solar Solutions</a></li>
                     <li class="nav-item"><a class="nav-link" href="<?= url('/how-it-works') ?>">How It Works</a></li>
@@ -90,16 +99,20 @@
             <div class="row g-4 mb-4">
                 <div class="col-lg-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1.1rem;">
-                            ☀
-                        </div>
-                        <h5 class="m-0 footer-brand-title">SURYA VISTAARA PVT. LTD.</h5>
+                        <?php if ($logoUrl = company_logo_url()): ?>
+                            <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 38px; width: auto; max-width: 160px; object-fit: contain;">
+                        <?php else: ?>
+                            <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1.1rem;">
+                                ☀
+                            </div>
+                            <h5 class="m-0 footer-brand-title"><?= htmlspecialchars(company_name()) ?></h5>
+                        <?php endif; ?>
                     </div>
                     <p style="font-size: 0.88rem; line-height: 1.6; color: #CBD5E1;">
-                        Surya Vistaara Pvt. Ltd. (SVPL) is an authorized corporate promoter for <strong>Dhwajja Solar India Pvt. Ltd.</strong>, driving clean rooftop solar energy under the PM Surya Ghar: Muft Bijli Yojana across all 30 districts of Odisha.
+                        <?= htmlspecialchars(company_name()) ?> (<?= htmlspecialchars(company_short_name()) ?>) is an authorized corporate promoter for <strong><?= htmlspecialchars(company_promoter()) ?></strong>, driving clean rooftop solar energy under the PM Surya Ghar: Muft Bijli Yojana across all 30 districts of Odisha.
                     </p>
                     <div class="d-flex gap-2 mt-3">
-                        <a href="https://api.whatsapp.com/send?phone=919040999899&text=Hello%20Surya%20Vistaara%20Team" target="_blank" class="btn btn-sm btn-outline-success" style="display: inline-flex; align-items: center;">
+                        <a href="https://api.whatsapp.com/send?phone=91<?= preg_replace('/[^0-9]/', '', company_whatsapp()) ?>&text=Hello%20<?= urlencode(company_short_name()) ?>%20Team" target="_blank" class="btn btn-sm btn-outline-success" style="display: inline-flex; align-items: center;">
                             <i class="bi bi-whatsapp me-1"></i> WhatsApp Helpline
                         </a>
                     </div>
@@ -108,7 +121,7 @@
                 <div class="col-lg-2 col-6">
                     <h5>Quick Navigation</h5>
                     <a href="<?= url('/') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> Home</a>
-                    <a href="<?= url('/about') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> About SVPL</a>
+                    <a href="<?= url('/about') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> About Us</a>
                     <a href="<?= url('/pm-surya-ghar') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> PM Surya Ghar</a>
                     <a href="<?= url('/solar-solutions') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> Solar Solutions</a>
                     <a href="<?= url('/how-it-works') ?>"><i class="bi bi-chevron-right me-1 text-warning small"></i> How It Works</a>
@@ -129,10 +142,10 @@
                 <div class="col-lg-3">
                     <h5>Office & Helpdesk</h5>
                     <p style="font-size: 0.88rem; line-height: 1.5; color: #CBD5E1;">
-                        <i class="bi bi-geo-alt-fill text-warning me-1"></i> MIG-84, Pokhariput, BDA Colony, Phase-1 Pokhariput, Bhubaneswar, Odisha - 751020<br>
-                        <i class="bi bi-telephone-fill text-success me-1"></i> <strong><a href="tel:9040999899" style="color: #FBBF24 !important; display: inline;">9040999899</a></strong><br>
-                        <i class="bi bi-envelope-fill text-info me-1"></i> dhwajjasolarsupport@gmail.com<br>
-                        <i class="bi bi-patch-check-fill text-warning me-1"></i> GSTIN: <code class="text-white">21AAMCD5948B1ZU</code>
+                        <i class="bi bi-geo-alt-fill text-warning me-1"></i> <?= htmlspecialchars(company_address()) ?><br>
+                        <i class="bi bi-telephone-fill text-success me-1"></i> <strong><a href="tel:<?= preg_replace('/[^0-9]/', '', company_phone()) ?>" style="color: #FBBF24 !important; display: inline;"><?= htmlspecialchars(company_phone()) ?></a></strong><br>
+                        <i class="bi bi-envelope-fill text-info me-1"></i> <?= htmlspecialchars(company_email()) ?><br>
+                        <i class="bi bi-patch-check-fill text-warning me-1"></i> GSTIN: <code class="text-white"><?= htmlspecialchars(company_gstin()) ?></code>
                     </p>
                     <div class="p-2 rounded bg-dark border border-secondary text-white" style="font-size: 0.75rem;">
                         <strong class="text-warning">DISCOM Coverage:</strong> TPCODL, TPNODL, TPSODL, TPWODL
@@ -143,7 +156,7 @@
             <!-- MANDATORY STATUTORY DISCLAIMER -->
             <div class="pt-3 border-top border-secondary text-center" style="font-size: 0.75rem; color: #94A3B8;">
                 <p class="mb-2">
-                    <strong>Statutory Disclaimer:</strong> Surya Vistaara Pvt. Ltd. (SVPL) is an authorized corporate promoter for Dhwajja Solar India Pvt. Ltd. and is NOT a government department. PM Surya Ghar subsidies, loan interest rates, and DISCOM net-metering approvals are subject to Central Government and DISCOM guidelines.
+                    <strong>Statutory Disclaimer:</strong> <?= htmlspecialchars(company_name()) ?> (<?= htmlspecialchars(company_short_name()) ?>) is an authorized corporate promoter for <?= htmlspecialchars(company_promoter()) ?> and is NOT a government department. PM Surya Ghar subsidies, loan interest rates, and DISCOM net-metering approvals are subject to Central Government and DISCOM guidelines.
                 </p>
                 <div class="d-flex justify-content-center gap-3 mt-2 flex-wrap">
                     <a href="<?= url('/terms') ?>" class="footer-legal-link">Terms & Conditions</a>
@@ -153,7 +166,7 @@
                     <a href="<?= url('/disclaimer') ?>" class="footer-legal-link">Disclaimer</a>
                 </div>
                 <div class="mt-2 text-white-50">
-                    &copy; <?= date('Y') ?> Surya Vistaara Pvt. Ltd. All rights reserved.
+                    &copy; <?= date('Y') ?> <?= htmlspecialchars(company_name()) ?>. All rights reserved.
                 </div>
             </div>
         </div>

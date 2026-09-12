@@ -19,6 +19,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Dynamic Favicon -->
+    <?php if ($favUrl = company_favicon_url()): ?>
+        <link rel="icon" href="<?= htmlspecialchars($favUrl) ?>">
+    <?php endif; ?>
+
     <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -65,13 +70,18 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     </button>
 
                     <a href="<?= url('/admin/dashboard') ?>" class="d-flex align-items-center gap-2 text-decoration-none">
-                        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1rem;">
-                            ☀
-                        </div>
-                        <div>
-                            <span class="font-heading fw-bold text-navy" style="font-size: 1.05rem; letter-spacing: -0.3px;">SURYA VISTAARA</span>
+                        <?php if ($logoUrl = company_logo_url()): ?>
+                            <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 36px; width: auto; max-width: 150px; object-fit: contain;">
                             <span class="badge bg-warning text-dark ms-1 fw-bold d-none d-sm-inline-block" style="font-size: 0.65rem;">ADMIN</span>
-                        </div>
+                        <?php else: ?>
+                            <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1rem;">
+                                ☀
+                            </div>
+                            <div>
+                                <span class="font-heading fw-bold text-navy" style="font-size: 1.05rem; letter-spacing: -0.3px;"><?= htmlspecialchars(company_short_name()) ?></span>
+                                <span class="badge bg-warning text-dark ms-1 fw-bold d-none d-sm-inline-block" style="font-size: 0.65rem;">ADMIN</span>
+                            </div>
+                        <?php endif; ?>
                     </a>
                 </div>
 
@@ -93,13 +103,17 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         <div class="offcanvas offcanvas-start offcanvas-svpl" tabindex="-1" id="adminMobileDrawer" aria-labelledby="adminMobileDrawerLabel">
             <div class="offcanvas-header d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center gap-2">
-                    <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
-                        ☀
-                    </div>
-                    <div>
-                        <h6 class="offcanvas-title font-heading fw-bold text-white mb-0" id="adminMobileDrawerLabel">SURYA VISTAARA</h6>
-                        <small class="text-warning fw-semibold" style="font-size: 0.7rem;">Executive Command</small>
-                    </div>
+                    <?php if ($logoUrl = company_logo_url()): ?>
+                        <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 32px; width: auto; max-width: 140px; object-fit: contain;">
+                    <?php else: ?>
+                        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
+                            ☀
+                        </div>
+                        <div>
+                            <h6 class="offcanvas-title font-heading fw-bold text-white mb-0" id="adminMobileDrawerLabel"><?= htmlspecialchars(company_short_name()) ?></h6>
+                            <small class="text-warning fw-semibold" style="font-size: 0.7rem;">Executive Command</small>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>

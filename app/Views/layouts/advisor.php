@@ -21,6 +21,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- Dynamic Favicon -->
+    <?php if ($favUrl = company_favicon_url()): ?>
+        <link rel="icon" href="<?= htmlspecialchars($favUrl) ?>">
+    <?php endif; ?>
+
     <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -42,11 +47,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             <div class="live-ticker-bar px-3 d-none d-lg-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
-                        <span class="text-white"><i class="bi bi-shield-fill-check text-warning me-1"></i> Certified Solar Advisor Partner Portal</span>
+                        <span class="text-white"><i class="bi bi-shield-fill-check text-warning me-1"></i> <?= htmlspecialchars(company_name()) ?> — Certified Solar Advisor Partner Portal</span>
                         <span class="d-none d-md-inline text-success fw-bold"><i class="bi bi-gift-fill me-1"></i> Central ₹78k + Odisha ₹60k = Total ₹1,38,000 Subsidy</span>
                     </div>
                     <div>
-                        <span class="badge bg-dark text-warning border border-warning" style="font-size: 0.68rem;">Dhwajja Solar India</span>
+                        <span class="badge bg-dark text-warning border border-warning" style="font-size: 0.68rem;"><?= htmlspecialchars(company_promoter()) ?></span>
                     </div>
                 </div>
             </div>

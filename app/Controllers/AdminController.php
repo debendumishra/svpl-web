@@ -470,19 +470,86 @@ class AdminController
     {
         $settings = Setting::getAll();
         Response::view('admin/settings', [
-            'pageTitle' => 'System Settings & Business Rules — SVPL Admin',
+            'pageTitle' => 'System Settings & Company Branding — ' . company_short_name() . ' Admin',
             'settings' => $settings,
+            'successMsg' => $_SESSION['success_msg'] ?? (isset($_GET['saved']) ? 'Settings updated successfully!' : null),
+            'errorMsg' => $_SESSION['error_msg'] ?? null,
         ]);
+        unset($_SESSION['success_msg'], $_SESSION['error_msg']);
     }
 
     public function updateSettings(): void
     {
+        $brandingDir = dirname(dirname(__DIR__)) . '/public/uploads/branding/';
+        if (!is_dir($brandingDir)) {
+            mkdir($brandingDir, 0777, true);
+        }
+
+        // 1. Process Text Settings
+        $ignoredKeys = ['_csrf', '_csrf_token', 'company_logo_base64', 'remove_logo', 'remove_favicon'];
         foreach ($_POST as $key => $val) {
-            if ($key !== '_csrf') {
-                Setting::set($key, (string)$val);
+            if (!in_array($key, $ignoredKeys, true) && is_string($val)) {
+                Setting::set($key, trim($val));
             }
         }
-        Response::redirect('/admin/settings?saved=1');
+
+        // 2. Process Logo Removal
+        if (!empty($_POST['remove_logo']) && $_POST['remove_logo'] === '1') {
+            Setting::remove('company_logo');
+        }
+
+        // 3. Process Favicon Removal
+        if (!empty($_POST['remove_favicon']) && $_POST['remove_favicon'] === '1') {
+            Setting::remove('company_favicon');
+        }
+
+        // 4. Process Company Logo Upload
+        // 4A. File Upload
+        if (isset($_FILES['company_logo']) && $_FILES['company_logo']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['company_logo'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['png', 'jpg', 'jpeg', 'webp', 'svg'];
+            if (in_array($ext, $allowedExts, true)) {
+                $filename = 'company_logo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                if (move_uploaded_file($file['tmp_name'], $brandingDir . $filename)) {
+                    Setting::set('company_logo', 'public/uploads/branding/' . $filename, 'company');
+                }
+            }
+        }
+        // 4B. Base64 Logo / Camera Capture
+        elseif (!empty($_POST['company_logo_base64']) && strpos($_POST['company_logo_base64'], 'data:image/') === 0) {
+            $base64Str = $_POST['company_logo_base64'];
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Str, $type)) {
+                $data = substr($base64Str, strpos($base64Str, ',') + 1);
+                $decoded = base64_decode($data);
+                if ($decoded !== false) {
+                    $ext = strtolower($type[1]) === 'jpeg' ? 'jpg' : strtolower($type[1]);
+                    $filename = 'company_logo_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                    if (file_put_contents($brandingDir . $filename, $decoded)) {
+                        Setting::set('company_logo', 'public/uploads/branding/' . $filename, 'company');
+                    }
+                }
+            }
+        }
+
+        // 5. Process Favicon Upload
+        if (isset($_FILES['company_favicon']) && $_FILES['company_favicon']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['company_favicon'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $allowedExts = ['png', 'ico', 'svg', 'jpg', 'jpeg', 'webp'];
+            if (in_array($ext, $allowedExts, true)) {
+                $filename = 'favicon_' . time() . '_' . rand(1000, 9999) . '.' . $ext;
+                if (move_uploaded_file($file['tmp_name'], $brandingDir . $filename)) {
+                    Setting::set('company_favicon', 'public/uploads/branding/' . $filename, 'company');
+                }
+            }
+        }
+
+        $currentUser = AuthService::user();
+        AuditLog::log($currentUser['id'] ?? 1, 'SETTINGS_UPDATE', 'SYSTEM', 1, "Updated platform configuration and company branding");
+
+        $_SESSION['success_msg'] = "System settings & company branding updated successfully!";
+        Response::redirect('/admin/settings');
     }
 
     public function ledger(): void
