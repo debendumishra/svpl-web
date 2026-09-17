@@ -182,16 +182,82 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
                 </select>
             </div>
 
-            <div class="col-md-4">
-                <label class="form-label small fw-bold text-navy">Proposed Solar Rooftop Capacity <span class="text-danger">*</span></label>
-                <select name="proposed_solar_kw" class="form-select fw-bold text-success" required>
-                    <option value="1.0">1 kW Plant (Subsidy: ₹45,000)</option>
-                    <option value="2.0">2 kW Plant (Subsidy: ₹90,000)</option>
-                    <option value="3.0" selected>3 kW Plant (Max Central+State Subsidy: ₹1,38,000)</option>
-                    <option value="4.0">4 kW Plant (Subsidy: ₹1,38,000)</option>
-                    <option value="5.0">5 kW Plant (Subsidy: ₹1,38,000)</option>
-                    <option value="10.0">10 kW Commercial / Institution (Subsidy: ₹1,38,000)</option>
+            <!-- Package Selection (All Vendor Brands) -->
+            <?php
+                if (!isset($packages) || empty($packages)) {
+                    $packages = \App\Models\Package::getAllActive();
+                }
+                $groupedPackages = [];
+                foreach ($packages as $pkg) {
+                    $b = $pkg['brand'] ?? 'Dhwajja Solar';
+                    $groupedPackages[$b][] = $pkg;
+                }
+                $selectedPkgId = $post['package_id'] ?? ($_GET['package_id'] ?? null);
+                $selectedPkgCode = $_GET['pkg'] ?? null;
+            ?>
+            <div class="col-12">
+                <label class="form-label small fw-bold text-navy">
+                    <i class="bi bi-box-seam-fill text-warning me-1"></i> Choose Solar Package & Vendor Brand <span class="text-danger">*</span>
+                </label>
+                <select name="package_id" id="selectAdvisorCustPackage" class="form-select form-select-lg fw-bold text-navy" required onchange="onAdvisorPackageChange(this)">
+                    <option value="">-- Select Manufacturer & Package --</option>
+                    <?php foreach ($groupedPackages as $brandName => $pkgList): ?>
+                        <optgroup label="☀ <?= htmlspecialchars($brandName) ?>">
+                            <?php foreach ($pkgList as $p): ?>
+                                <?php
+                                    $isSelected = ($selectedPkgId && $selectedPkgId == $p['id']) ||
+                                                  ($selectedPkgCode && $selectedPkgCode === $p['package_code']) ||
+                                                  (!$selectedPkgId && !$selectedPkgCode && $p['capacity_kw'] == 3.00 && $p['brand'] === 'Tata Power Solar');
+                                ?>
+                                <option value="<?= $p['id'] ?>"
+                                        data-cap="<?= $p['capacity_kw'] ?>"
+                                        data-gross="<?= (float)$p['total_price'] ?>"
+                                        data-sub="<?= (float)$p['estimated_subsidy'] ?>"
+                                        data-net="<?= (float)$p['net_customer_cost'] ?>"
+                                        data-type="<?= htmlspecialchars($p['system_type']) ?>"
+                                        data-brand="<?= htmlspecialchars($p['brand']) ?>"
+                                        data-title="<?= htmlspecialchars($p['title']) ?>"
+                                        data-features="<?= htmlspecialchars($p['key_features'] ?? '') ?>"
+                                        data-panels="<?= htmlspecialchars($p['panel_type'] ?? '') ?>"
+                                        data-inverter="<?= htmlspecialchars($p['inverter_type'] ?? '') ?>"
+                                        <?= $isSelected ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($p['brand']) ?> — <?= number_format($p['capacity_kw'], 0) ?> kW <?= htmlspecialchars($p['system_type']) ?> | Gross: ₹<?= number_format($p['total_price']) ?> <?= $p['estimated_subsidy'] > 0 ? ('(Net: ₹' . number_format($p['net_customer_cost']) . ')') : '' ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                    <?php endforeach; ?>
                 </select>
+            </div>
+
+            <!-- Live Selected Package Card -->
+            <div class="col-12" id="advisorPkgLiveCard">
+                <div class="p-3 bg-light rounded-3 border border-warning shadow-sm">
+                    <div class="row align-items-center g-2">
+                        <div class="col-md-7">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge bg-warning text-dark fw-bold" id="advCardPkgBrand">Brand</span>
+                                <span class="badge bg-primary" id="advCardPkgType">On-Grid</span>
+                                <span class="badge bg-secondary" id="advCardPkgCap">3 kW</span>
+                            </div>
+                            <h6 class="fw-bold text-navy mb-1" id="advCardPkgTitle">Selected System Package</h6>
+                            <div class="small text-secondary" id="advCardPkgSpecs">
+                                <span id="advCardPkgPanels"></span> • <span id="advCardPkgInverter"></span>
+                            </div>
+                            <div class="small text-dark mt-1 fst-italic" id="advCardPkgFeatures"></div>
+                        </div>
+                        <div class="col-md-5 text-md-end border-start-md ps-md-3">
+                            <div class="small text-secondary">Gross System Cost: <span class="text-decoration-line-through text-dark fw-semibold" id="advCardPkgGross">₹0</span></div>
+                            <div class="small text-success fw-bold"><i class="bi bi-gift-fill me-1"></i> PM Surya Ghar Subsidy: <span id="advCardPkgSub">- ₹0</span></div>
+                            <hr class="my-1">
+                            <div class="fw-bold text-navy">Net Customer Payable: <span class="fs-5 text-success" id="advCardPkgNet">₹0</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-navy">Proposed Capacity (kW)</label>
+                <input type="number" step="0.5" name="proposed_solar_kw" id="advInputProposedKw" class="form-control fw-bold text-success" value="3.0" readonly>
             </div>
 
             <div class="col-md-4">
@@ -340,3 +406,55 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
         </div>
     </div>
 </form>
+
+<script>
+function onAdvisorPackageChange(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt || !opt.value) {
+        document.getElementById('advisorPkgLiveCard').style.display = 'none';
+        return;
+    }
+
+    const brand = opt.getAttribute('data-brand') || '';
+    const title = opt.getAttribute('data-title') || '';
+    const cap = opt.getAttribute('data-cap') || '3';
+    const type = opt.getAttribute('data-type') || 'On-Grid';
+    const gross = parseFloat(opt.getAttribute('data-gross')) || 0;
+    const sub = parseFloat(opt.getAttribute('data-sub')) || 0;
+    const net = parseFloat(opt.getAttribute('data-net')) || 0;
+    const features = opt.getAttribute('data-features') || '';
+    const panels = opt.getAttribute('data-panels') || '';
+    const inverter = opt.getAttribute('data-inverter') || '';
+
+    // Update UI Card
+    document.getElementById('advCardPkgBrand').innerText = brand;
+    document.getElementById('advCardPkgType').innerText = type;
+    document.getElementById('advCardPkgCap').innerText = parseInt(cap) + ' kW Capacity';
+    document.getElementById('advCardPkgTitle').innerText = title;
+    document.getElementById('advCardPkgPanels').innerText = panels;
+    document.getElementById('advCardPkgInverter').innerText = inverter;
+    document.getElementById('advCardPkgGross').innerText = '₹' + gross.toLocaleString('en-IN');
+    document.getElementById('advCardPkgSub').innerText = sub > 0 ? ('- ₹' + sub.toLocaleString('en-IN')) : '₹0';
+    document.getElementById('advCardPkgNet').innerText = '₹' + net.toLocaleString('en-IN');
+    
+    const featEl = document.getElementById('advCardPkgFeatures');
+    if (features && features !== 'None') {
+        featEl.innerText = '★ ' + features;
+        featEl.style.display = 'block';
+    } else {
+        featEl.style.display = 'none';
+    }
+
+    // Update Proposed kW input
+    document.getElementById('advInputProposedKw').value = parseFloat(cap).toFixed(1);
+    document.getElementById('advisorPkgLiveCard').style.display = 'block';
+}
+
+// Trigger initial load
+document.addEventListener('DOMContentLoaded', function() {
+    const pkgSelect = document.getElementById('selectAdvisorCustPackage');
+    if (pkgSelect) {
+        onAdvisorPackageChange(pkgSelect);
+    }
+});
+</script>

@@ -91,37 +91,100 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                         </div>
                     </div>
 
-                    <!-- Solar Requirement -->
+                    <!-- Solar Requirement & Package Choice -->
+                    <?php
+                        if (!isset($packages) || empty($packages)) {
+                            $packages = \App\Models\Package::getAllActive();
+                        }
+                        $groupedPackages = [];
+                        foreach ($packages as $pkg) {
+                            $b = $pkg['brand'] ?? 'Dhwajja Solar';
+                            $groupedPackages[$b][] = $pkg;
+                        }
+                        $selectedPkgId = $post['package_id'] ?? ($_GET['package_id'] ?? null);
+                        $selectedPkgCode = $_GET['pkg'] ?? null;
+                    ?>
                     <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
-                        2. Solar Capacity & Rooftop Assessment
+                        <i class="bi bi-box-seam-fill text-warning me-1"></i> 2. Select Solar Brand Package & Capacity
                     </h5>
+                    
                     <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Proposed Solar Capacity (kW) *</label>
-                            <select name="proposed_solar_kw" class="form-select" required>
-                                <option value="2.00">2 KW Plant (120 sq.ft. | ₹1,10,000 Subsidy | Net ₹50,000 | EMI: ₹545/mo)</option>
-                                <option value="3.00" selected>3 KW Plant (180 sq.ft. | ₹1,38,000 Subsidy | Net ₹72,000 | EMI: ₹785/mo)</option>
-                                <option value="4.00">4 KW Plant (210 sq.ft. | ₹1,38,000 Subsidy | Net ₹1,22,000 | EMI: ₹1,333/mo)</option>
-                                <option value="5.00">5 KW Plant (270 sq.ft. | ₹1,38,000 Subsidy | Net ₹1,92,000 | EMI: ₹2,098/mo)</option>
+                        
+                        <!-- Package Dropdown -->
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-navy">
+                                Choose Solar Package & Manufacturer <span class="text-danger">*</span>
+                            </label>
+                            <select name="package_id" id="selectCustomerPackage" class="form-select form-select-lg fw-bold text-navy" required onchange="onPackageChange(this)">
+                                <option value="">-- Choose Solar Package --</option>
+                                <?php foreach ($groupedPackages as $brandName => $pkgList): ?>
+                                    <optgroup label="☀ <?= htmlspecialchars($brandName) ?>">
+                                        <?php foreach ($pkgList as $p): ?>
+                                            <?php
+                                                $isSelected = ($selectedPkgId && $selectedPkgId == $p['id']) ||
+                                                              ($selectedPkgCode && $selectedPkgCode === $p['package_code']) ||
+                                                              (!$selectedPkgId && !$selectedPkgCode && $p['capacity_kw'] == 3.00 && $p['brand'] === 'Tata Power Solar');
+                                            ?>
+                                            <option value="<?= $p['id'] ?>"
+                                                    data-cap="<?= $p['capacity_kw'] ?>"
+                                                    data-gross="<?= (float)$p['total_price'] ?>"
+                                                    data-sub="<?= (float)$p['estimated_subsidy'] ?>"
+                                                    data-net="<?= (float)$p['net_customer_cost'] ?>"
+                                                    data-type="<?= htmlspecialchars($p['system_type']) ?>"
+                                                    data-brand="<?= htmlspecialchars($p['brand']) ?>"
+                                                    data-title="<?= htmlspecialchars($p['title']) ?>"
+                                                    data-features="<?= htmlspecialchars($p['key_features'] ?? '') ?>"
+                                                    data-panels="<?= htmlspecialchars($p['panel_type'] ?? '') ?>"
+                                                    data-inverter="<?= htmlspecialchars($p['inverter_type'] ?? '') ?>"
+                                                    <?= $isSelected ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($p['brand']) ?> — <?= number_format($p['capacity_kw'], 0) ?> kW <?= htmlspecialchars($p['system_type']) ?> | Gross: ₹<?= number_format($p['total_price']) ?> <?= $p['estimated_subsidy'] > 0 ? ('(Net: ₹' . number_format($p['net_customer_cost']) . ')') : '' ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Current Sanctioned Load (kW)</label>
+
+                        <!-- Live Selected Package Card -->
+                        <div class="col-12" id="pkgLiveCard">
+                            <div class="p-3 bg-light rounded-3 border border-warning shadow-sm">
+                                <div class="row align-items-center g-2">
+                                    <div class="col-md-7">
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge bg-warning text-dark fw-bold" id="cardPkgBrand">Brand</span>
+                                            <span class="badge bg-primary" id="cardPkgType">On-Grid</span>
+                                            <span class="badge bg-secondary" id="cardPkgCap">3 kW</span>
+                                        </div>
+                                        <h6 class="fw-bold text-navy mb-1" id="cardPkgTitle">Selected System Package</h6>
+                                        <div class="small text-secondary" id="cardPkgSpecs">
+                                            <span id="cardPkgPanels"></span> • <span id="cardPkgInverter"></span>
+                                        </div>
+                                        <div class="small text-dark mt-1 fst-italic" id="cardPkgFeatures"></div>
+                                    </div>
+                                    <div class="col-md-5 text-md-end border-start-md ps-md-3">
+                                        <div class="small text-secondary">Gross Amount: <span class="text-decoration-line-through text-dark fw-semibold" id="cardPkgGross">₹0</span></div>
+                                        <div class="small text-success fw-bold"><i class="bi bi-gift-fill me-1"></i> PM Surya Ghar Subsidy: <span id="cardPkgSub">- ₹0</span></div>
+                                        <hr class="my-1">
+                                        <div class="fw-bold text-navy">Net Customer Investment: <span class="fs-5 text-success" id="cardPkgNet">₹0</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Capacity & Load Controls -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Capacity (kW)</label>
+                            <input type="number" step="0.5" name="proposed_solar_kw" id="inputProposedKw" class="form-control fw-bold text-success" value="3.0" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Sanctioned Load (kW)</label>
                             <input type="number" step="0.5" name="sanctioned_load_kw" class="form-control" value="2.0" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Average Monthly Electricity Bill (₹)</label>
-                            <input type="number" name="monthly_avg_bill" class="form-control" placeholder="e.g. 1500" value="1500">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Average Monthly Bill (₹)</label>
+                            <input type="number" name="monthly_avg_bill" class="form-control" placeholder="e.g. 2500" value="2500">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Select Solar Package</label>
-                            <select name="package_id" class="form-select">
-                                <option value="3" selected>3 KW Dhwajja Solar On-Grid Package (Recommended)</option>
-                                <option value="2">2 KW Dhwajja Solar On-Grid Package</option>
-                                <option value="4">4 KW Dhwajja Solar On-Grid Package</option>
-                                <option value="5">5 KW Dhwajja Solar On-Grid Package</option>
-                            </select>
-                        </div>
+
                     </div>
 
                     <!-- Location -->
@@ -196,3 +259,55 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
         </div>
     </div>
 </div>
+
+<script>
+function onPackageChange(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt || !opt.value) {
+        document.getElementById('pkgLiveCard').style.display = 'none';
+        return;
+    }
+
+    const brand = opt.getAttribute('data-brand') || '';
+    const title = opt.getAttribute('data-title') || '';
+    const cap = opt.getAttribute('data-cap') || '3';
+    const type = opt.getAttribute('data-type') || 'On-Grid';
+    const gross = parseFloat(opt.getAttribute('data-gross')) || 0;
+    const sub = parseFloat(opt.getAttribute('data-sub')) || 0;
+    const net = parseFloat(opt.getAttribute('data-net')) || 0;
+    const features = opt.getAttribute('data-features') || '';
+    const panels = opt.getAttribute('data-panels') || '';
+    const inverter = opt.getAttribute('data-inverter') || '';
+
+    // Update UI Card
+    document.getElementById('cardPkgBrand').innerText = brand;
+    document.getElementById('cardPkgType').innerText = type;
+    document.getElementById('cardPkgCap').innerText = parseInt(cap) + ' kW Capacity';
+    document.getElementById('cardPkgTitle').innerText = title;
+    document.getElementById('cardPkgPanels').innerText = panels;
+    document.getElementById('cardPkgInverter').innerText = inverter;
+    document.getElementById('cardPkgGross').innerText = '₹' + gross.toLocaleString('en-IN');
+    document.getElementById('cardPkgSub').innerText = sub > 0 ? ('- ₹' + sub.toLocaleString('en-IN')) : '₹0';
+    document.getElementById('cardPkgNet').innerText = '₹' + net.toLocaleString('en-IN');
+    
+    const featEl = document.getElementById('cardPkgFeatures');
+    if (features && features !== 'None') {
+        featEl.innerText = '★ ' + features;
+        featEl.style.display = 'block';
+    } else {
+        featEl.style.display = 'none';
+    }
+
+    // Update Proposed kW input
+    document.getElementById('inputProposedKw').value = parseFloat(cap).toFixed(1);
+    document.getElementById('pkgLiveCard').style.display = 'block';
+}
+
+// Trigger initial load
+document.addEventListener('DOMContentLoaded', function() {
+    const pkgSelect = document.getElementById('selectCustomerPackage');
+    if (pkgSelect) {
+        onPackageChange(pkgSelect);
+    }
+});
+</script>

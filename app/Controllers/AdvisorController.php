@@ -14,6 +14,7 @@ use App\Models\Lead;
 use App\Models\Genealogy;
 use App\Models\Wallet;
 use App\Models\Commission;
+use App\Models\Package;
 use App\Services\GenealogyService;
 use App\Services\DocumentGenerator;
 
@@ -197,9 +198,12 @@ class AdvisorController
             return;
         }
 
+        $packages = Package::getAllActive();
+
         Response::view('advisor/register_customer', [
             'pageTitle' => 'Register New Customer — SVPL Advisor',
             'advisor' => $advisor,
+            'packages' => $packages,
             'post' => [],
         ]);
     }
@@ -214,6 +218,7 @@ class AdvisorController
             return;
         }
 
+        $packages = Package::getAllActive();
         $post = $_POST;
         $mobile = trim($post['mobile'] ?? '');
 
@@ -221,11 +226,23 @@ class AdvisorController
             Response::view('advisor/register_customer', [
                 'pageTitle' => 'Register New Customer — SVPL Advisor',
                 'advisor' => $advisor,
+                'packages' => $packages,
                 'error' => 'Please fill in Customer Name, Mobile Number, and DISCOM Consumer Number.',
                 'post' => $post,
             ]);
             return;
         }
+
+        // Package selection & calculations
+        $packageId = !empty($post['package_id']) ? (int)$post['package_id'] : null;
+        $selectedPkg = $packageId ? Package::findById($packageId) : null;
+
+        $proposedKw = $selectedPkg ? (float)$selectedPkg['capacity_kw'] : (float)($post['proposed_solar_kw'] ?? 3.0);
+        $totalCost = $selectedPkg ? (float)$selectedPkg['total_price'] : 210000.00;
+        $totalSubsidy = $selectedPkg ? (float)$selectedPkg['estimated_subsidy'] : 138000.00;
+        $centralSubsidy = min(78000.00, $totalSubsidy);
+        $stateSubsidy = max(0.0, $totalSubsidy - $centralSubsidy);
+        $netPayable = $selectedPkg ? (float)$selectedPkg['net_customer_cost'] : max(0.0, $totalCost - $totalSubsidy);
 
         \App\Helpers\Database::beginTransaction();
         try {
@@ -264,7 +281,7 @@ class AdvisorController
                 'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
                 'consumer_number' => trim($post['consumer_number']),
                 'sanctioned_load_kw' => (float) ($post['sanctioned_load_kw'] ?? 2.0),
-                'proposed_solar_kw' => (float) ($post['proposed_solar_kw'] ?? 3.0),
+                'proposed_solar_kw' => $proposedKw,
                 'monthly_avg_bill' => (float) ($post['monthly_avg_bill'] ?? 2500),
                 'roof_type' => trim($post['roof_type'] ?? 'RCC Concrete Roof'),
                 'status' => 'New',
@@ -276,6 +293,7 @@ class AdvisorController
                 'lead_code' => $leadCode,
                 'customer_id' => $custId,
                 'advisor_id' => (int) $advisor['id'],
+                'package_id' => $packageId,
                 'lead_source' => 'Advisor Portal (' . $advisor['advisor_code'] . ')',
                 'first_name' => trim($post['first_name']),
                 'last_name' => trim($post['last_name']),
@@ -288,7 +306,11 @@ class AdvisorController
                 'pincode' => trim($post['pincode'] ?? '751020'),
                 'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
                 'consumer_number' => trim($post['consumer_number']),
-                'proposed_capacity_kw' => (float) ($post['proposed_solar_kw'] ?? 3.0),
+                'proposed_capacity_kw' => $proposedKw,
+                'estimated_project_cost' => $totalCost,
+                'subsidy_amount' => $centralSubsidy,
+                'state_subsidy' => $stateSubsidy,
+                'customer_payable_amount' => $netPayable,
                 'stage' => 'REGISTRATION',
                 'status' => 'Application Submitted by Advisor ' . $advisor['advisor_code'],
             ]);
