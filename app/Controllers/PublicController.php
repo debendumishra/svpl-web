@@ -49,8 +49,15 @@ class PublicController
 
     public function solarSolutions(): void
     {
+        $packages = \App\Models\Package::getAllActive();
+        $brands = \App\Models\Package::getBrands();
+        $systemTypes = \App\Models\Package::getSystemTypes();
+
         Response::view('public/solar_solutions', [
             'pageTitle' => 'Solar Solutions & Packages — Surya Vistaara (Dhwajja Solar India)',
+            'packages' => $packages,
+            'brands' => $brands,
+            'systemTypes' => $systemTypes,
         ]);
     }
 

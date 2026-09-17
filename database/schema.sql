@@ -536,10 +536,13 @@ DROP TABLE IF EXISTS `packages`;
 CREATE TABLE `packages` (
   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   `package_code` VARCHAR(50) NOT NULL UNIQUE,
+  `brand` VARCHAR(100) NULL,
   `title` VARCHAR(150) NOT NULL,
   `capacity_kw` DECIMAL(5,2) NOT NULL,
+  `system_type` VARCHAR(50) NOT NULL DEFAULT 'On-Grid',
   `panel_type` VARCHAR(150) NOT NULL,
   `inverter_type` VARCHAR(150) NOT NULL,
+  `key_features` TEXT NULL,
   `battery_included` TINYINT(1) NOT NULL DEFAULT 0,
   `total_price` DECIMAL(12,2) NOT NULL,
   `estimated_subsidy` DECIMAL(12,2) NOT NULL,
