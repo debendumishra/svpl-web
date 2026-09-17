@@ -173,6 +173,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     <div class="collapse show" id="mobMenuOperations">
                         <ul class="nav flex-column mb-1">
                             <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/packages') !== false ? 'active' : '' ?>" href="<?= url('/admin/packages') ?>">
+                                    <i class="bi bi-box-seam-fill text-warning"></i> <span>Solar Packages Desk</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
                                     <i class="bi bi-box-seam"></i> <span>Dispatches & Kits</span>
                                 </a>
@@ -321,6 +326,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     </div>
                     <div class="collapse show" id="menuOperations">
                         <ul class="nav flex-column mb-1">
+                            <li class="nav-item">
+                                <a class="nav-link <?= strpos($activeUri, '/admin/packages') !== false ? 'active' : '' ?>" href="<?= url('/admin/packages') ?>">
+                                    <i class="bi bi-box-seam-fill text-warning"></i> <span class="sidebar-text">Solar Packages Desk</span>
+                                </a>
+                            </li>
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
                                     <i class="bi bi-box-seam"></i> <span class="sidebar-text">Dispatches & Kits</span>

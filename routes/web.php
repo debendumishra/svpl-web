@@ -121,6 +121,18 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/admin/dispatches/create', [AdminController::class, 'createDispatch']);
     Router::post('/admin/dispatches/update-status', [AdminController::class, 'updateDispatchStatus']);
 
+    // Solar Packages & Products Desk (Admin & Manager)
+    Router::get('/admin/packages', [AdminController::class, 'packages']);
+    Router::get('/manager/packages', [AdminController::class, 'packages']);
+    Router::post('/admin/packages/create', [AdminController::class, 'createPackage']);
+    Router::post('/manager/packages/create', [AdminController::class, 'createPackage']);
+    Router::post('/admin/packages/update/{id}', [AdminController::class, 'updatePackage']);
+    Router::post('/manager/packages/update/{id}', [AdminController::class, 'updatePackage']);
+    Router::get('/admin/packages/toggle/{id}', [AdminController::class, 'togglePackageStatus']);
+    Router::get('/manager/packages/toggle/{id}', [AdminController::class, 'togglePackageStatus']);
+    Router::post('/admin/packages/delete/{id}', [AdminController::class, 'deletePackage']);
+    Router::post('/manager/packages/delete/{id}', [AdminController::class, 'deletePackage']);
+
     // Company Financial Books & Account Ledger
     Router::get('/admin/ledger', [AdminController::class, 'ledger']);
     Router::get('/admin/accounts', [AdminController::class, 'ledger']);

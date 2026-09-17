@@ -34,6 +34,8 @@ try {
         echo "Added column `key_features`\n";
     }
 
+    $db->exec("UPDATE `packages` SET `brand` = 'Dhwajja Solar' WHERE `brand` IS NULL OR `brand` = ''");
+
     // 2. Package data from user's official table
     $packages = [
         // 1. Tata Power Solar

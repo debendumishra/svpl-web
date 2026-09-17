@@ -22,6 +22,7 @@ use App\Models\Loan;
 use App\Models\Subsidy;
 use App\Models\Payment;
 use App\Models\CompanyLedger;
+use App\Models\Package;
 use App\Models\User;
 use App\Services\AuthService;
 
@@ -1316,4 +1317,140 @@ class AdminController
             'card' => $card,
         ]);
     }
+
+    // ==========================================
+    // SOLAR PACKAGES MANAGEMENT (CRUD & STATUS)
+    // ==========================================
+
+    public function packages(): void
+    {
+        $filters = [
+            'status' => trim($_GET['status'] ?? ''),
+            'brand' => trim($_GET['brand'] ?? 'ALL'),
+            'system_type' => trim($_GET['system_type'] ?? 'ALL'),
+            'search' => trim($_GET['search'] ?? ''),
+        ];
+
+        $packages = Package::getAll($filters);
+        $stats = Package::getStats();
+        $brands = Package::getBrands();
+        $systemTypes = Package::getSystemTypes();
+
+        Response::view('admin/packages', [
+            'pageTitle' => 'Solar Package Catalog & Product Management — SVPL Admin',
+            'packages' => $packages,
+            'stats' => $stats,
+            'brands' => $brands,
+            'systemTypes' => $systemTypes,
+            'filters' => $filters,
+        ]);
+    }
+
+    public function createPackage(): void
+    {
+        $title = trim($_POST['title'] ?? '');
+        $brand = trim($_POST['brand'] ?? '');
+        $capacityKw = (float)($_POST['capacity_kw'] ?? 0);
+        $totalPrice = (float)($_POST['total_price'] ?? 0);
+
+        if (empty($title) || empty($brand) || $capacityKw <= 0 || $totalPrice <= 0) {
+            $_SESSION['error_msg'] = "Please fill in all required fields (Brand, Title, Capacity, Total Price).";
+            Response::redirect(url('/admin/packages'));
+            return;
+        }
+
+        $packageId = Package::create($_POST);
+
+        AuditLog::log(
+            'CREATE_PACKAGE',
+            "Created solar package #{$packageId}: {$brand} - {$title} ({$capacityKw} kW) - ₹" . number_format($totalPrice)
+        );
+
+        $_SESSION['success_msg'] = "Solar Package '{$title}' created successfully!";
+        Response::redirect(url('/admin/packages'));
+    }
+
+    public function updatePackage(string $id): void
+    {
+        $packageId = (int)$id;
+        $pkg = Package::findById($packageId);
+        if (!$pkg) {
+            $_SESSION['error_msg'] = "Package #{$id} not found.";
+            Response::redirect(url('/admin/packages'));
+            return;
+        }
+
+        $title = trim($_POST['title'] ?? '');
+        $brand = trim($_POST['brand'] ?? '');
+        $capacityKw = (float)($_POST['capacity_kw'] ?? 0);
+        $totalPrice = (float)($_POST['total_price'] ?? 0);
+
+        if (empty($title) || empty($brand) || $capacityKw <= 0 || $totalPrice <= 0) {
+            $_SESSION['error_msg'] = "Please fill in all required fields (Brand, Title, Capacity, Total Price).";
+            Response::redirect(url('/admin/packages'));
+            return;
+        }
+
+        Package::update($packageId, $_POST);
+
+        AuditLog::log(
+            'UPDATE_PACKAGE',
+            "Updated solar package #{$packageId}: {$brand} - {$title} ({$capacityKw} kW)"
+        );
+
+        $_SESSION['success_msg'] = "Solar Package #{$pkg['package_code']} updated successfully!";
+        Response::redirect(url('/admin/packages'));
+    }
+
+    public function togglePackageStatus(string $id): void
+    {
+        $packageId = (int)$id;
+        $pkg = Package::findById($packageId);
+        if (!$pkg) {
+            $_SESSION['error_msg'] = "Package #{$id} not found.";
+            Response::redirect(url('/admin/packages'));
+            return;
+        }
+
+        Package::toggleStatus($packageId);
+        $newStatus = $pkg['is_active'] == 1 ? 'Inactive (Hidden)' : 'Active (Live)';
+
+        AuditLog::log(
+            'TOGGLE_PACKAGE_STATUS',
+            "Toggled status for package #{$packageId} ({$pkg['package_code']}) to {$newStatus}"
+        );
+
+        $_SESSION['success_msg'] = "Package #{$pkg['package_code']} is now {$newStatus}!";
+        Response::redirect(url('/admin/packages'));
+    }
+
+    public function deletePackage(string $id): void
+    {
+        $packageId = (int)$id;
+        $pkg = Package::findById($packageId);
+        if (!$pkg) {
+            $_SESSION['error_msg'] = "Package #{$id} not found.";
+            Response::redirect(url('/admin/packages'));
+            return;
+        }
+
+        $deleted = Package::delete($packageId);
+
+        if ($deleted) {
+            AuditLog::log(
+                'DELETE_PACKAGE',
+                "Deleted package #{$packageId} ({$pkg['package_code']} - {$pkg['title']})"
+            );
+            $_SESSION['success_msg'] = "Package #{$pkg['package_code']} permanently deleted.";
+        } else {
+            AuditLog::log(
+                'DEACTIVATE_PACKAGE',
+                "Deactivated package #{$packageId} ({$pkg['package_code']}) because it is referenced in customer leads"
+            );
+            $_SESSION['warning_msg'] = "Package #{$pkg['package_code']} is linked to existing customer leads. It has been safely deactivated instead of deleted.";
+        }
+
+        Response::redirect(url('/admin/packages'));
+    }
 }
+
