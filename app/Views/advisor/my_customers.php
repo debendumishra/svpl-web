@@ -12,11 +12,16 @@ $stageMap = [
     'GOVT_PORTAL'               => ['label' => '3. Govt Portal Submitted', 'badge' => 'bg-primary text-white'],
     'LOAN_APPLIED'              => ['label' => '4. Bank Loan Applied', 'badge' => 'bg-warning text-dark fw-bold'],
     'LOAN_SANCTIONED'           => ['label' => '5. Loan Sanctioned', 'badge' => 'bg-primary-subtle text-primary border border-primary-subtle fw-bold'],
-    'INSTALLATION_COMMENCED'    => ['label' => '6. Installation Commenced', 'badge' => 'bg-dark text-warning fw-bold'],
-    'INSTALLATION_COMPLETED'    => ['label' => '7. Installation Completed', 'badge' => 'bg-success text-white fw-bold'],
-    'JE_REPORT'                 => ['label' => '8. DISCOM JE Inspection', 'badge' => 'bg-info-subtle text-dark border'],
-    'SUBSIDY_APPLIED'           => ['label' => '9. Subsidy Applied', 'badge' => 'bg-primary text-white'],
-    'SUBSIDY_RECEIVED'          => ['label' => '10. Subsidy Disbursed (Active)', 'badge' => 'bg-success text-white fw-bold'],
+    'INSTRUMENT_DESPATCHED'     => ['label' => '6. Instrument Despatched', 'badge' => 'bg-warning text-dark fw-bold'],
+    'INSTALLATION_COMMENCED'    => ['label' => '7. Installation Commenced', 'badge' => 'bg-dark text-warning fw-bold'],
+    'INSTALLATION_COMPLETED'    => ['label' => '8. Installation Completed', 'badge' => 'bg-primary text-white fw-bold'],
+    'JE_REPORT'                 => ['label' => '9. DISCOM JE Inspection', 'badge' => 'bg-info-subtle text-dark border'],
+    'NET_METER'                 => ['label' => '10. Net Meter Installed', 'badge' => 'bg-info text-white fw-bold'],
+    'INTIMATION_TO_MMG'         => ['label' => '11. Intimation to MMG', 'badge' => 'bg-secondary-subtle text-dark border'],
+    'MMG_METER_REPORT'          => ['label' => '12. MMG Meter Report', 'badge' => 'bg-purple text-white bg-opacity-75'],
+    'BANK_SECOND_INSTALLMENT'   => ['label' => '13. Bank 2nd Installment', 'badge' => 'bg-success-subtle text-success border fw-bold'],
+    'SUBSIDY_APPLIED'           => ['label' => '14. Subsidy Applied', 'badge' => 'bg-primary text-white'],
+    'SUBSIDY_RECEIVED'          => ['label' => '15. Subsidy Disbursed (Active)', 'badge' => 'bg-success text-white fw-bold'],
 ];
 ?>
 

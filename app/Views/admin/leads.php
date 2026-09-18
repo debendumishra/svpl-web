@@ -9,12 +9,15 @@ $title = "Lead Pipeline Management — SVPL Admin";
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 animate-fade-in">
     <div>
         <div class="d-flex align-items-center gap-2 mb-1">
-            <h3 class="font-heading fw-bold mb-0 text-navy">10-Stage Solar Lead Pipeline Board</h3>
+            <h3 class="font-heading fw-bold mb-0 text-navy">15-Point Solar Lead Lifecycle Pipeline</h3>
             <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.72rem;">Odisha PM Surya Ghar</span>
         </div>
-        <p class="text-secondary small mb-0">Track applications across registration, feasibility, 5.6% bank loans, JE net-metering, and ₹1.38L DBT subsidies</p>
+        <p class="text-secondary small mb-0">Track applications across registration, feasibility, 5.6% bank loans, instrument dispatch, installation, JE net-metering, MMG meter change, bank 2nd tranche, and ₹1.38L DBT subsidies.</p>
     </div>
     <div class="d-flex gap-2">
+        <a href="<?= url('/admin/dispatches') ?>" class="btn btn-outline-navy btn-sm shadow-sm">
+            <i class="bi bi-truck me-1"></i> Despatch Desk
+        </a>
         <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm">
             <i class="bi bi-plus-circle-fill me-1"></i> + New Lead
         </a>
@@ -24,23 +27,28 @@ $title = "Lead Pipeline Management — SVPL Admin";
     </div>
 </div>
 
-<!-- STAGE FILTER PILLS -->
+<!-- 15 STAGE FILTER PILLS -->
 <div class="d-flex gap-2 overflow-x-auto pb-3 mb-3 animate-fade-in stagger-1">
     <a href="<?= url('/admin/leads') ?>" class="btn btn-sm <?= empty($currentStage) ? 'btn-svpl-navy' : 'btn-outline-secondary' ?>">
-        All Stages
+        All 15 Stages
     </a>
     <?php
     $allStages = [
-        'REGISTRATION' => '1. Registration',
-        'DOCUMENTS' => '2. Documents',
-        'GOVT_PORTAL' => '3. Govt Portal',
-        'LOAN_APPLIED' => '4. Loan Applied',
-        'LOAN_SANCTIONED' => '5. Loan Sanctioned',
-        'INSTALLATION_COMMENCED' => '6. Installing',
-        'INSTALLATION_COMPLETED' => '7. Completed',
-        'JE_REPORT' => '8. JE Report',
-        'SUBSIDY_APPLIED' => '9. Subsidy Applied',
-        'SUBSIDY_RECEIVED' => '10. Dual Subsidy DBT',
+        'REGISTRATION'              => '1. Registration',
+        'DOCUMENTS'                 => '2. Documents',
+        'GOVT_PORTAL'               => '3. Govt Portal',
+        'LOAN_APPLIED'              => '4. Loan Applied',
+        'LOAN_SANCTIONED'           => '5. Loan Sanctioned',
+        'INSTRUMENT_DESPATCHED'     => '6. Instrument Despatched',
+        'INSTALLATION_COMMENCED'    => '7. Installing',
+        'INSTALLATION_COMPLETED'    => '8. Installed',
+        'JE_REPORT'                 => '9. JE Report',
+        'NET_METER'                 => '10. Net Meter',
+        'INTIMATION_TO_MMG'         => '11. Intimation MMG',
+        'MMG_METER_REPORT'          => '12. MMG Meter Report',
+        'BANK_SECOND_INSTALLMENT'   => '13. Bank 2nd Tranche',
+        'SUBSIDY_APPLIED'           => '14. Subsidy Applied',
+        'SUBSIDY_RECEIVED'          => '15. Subsidy Received',
     ];
     foreach ($allStages as $k => $lbl): ?>
         <a href="<?= url('/admin/leads?stage=' . $k) ?>" class="btn btn-sm <?= ($currentStage ?? '') === $k ? 'btn-svpl-solar' : 'btn-outline-secondary' ?> text-nowrap">

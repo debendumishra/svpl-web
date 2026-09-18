@@ -139,4 +139,93 @@ class LeadController
 
         Response::json(['status' => true, 'message' => 'UTR Disbursal recorded successfully. Customer marked as ACTIVE (Green).']);
     }
+
+    public function saveNetMeter(): void
+    {
+        $post = $_POST;
+        $leadId = (int)($post['lead_id'] ?? 0);
+        if (!$leadId) {
+            Response::json(['status' => false, 'message' => 'Invalid Lead ID']);
+            return;
+        }
+
+        $meterNo = trim($post['net_meter_number'] ?? '');
+        $date = trim($post['net_meter_date'] ?? date('Y-m-d'));
+        $remarks = trim($post['remarks'] ?? 'Net Meter / Bidirectional meter installed & configured.');
+
+        \App\Helpers\Database::execute(
+            "UPDATE leads SET net_meter_number = ?, net_meter_date = ?, updated_at = NOW() WHERE id = ?",
+            [$meterNo, $date, $leadId]
+        );
+
+        LeadPipelineService::advanceStage($leadId, 'NET_METER', 'Net Meter Installed', "Net Meter No: {$meterNo} (Installed: {$date}). " . $remarks);
+        Response::json(['status' => true, 'message' => 'Net Meter installation recorded successfully.']);
+    }
+
+    public function saveMmgIntimation(): void
+    {
+        $post = $_POST;
+        $leadId = (int)($post['lead_id'] ?? 0);
+        if (!$leadId) {
+            Response::json(['status' => false, 'message' => 'Invalid Lead ID']);
+            return;
+        }
+
+        $refNo = trim($post['mmg_intimation_ref'] ?? ('MMG-INT-' . time()));
+        $date = trim($post['mmg_intimation_date'] ?? date('Y-m-d'));
+        $remarks = trim($post['remarks'] ?? 'Official meter change intimation submitted to DISCOM MMG Division.');
+
+        \App\Helpers\Database::execute(
+            "UPDATE leads SET mmg_intimation_ref = ?, mmg_intimation_date = ?, updated_at = NOW() WHERE id = ?",
+            [$refNo, $date, $leadId]
+        );
+
+        LeadPipelineService::advanceStage($leadId, 'INTIMATION_TO_MMG', 'Intimated to MMG', "MMG Ref: {$refNo} (Date: {$date}). " . $remarks);
+        Response::json(['status' => true, 'message' => 'Intimation to MMG recorded successfully.']);
+    }
+
+    public function saveMmgReport(): void
+    {
+        $post = $_POST;
+        $leadId = (int)($post['lead_id'] ?? 0);
+        if (!$leadId) {
+            Response::json(['status' => false, 'message' => 'Invalid Lead ID']);
+            return;
+        }
+
+        $reportNo = trim($post['mmg_report_number'] ?? ('MMG-REP-' . time()));
+        $date = trim($post['mmg_report_date'] ?? date('Y-m-d'));
+        $remarks = trim($post['remarks'] ?? 'MMG Meter Change & Test verification report passed.');
+
+        \App\Helpers\Database::execute(
+            "UPDATE leads SET mmg_report_number = ?, mmg_report_date = ?, updated_at = NOW() WHERE id = ?",
+            [$reportNo, $date, $leadId]
+        );
+
+        LeadPipelineService::advanceStage($leadId, 'MMG_METER_REPORT', 'MMG Meter Change Report Completed', "MMG Report No: {$reportNo} (Date: {$date}). " . $remarks);
+        Response::json(['status' => true, 'message' => 'MMG Meter Change Report saved successfully.']);
+    }
+
+    public function saveBankSecondInstallment(): void
+    {
+        $post = $_POST;
+        $leadId = (int)($post['lead_id'] ?? 0);
+        if (!$leadId) {
+            Response::json(['status' => false, 'message' => 'Invalid Lead ID']);
+            return;
+        }
+
+        $utr = trim($post['bank_second_inst_utr'] ?? '');
+        $amount = (float)($post['bank_second_inst_amount'] ?? 0);
+        $date = trim($post['bank_second_inst_date'] ?? date('Y-m-d'));
+        $remarks = trim($post['remarks'] ?? 'Bank 2nd installment / balance disbursement credited.');
+
+        \App\Helpers\Database::execute(
+            "UPDATE leads SET bank_second_inst_utr = ?, bank_second_inst_amount = ?, bank_second_inst_date = ?, updated_at = NOW() WHERE id = ?",
+            [$utr, $amount, $date, $leadId]
+        );
+
+        LeadPipelineService::advanceStage($leadId, 'BANK_SECOND_INSTALLMENT', 'Bank Second Installment Released', "Bank 2nd Tranche: ₹" . number_format($amount, 2) . " (UTR: {$utr}, Date: {$date}). " . $remarks);
+        Response::json(['status' => true, 'message' => 'Bank Second Installment release recorded successfully.']);
+    }
 }

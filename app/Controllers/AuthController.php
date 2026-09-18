@@ -83,6 +83,8 @@ class AuthController
             Response::redirect('/admin/dashboard');
         } elseif ($role === 'BOE') {
             Response::redirect('/boe/dashboard');
+        } elseif ($role === 'ENGINEER') {
+            Response::redirect('/engineer/dashboard');
         } elseif ($role === 'ADVISOR') {
             Response::redirect('/advisor/dashboard');
         } else {

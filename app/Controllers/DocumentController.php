@@ -13,6 +13,7 @@ use App\Models\Customer;
 use App\Models\Quotation;
 use App\Models\JEReport;
 use App\Models\User;
+use App\Models\PackageDispatch;
 use App\Services\DocumentGenerator;
 
 class DocumentController
@@ -93,6 +94,105 @@ class DocumentController
         Response::view('printable/je_report', [
             'lead' => $lead,
             'jeReport' => $jeReport,
+        ]);
+    }
+
+    public function printEwayBill(string $id): void
+    {
+        $dispatch = PackageDispatch::findById((int) $id);
+        if (!$dispatch) {
+            Response::notFound("Dispatch record #{$id} not found.");
+            return;
+        }
+
+        $items = [];
+        if (!empty($dispatch['items_json'])) {
+            try {
+                $items = is_array($dispatch['items_json']) ? $dispatch['items_json'] : json_decode($dispatch['items_json'], true);
+            } catch (\Throwable $e) {
+                $items = [];
+            }
+        }
+        if (empty($items)) {
+            $items = PackageDispatch::STANDARD_INSTRUMENTS;
+        }
+
+        $ewbNumber = '2118' . str_pad((string)$dispatch['id'], 8, '0', STR_PAD_LEFT);
+        $qrPayload = "EWB:{$ewbNumber}|GSTIN:21AAKCS8912K1Z9|DOC:{$dispatch['tracking_number']}|VEH:{$dispatch['vehicle_number']}|DATE:{$dispatch['dispatch_date']}";
+        $qrUrl = DocumentGenerator::getQrCodeUrl($qrPayload);
+
+        Response::view('printable/eway_bill', [
+            'dispatch'   => $dispatch,
+            'items'      => $items,
+            'ewbNumber'  => $ewbNumber,
+            'qrUrl'      => $qrUrl,
+        ]);
+    }
+
+    public function printDispatchInvoice(string $id): void
+    {
+        $dispatch = PackageDispatch::findById((int) $id);
+        if (!$dispatch) {
+            Response::notFound("Dispatch record #{$id} not found.");
+            return;
+        }
+
+        $items = [];
+        if (!empty($dispatch['items_json'])) {
+            try {
+                $items = is_array($dispatch['items_json']) ? $dispatch['items_json'] : json_decode($dispatch['items_json'], true);
+            } catch (\Throwable $e) {
+                $items = [];
+            }
+        }
+        if (empty($items)) {
+            $items = PackageDispatch::STANDARD_INSTRUMENTS;
+        }
+
+        $invYear = !empty($dispatch['dispatch_date']) ? date('Y', strtotime($dispatch['dispatch_date'])) : date('Y');
+        $invNextYear = substr((string)((int)$invYear + 1), -2);
+        $invoiceNumber = "SVPL/INV/{$invYear}-{$invNextYear}/" . str_pad((string)$dispatch['id'], 4, '0', STR_PAD_LEFT);
+        
+        $qrPayload = "GSTIN:21AAKCS8912K1Z9|INV:{$invoiceNumber}|DATE:{$dispatch['dispatch_date']}|VAL:" . ($dispatch['estimated_project_cost'] ?? '180000') . "|BUYER:{$dispatch['cust_first']} {$dispatch['cust_last']}";
+        $qrUrl = DocumentGenerator::getQrCodeUrl($qrPayload);
+
+        Response::view('printable/dispatch_invoice', [
+            'dispatch'      => $dispatch,
+            'items'         => $items,
+            'invoiceNumber' => $invoiceNumber,
+            'qrUrl'         => $qrUrl,
+        ]);
+    }
+
+    public function printDispatchChallan(string $id): void
+    {
+        $dispatch = PackageDispatch::findById((int) $id);
+        if (!$dispatch) {
+            Response::notFound("Dispatch record #{$id} not found.");
+            return;
+        }
+
+        $items = [];
+        if (!empty($dispatch['items_json'])) {
+            try {
+                $items = is_array($dispatch['items_json']) ? $dispatch['items_json'] : json_decode($dispatch['items_json'], true);
+            } catch (\Throwable $e) {
+                $items = [];
+            }
+        }
+        if (empty($items)) {
+            $items = PackageDispatch::STANDARD_INSTRUMENTS;
+        }
+
+        $challanNumber = $dispatch['tracking_number'] ?: ('CHL-' . date('Ymd') . '-' . $dispatch['id']);
+        $qrPayload = "CHALLAN:{$challanNumber}|VEH:{$dispatch['vehicle_number']}|DRIVER:{$dispatch['driver_name']}|DATE:{$dispatch['dispatch_date']}";
+        $qrUrl = DocumentGenerator::getQrCodeUrl($qrPayload);
+
+        Response::view('printable/dispatch_challan', [
+            'dispatch'      => $dispatch,
+            'items'         => $items,
+            'challanNumber' => $challanNumber,
+            'qrUrl'         => $qrUrl,
         ]);
     }
 

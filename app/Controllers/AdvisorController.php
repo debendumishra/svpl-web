@@ -262,6 +262,11 @@ class AdvisorController
             }
 
             // Generate Customer Code & Record
+            // Generate Customer Code & Record
+            $billMobile = !empty($post['electricity_bill_mobile']) ? trim($post['electricity_bill_mobile']) : $mobile;
+            $billDob = !empty($post['electricity_bill_dob']) ? trim($post['electricity_bill_dob']) : (!empty($post['dob']) ? trim($post['dob']) : null);
+            $dob = !empty($post['dob']) ? trim($post['dob']) : $billDob;
+
             $custCode = Customer::generateCustomerCode();
             $custId = Customer::create([
                 'user_id' => $userId,
@@ -269,6 +274,7 @@ class AdvisorController
                 'advisor_id' => (int) $advisor['id'],
                 'first_name' => trim($post['first_name']),
                 'last_name' => trim($post['last_name']),
+                'dob' => $dob,
                 'mobile' => $mobile,
                 'email' => !empty($post['email']) ? trim($post['email']) : null,
                 'state' => 'Odisha',
@@ -280,6 +286,8 @@ class AdvisorController
                 'address_line' => trim($post['address_line'] ?? ''),
                 'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
                 'consumer_number' => trim($post['consumer_number']),
+                'electricity_bill_mobile' => $billMobile,
+                'electricity_bill_dob' => $billDob,
                 'sanctioned_load_kw' => (float) ($post['sanctioned_load_kw'] ?? 2.0),
                 'proposed_solar_kw' => $proposedKw,
                 'monthly_avg_bill' => (float) ($post['monthly_avg_bill'] ?? 2500),
@@ -306,6 +314,8 @@ class AdvisorController
                 'pincode' => trim($post['pincode'] ?? '751020'),
                 'discom_name' => trim($post['discom_name'] ?? 'TPCODL'),
                 'consumer_number' => trim($post['consumer_number']),
+                'electricity_bill_mobile' => $billMobile,
+                'electricity_bill_dob' => $billDob,
                 'proposed_capacity_kw' => $proposedKw,
                 'estimated_project_cost' => $totalCost,
                 'subsidy_amount' => $centralSubsidy,

@@ -101,4 +101,51 @@ class LocationController
             'count' => count($results),
         ]);
     }
+
+    public function getDiscomByDistrict(): void
+    {
+        $district = trim($_GET['district'] ?? '');
+        if (empty($district)) {
+            Response::json(['success' => false, 'message' => 'District parameter is required']);
+            return;
+        }
+
+        $discom = \App\Models\Discom::getDiscomByDistrict($district);
+        if ($discom) {
+            Response::json([
+                'success' => true,
+                'district' => $district,
+                'discom' => $discom,
+                'discom_code' => $discom['discom_code'],
+                'discom_name' => $discom['discom_full_name'] ?? $discom['discom_code'],
+                'short_name' => $discom['short_name'] ?? $discom['discom_code']
+            ]);
+        } else {
+            Response::json([
+                'success' => false,
+                'district' => $district,
+                'message' => 'No DISCOM mapped for this district'
+            ]);
+        }
+    }
+
+    public function getDistrictDiscomMap(): void
+    {
+        $map = \App\Models\Discom::getDistrictLookupMap();
+        Response::json([
+            'success' => true,
+            'map' => $map,
+            'count' => count($map)
+        ]);
+    }
+
+    public function getDiscomList(): void
+    {
+        $providers = \App\Models\Discom::getAllActive();
+        Response::json([
+            'success' => true,
+            'discoms' => $providers,
+            'count' => count($providers)
+        ]);
+    }
 }

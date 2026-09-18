@@ -41,17 +41,20 @@ class Lead
                     lead_code, customer_id, advisor_id, lead_source,
                     first_name, last_name, mobile, email,
                     state, district, block, gram_panchayat, pincode,
-                    discom_name, consumer_number, proposed_capacity_kw,
+                    discom_name, consumer_number, electricity_bill_mobile, electricity_bill_dob, proposed_capacity_kw,
                     package_id, stage, status, estimated_project_cost,
                     subsidy_amount, state_subsidy, customer_payable_amount, created_at
                 ) VALUES (
                     ?, ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
-                    ?, ?, ?,
+                    ?, ?, ?, ?, ?,
                     ?, ?, ?, ?,
                     ?, ?, ?, NOW()
                 )";
+
+        $billDob = !empty($data['electricity_bill_dob']) ? $data['electricity_bill_dob'] : (!empty($data['dob']) ? $data['dob'] : null);
+        $billMobile = !empty($data['electricity_bill_mobile']) ? $data['electricity_bill_mobile'] : ($data['mobile'] ?? null);
 
         Database::query($sql, [
             $data['lead_code'],
@@ -69,6 +72,8 @@ class Lead
             $data['pincode'],
             $data['discom_name'] ?? 'TPCODL',
             $data['consumer_number'] ?? null,
+            $billMobile,
+            $billDob,
             $data['proposed_capacity_kw'] ?? 3.0,
             $data['package_id'] ?? 3,
             $data['stage'] ?? 'REGISTRATION',

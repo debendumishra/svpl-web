@@ -49,6 +49,15 @@ class User
             return self::findById((int)$cust['user_id']);
         }
 
+        // 4. Match by engineer code or mobile in engineers table
+        $eng = Database::fetchOne(
+            "SELECT user_id FROM engineers WHERE engineer_code = ? OR mobile = ?",
+            [$identifier, $identifier]
+        );
+        if ($eng && !empty($eng['user_id'])) {
+            return self::findById((int)$eng['user_id']);
+        }
+
         return null;
     }
 

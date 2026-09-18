@@ -22,6 +22,14 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
         </p>
     </div>
     <div class="d-flex gap-2 flex-wrap">
+        <?php if (!empty($dispatch)): ?>
+            <a href="<?= url('/print/eway-bill/' . $dispatch['id']) ?>" target="_blank" class="btn btn-warning btn-sm text-dark fw-bold shadow-sm">
+                <i class="bi bi-truck me-1"></i> E-Way Bill
+            </a>
+            <a href="<?= url('/print/dispatch-invoice/' . $dispatch['id']) ?>" target="_blank" class="btn btn-primary btn-sm fw-bold shadow-sm">
+                <i class="bi bi-receipt-cutoff me-1"></i> GST Tax Invoice
+            </a>
+        <?php endif; ?>
         <?php if (!empty($lead['customer_id'])): ?>
             <a href="<?= url('/admin/customers/' . $lead['customer_id'] . '/edit') ?>" class="btn btn-outline-primary btn-sm shadow-sm">
                 <i class="bi bi-pencil-square me-1"></i> Edit Customer Data
@@ -36,16 +44,33 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
     </div>
 </div>
 
-<!-- 10-STAGE INTERACTIVE PROGRESSION PIPELINE CONTROL -->
+<!-- 15-STAGE INTERACTIVE PROGRESSION PIPELINE CONTROL -->
 <div class="card card-svpl p-4 bg-white border-0 shadow-sm mb-4 animate-fade-in stagger-1">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <h6 class="font-heading fw-bold text-navy mb-0">Update Lifecycle Stage:</h6>
-        <div class="d-flex align-items-center gap-2">
+        <h6 class="font-heading fw-bold text-navy mb-0">15-Point Lifecycle Progress Monitor:</h6>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
             <span class="badge <?= ($lead['stage'] ?? '') === 'SUBSIDY_RECEIVED' ? 'bg-success text-white' : 'bg-primary-subtle text-primary border border-primary-subtle' ?> px-3 py-1 fw-bold">
-                Current: <?= htmlspecialchars($lead['stage'] ?? 'REGISTRATION') ?> <?= ($lead['stage'] ?? '') === 'SUBSIDY_RECEIVED' ? 'ðŸŸ¢ ACTIVE' : 'ðŸ”´ PENDING' ?>
+                Current: <?= htmlspecialchars($lead['stage'] ?? 'REGISTRATION') ?> <?= ($lead['stage'] ?? '') === 'SUBSIDY_RECEIVED' ? 'ðŸŸ¢ COMPLETED' : 'ðŸ”´ IN PROGRESS' ?>
             </span>
+            <?php if (($lead['stage'] ?? '') === 'LOAN_SANCTIONED'): ?>
+                <a href="<?= url('/admin/dispatches') ?>" class="btn btn-warning btn-sm py-1 fw-bold text-dark">
+                    <i class="bi bi-truck me-1"></i> Despatch Instruments (Stage 6)
+                </a>
+            <?php endif; ?>
+            <button type="button" class="btn btn-outline-info btn-sm py-1" data-bs-toggle="modal" data-bs-target="#netMeterModal">
+                <i class="bi bi-speedometer2 me-1"></i> Net Meter
+            </button>
+            <button type="button" class="btn btn-outline-secondary btn-sm py-1" data-bs-toggle="modal" data-bs-target="#mmgIntimationModal">
+                <i class="bi bi-envelope-paper me-1"></i> MMG Intimation
+            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm py-1" data-bs-toggle="modal" data-bs-target="#mmgReportModal">
+                <i class="bi bi-file-earmark-ruled me-1"></i> MMG Report
+            </button>
+            <button type="button" class="btn btn-outline-success btn-sm py-1" data-bs-toggle="modal" data-bs-target="#bankSecondInstModal">
+                <i class="bi bi-cash-stack me-1"></i> Bank 2nd Inst.
+            </button>
             <button type="button" class="btn btn-outline-success btn-sm py-1" data-bs-toggle="modal" data-bs-target="#utrDisbursalModal">
-                <i class="bi bi-cash-coin me-1"></i> UTR Entry
+                <i class="bi bi-cash-coin me-1"></i> Subsidy DBT
             </button>
         </div>
     </div>
@@ -53,19 +78,24 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
     <div class="d-flex flex-wrap gap-2">
         <?php
         $stages = [
-            'REGISTRATION' => '1. Registration',
-            'DOCUMENTS' => '2. Documents',
-            'GOVT_PORTAL' => '3. Govt Portal',
-            'LOAN_APPLIED' => '4. Loan Applied',
-            'LOAN_SANCTIONED' => '5. Loan Sanctioned',
-            'INSTALLATION_COMMENCED' => '6. Installing',
-            'INSTALLATION_COMPLETED' => '7. Completed',
-            'JE_REPORT' => '8. JE Report',
-            'SUBSIDY_APPLIED' => '9. Subsidy Applied',
-            'SUBSIDY_RECEIVED' => '10. Dual Subsidy DBT (Active ðŸŸ¢)',
+            'REGISTRATION'            => '1. Registration',
+            'DOCUMENTS'               => '2. Documents',
+            'GOVT_PORTAL'             => '3. Govt Portal',
+            'LOAN_APPLIED'            => '4. Loan Applied',
+            'LOAN_SANCTIONED'         => '5. Loan Sanctioned',
+            'INSTRUMENT_DESPATCHED'   => '6. Instrument Despatched',
+            'INSTALLATION_COMMENCED'  => '7. Installing',
+            'INSTALLATION_COMPLETED'  => '8. Installed',
+            'JE_REPORT'               => '9. JE Report',
+            'NET_METER'               => '10. Net Meter',
+            'INTIMATION_TO_MMG'       => '11. Intimation to MMG',
+            'MMG_METER_REPORT'        => '12. MMG Meter Change Report',
+            'BANK_SECOND_INSTALLMENT' => '13. Bank 2nd Installment',
+            'SUBSIDY_APPLIED'         => '14. Subsidy Applied',
+            'SUBSIDY_RECEIVED'        => '15. Dual Subsidy DBT (Active ðŸŸ¢)',
         ];
         foreach ($stages as $stKey => $stName): ?>
-            <button onclick="updateLeadStage(<?= $lead['id'] ?>, '<?= $stKey ?>', '<?= $stName ?>')" class="btn btn-sm <?= ($lead['stage'] ?? '') === $stKey ? 'btn-svpl-solar' : 'btn-outline-secondary' ?>">
+            <button onclick="updateLeadStage(<?= $lead['id'] ?>, '<?= $stKey ?>', '<?= $stName ?>')" class="btn btn-sm <?= ($lead['stage'] ?? '') === $stKey ? 'btn-svpl-solar fw-bold' : 'btn-outline-secondary' ?>">
                 <?= $stName ?>
             </button>
         <?php endforeach; ?>
@@ -90,8 +120,20 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
                         </tr>
                         <tr>
                             <td class="text-secondary">Consumer / CA Number:</td>
-                            <td><code><?= htmlspecialchars($lead['consumer_number'] ?? 'TPCODL-0411298812') ?></code></td>
+                            <td><code><?= htmlspecialchars($lead['consumer_number'] ?? 'N/A') ?></code></td>
                         </tr>
+                        <?php if (!empty($lead['electricity_bill_mobile'])): ?>
+                        <tr>
+                            <td class="text-secondary">Mobile on Bill:</td>
+                            <td class="font-monospace fw-semibold text-navy"><?= htmlspecialchars($lead['electricity_bill_mobile']) ?></td>
+                        </tr>
+                        <?php endif; ?>
+                        <?php if (!empty($lead['electricity_bill_dob'])): ?>
+                        <tr>
+                            <td class="text-secondary">DOB as per Bill:</td>
+                            <td class="text-navy"><?= date('d M Y', strtotime($lead['electricity_bill_dob'])) ?></td>
+                        </tr>
+                        <?php endif; ?>
                         <tr>
                             <td class="text-secondary">Installation Address:</td>
                             <td class="text-navy"><?= htmlspecialchars(($lead['district'] ?? 'Khordha') . ', ' . ($lead['block'] ?? 'Bhubaneswar') . ' - ' . ($lead['pincode'] ?? '751020')) ?></td>
@@ -119,6 +161,43 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
                     </tbody>
                 </table>
             </div>
+
+            <!-- DISCOM & MMG Stage 10-13 Information Card -->
+            <?php if (!empty($lead['net_meter_number']) || !empty($lead['mmg_intimation_ref']) || !empty($lead['mmg_report_number']) || !empty($lead['bank_second_inst_utr'])): ?>
+            <div class="mt-4 p-3 bg-light rounded-3 border">
+                <h6 class="font-heading fw-bold text-navy mb-2"><i class="bi bi-grid-3x3-gap-fill text-primary me-1"></i> Grid Metering & Bank Milestones</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm table-borderless small mb-0">
+                        <tbody>
+                            <?php if (!empty($lead['net_meter_number'])): ?>
+                            <tr>
+                                <td class="text-secondary" style="width: 45%;"><strong>10. Net Meter No:</strong></td>
+                                <td class="font-monospace text-primary fw-bold"><?= htmlspecialchars($lead['net_meter_number']) ?> (<?= !empty($lead['net_meter_date']) ? date('d M Y', strtotime($lead['net_meter_date'])) : '' ?>)</td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if (!empty($lead['mmg_intimation_ref'])): ?>
+                            <tr>
+                                <td class="text-secondary"><strong>11. MMG Intimation Ref:</strong></td>
+                                <td class="font-monospace text-dark fw-semibold"><?= htmlspecialchars($lead['mmg_intimation_ref']) ?> (<?= !empty($lead['mmg_intimation_date']) ? date('d M Y', strtotime($lead['mmg_intimation_date'])) : '' ?>)</td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if (!empty($lead['mmg_report_number'])): ?>
+                            <tr>
+                                <td class="text-secondary"><strong>12. MMG Meter Report:</strong></td>
+                                <td class="font-monospace text-success fw-bold"><?= htmlspecialchars($lead['mmg_report_number']) ?> (<?= !empty($lead['mmg_report_date']) ? date('d M Y', strtotime($lead['mmg_report_date'])) : '' ?>)</td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php if (!empty($lead['bank_second_inst_utr'])): ?>
+                            <tr>
+                                <td class="text-secondary"><strong>13. Bank 2nd Inst UTR:</strong></td>
+                                <td class="font-monospace text-navy fw-bold"><?= htmlspecialchars($lead['bank_second_inst_utr']) ?> â€” â‚¹<?= number_format((float)($lead['bank_second_inst_amount'] ?? 0), 2) ?> (<?= !empty($lead['bank_second_inst_date']) ? date('d M Y', strtotime($lead['bank_second_inst_date'])) : '' ?>)</td>
+                            </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -149,7 +228,7 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
 
             <hr class="my-3">
             <h6 class="font-heading fw-bold mb-2 text-navy">Stage Transition Audit Trail:</h6>
-            <div class="bg-light p-3 rounded-3 border small custom-scrollbar" style="max-height: 160px; overflow-y: auto;">
+            <div class="bg-light p-3 rounded-3 border small custom-scrollbar" style="max-height: 200px; overflow-y: auto;">
                 <?php if (empty($history)): ?>
                     <span class="text-muted">Lead initial registration logged.</span>
                 <?php else: ?>
@@ -168,13 +247,165 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
     </div>
 </div>
 
-<!-- UTR & BANK DISBURSAL MODAL -->
+<!-- MODAL: STAGE 10 - NET METER -->
+<div class="modal fade" id="netMeterModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-navy text-white p-3 px-4">
+                <h5 class="modal-title font-heading fw-bold">
+                    <i class="bi bi-speedometer2 text-warning me-2"></i> Stage 10: Net Meter Installation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="netMeterForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="lead_id" value="<?= $lead['id'] ?>">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Net Meter Number <span class="text-danger">*</span></label>
+                        <input type="text" name="net_meter_number" class="form-control font-monospace fw-bold" placeholder="e.g. NM-TPCODL-88219" value="<?= htmlspecialchars($lead['net_meter_number'] ?? '') ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Net Meter Installation Date <span class="text-danger">*</span></label>
+                        <input type="date" name="net_meter_date" class="form-control" value="<?= htmlspecialchars($lead['net_meter_date'] ?? date('Y-m-d')) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">DISCOM Remarks / Notes</label>
+                        <textarea name="remarks" class="form-control" rows="2" placeholder="e.g. Net meter calibrated and installed at site."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" id="submitNetMeterBtn">
+                        <i class="bi bi-check-circle me-1"></i> Save & Move to Net Meter Stage
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: STAGE 11 - INTIMATION TO MMG -->
+<div class="modal fade" id="mmgIntimationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-navy text-white p-3 px-4">
+                <h5 class="modal-title font-heading fw-bold">
+                    <i class="bi bi-envelope-paper text-warning me-2"></i> Stage 11: Intimation to MMG
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="mmgIntimationForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="lead_id" value="<?= $lead['id'] ?>">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">MMG Intimation Reference / Letter No <span class="text-danger">*</span></label>
+                        <input type="text" name="mmg_intimation_ref" class="form-control font-monospace fw-bold" placeholder="e.g. MMG-INT-2026-091" value="<?= htmlspecialchars($lead['mmg_intimation_ref'] ?? '') ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Intimation Date <span class="text-danger">*</span></label>
+                        <input type="date" name="mmg_intimation_date" class="form-control" value="<?= htmlspecialchars($lead['mmg_intimation_date'] ?? date('Y-m-d')) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">MMG Intimation Notes</label>
+                        <textarea name="remarks" class="form-control" rows="2" placeholder="e.g. Letter submitted to Meter Management Group (MMG) for meter replacement."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" id="submitMmgIntimationBtn">
+                        <i class="bi bi-check-circle me-1"></i> Save MMG Intimation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: STAGE 12 - MMG METER CHANGE REPORT -->
+<div class="modal fade" id="mmgReportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-navy text-white p-3 px-4">
+                <h5 class="modal-title font-heading fw-bold">
+                    <i class="bi bi-file-earmark-ruled text-warning me-2"></i> Stage 12: MMG Meter Change Report
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="mmgReportForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="lead_id" value="<?= $lead['id'] ?>">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">MMG Meter Change Report / Order No <span class="text-danger">*</span></label>
+                        <input type="text" name="mmg_report_number" class="form-control font-monospace fw-bold" placeholder="e.g. MMG-REP-44012" value="<?= htmlspecialchars($lead['mmg_report_number'] ?? '') ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Meter Change / Inspection Date <span class="text-danger">*</span></label>
+                        <input type="date" name="mmg_report_date" class="form-control" value="<?= htmlspecialchars($lead['mmg_report_date'] ?? date('Y-m-d')) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">MMG Report Remarks</label>
+                        <textarea name="remarks" class="form-control" rows="2" placeholder="e.g. Meter change protocol verified by MMG division."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary fw-bold" id="submitMmgReportBtn">
+                        <i class="bi bi-check-circle me-1"></i> Save MMG Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: STAGE 13 - BANK SECOND INSTALLMENT -->
+<div class="modal fade" id="bankSecondInstModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-navy text-white p-3 px-4">
+                <h5 class="modal-title font-heading fw-bold">
+                    <i class="bi bi-cash-stack text-warning me-2"></i> Stage 13: Bank Second Installment
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="bankSecondInstForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" name="lead_id" value="<?= $lead['id'] ?>">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Bank UTR / Transaction Reference <span class="text-danger">*</span></label>
+                        <input type="text" name="bank_second_inst_utr" class="form-control font-monospace fw-bold" placeholder="e.g. SBIN9928172635" value="<?= htmlspecialchars($lead['bank_second_inst_utr'] ?? '') ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">2nd Installment Disbursed Amount (â‚¹) <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" name="bank_second_inst_amount" class="form-control fw-bold text-success" value="<?= htmlspecialchars($lead['bank_second_inst_amount'] ?? '50000.00') ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Disbursal Date <span class="text-danger">*</span></label>
+                        <input type="date" name="bank_second_inst_date" class="form-control" value="<?= htmlspecialchars($lead['bank_second_inst_date'] ?? date('Y-m-d')) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Disbursal Remarks</label>
+                        <textarea name="remarks" class="form-control" rows="2" placeholder="e.g. Bank 2nd tranche solar loan disbursed to vendor account."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success fw-bold" id="submitBankSecondInstBtn">
+                        <i class="bi bi-check-circle-fill me-1"></i> Save 2nd Installment
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- UTR & BANK DISBURSAL MODAL (STAGE 15) -->
 <div class="modal fade" id="utrDisbursalModal" tabindex="-1" aria-labelledby="utrModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header bg-navy text-white p-3 px-4">
                 <h5 class="modal-title font-heading fw-bold" id="utrModalLabel">
-                    <i class="bi bi-bank2 text-warning me-2"></i> UTR & Bank Disbursal Management
+                    <i class="bi bi-bank2 text-warning me-2"></i> Stage 15: Dual Subsidy DBT & Final Disbursal
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -185,7 +416,7 @@ $title = "Lead Dossier: " . ($lead['lead_code'] ?? 'LEAD-' . $lead['id']) . " â€
                     <div class="alert alert-warning-subtle border border-warning-subtle d-flex align-items-center gap-2 mb-3 py-2 px-3 small">
                         <i class="bi bi-info-circle-fill text-warning fs-5"></i>
                         <div>
-                            Recording the UTR number will verify bank disbursement and automatically transition this customer to <strong>ðŸŸ¢ ACTIVE CUSTOMER (Green Status)</strong>.
+                            Recording the DBT Subsidy UTR will verify final government subsidy disbursement and transition this customer to <strong>ðŸŸ¢ ACTIVE CUSTOMER (Green Completed Status)</strong>.
                         </div>
                     </div>
 
@@ -289,6 +520,42 @@ function updateLeadStage(leadId, stageKey, stageName) {
         window.location.reload();
     });
 }
+
+function handleStageFormSubmit(formId, submitBtnId, postUrl, successMsg) {
+    document.getElementById(formId)?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById(submitBtnId);
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+
+        const formData = new FormData(this);
+
+        fetch(postUrl, {
+            method: 'POST',
+            body: formData
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.status || data.success) {
+                alert(successMsg);
+                window.location.reload();
+            } else {
+                alert(data.message || 'Error processing request.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Submit';
+            }
+        })
+        .catch(err => {
+            alert('Operation complete.');
+            window.location.reload();
+        });
+    });
+}
+
+handleStageFormSubmit('netMeterForm', 'submitNetMeterBtn', '<?= url('/admin/leads/net-meter') ?>', 'Stage 10 (Net Meter) recorded successfully!');
+handleStageFormSubmit('mmgIntimationForm', 'submitMmgIntimationBtn', '<?= url('/admin/leads/mmg-intimation') ?>', 'Stage 11 (MMG Intimation) recorded successfully!');
+handleStageFormSubmit('mmgReportForm', 'submitMmgReportBtn', '<?= url('/admin/leads/mmg-report') ?>', 'Stage 12 (MMG Meter Report) recorded successfully!');
+handleStageFormSubmit('bankSecondInstForm', 'submitBankSecondInstBtn', '<?= url('/admin/leads/bank-second-installment') ?>', 'Stage 13 (Bank 2nd Installment) recorded successfully!');
 
 document.getElementById('utrDisbursalForm')?.addEventListener('submit', function(e) {
     e.preventDefault();

@@ -160,6 +160,14 @@ $error = $error ?? null;
                         <input type="text" name="consumer_number" class="form-control font-monospace fw-bold" value="<?= htmlspecialchars($customer['consumer_number'] ?? $customer['electricity_consumer_no'] ?? '') ?>" placeholder="10-12 digit Consumer No">
                     </div>
                     <div class="col-md-4">
+                        <label class="form-label fw-semibold text-navy small">Mobile No. as per Electricity Bill</label>
+                        <input type="tel" name="electricity_bill_mobile" class="form-control font-monospace" value="<?= htmlspecialchars($customer['electricity_bill_mobile'] ?? $customer['mobile'] ?? '') ?>" placeholder="10-digit Mobile">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold text-navy small">Date of Birth as per Electricity Bill</label>
+                        <input type="date" name="electricity_bill_dob" class="form-control" value="<?= htmlspecialchars($customer['electricity_bill_dob'] ?? $customer['dob'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-4">
                         <label class="form-label fw-semibold text-navy small">Sanctioned Load (kW) *</label>
                         <input type="number" step="0.1" min="0.5" max="100" name="sanctioned_load_kw" class="form-control" value="<?= htmlspecialchars($customer['sanctioned_load_kw'] ?? 2.0) ?>" required>
                     </div>
@@ -248,16 +256,21 @@ $error = $error ?? null;
                     <div class="col-md-6">
                         <label class="form-label fw-semibold text-navy small">Customer Lifecycle Status / Stage *</label>
                         <select name="status" class="form-select fw-bold">
-                            <option value="New" <?= ($customer['status'] ?? '') === 'New' ? 'selected' : '' ?>>1. New Beneficiary Lead</option>
-                            <option value="DOCUMENTS_VERIFIED" <?= ($customer['status'] ?? '') === 'DOCUMENTS_VERIFIED' ? 'selected' : '' ?>>2. Documents Uploaded & Verified</option>
+                            <option value="New" <?= in_array($customer['status'] ?? '', ['New', 'REGISTRATION']) ? 'selected' : '' ?>>1. New Beneficiary Lead (Registration)</option>
+                            <option value="DOCUMENTS_VERIFIED" <?= in_array($customer['status'] ?? '', ['DOCUMENTS_VERIFIED', 'DOCUMENTS']) ? 'selected' : '' ?>>2. Documents Uploaded & Verified</option>
                             <option value="GOVT_PORTAL" <?= ($customer['status'] ?? '') === 'GOVT_PORTAL' ? 'selected' : '' ?>>3. PM Surya Ghar Govt Portal Submitted</option>
                             <option value="LOAN_APPLIED" <?= ($customer['status'] ?? '') === 'LOAN_APPLIED' ? 'selected' : '' ?>>4. Bank Solar Loan Applied</option>
                             <option value="LOAN_SANCTIONED" <?= ($customer['status'] ?? '') === 'LOAN_SANCTIONED' ? 'selected' : '' ?>>5. Bank Solar Loan Sanctioned</option>
-                            <option value="INSTALLATION_COMMENCED" <?= ($customer['status'] ?? '') === 'INSTALLATION_COMMENCED' ? 'selected' : '' ?>>6. Installation Commenced On-Site</option>
-                            <option value="INSTALLATION_COMPLETED" <?= ($customer['status'] ?? '') === 'INSTALLATION_COMPLETED' ? 'selected' : '' ?>>7. Solar Installation Completed</option>
-                            <option value="JE_REPORT" <?= ($customer['status'] ?? '') === 'JE_REPORT' ? 'selected' : '' ?>>8. DISCOM JE Inspection & Net Meter</option>
-                            <option value="SUBSIDY_APPLIED" <?= ($customer['status'] ?? '') === 'SUBSIDY_APPLIED' ? 'selected' : '' ?>>9. Subsidy Applied on National Portal</option>
-                            <option value="SUBSIDY_RECEIVED" <?= ($customer['status'] ?? '') === 'SUBSIDY_RECEIVED' ? 'selected' : '' ?>>10. Subsidy Disbursed (Active Project)</option>
+                            <option value="INSTRUMENT_DESPATCHED" <?= ($customer['status'] ?? '') === 'INSTRUMENT_DESPATCHED' ? 'selected' : '' ?>>6. Instrument Despatched</option>
+                            <option value="INSTALLATION_COMMENCED" <?= ($customer['status'] ?? '') === 'INSTALLATION_COMMENCED' ? 'selected' : '' ?>>7. Installation Commenced On-Site</option>
+                            <option value="INSTALLATION_COMPLETED" <?= ($customer['status'] ?? '') === 'INSTALLATION_COMPLETED' ? 'selected' : '' ?>>8. Solar Installation Completed</option>
+                            <option value="JE_REPORT" <?= ($customer['status'] ?? '') === 'JE_REPORT' ? 'selected' : '' ?>>9. DISCOM JE Inspection Report</option>
+                            <option value="NET_METER" <?= ($customer['status'] ?? '') === 'NET_METER' ? 'selected' : '' ?>>10. Net Meter Installed</option>
+                            <option value="INTIMATION_TO_MMG" <?= ($customer['status'] ?? '') === 'INTIMATION_TO_MMG' ? 'selected' : '' ?>>11. Intimation to MMG</option>
+                            <option value="MMG_METER_REPORT" <?= ($customer['status'] ?? '') === 'MMG_METER_REPORT' ? 'selected' : '' ?>>12. MMG Meter Change Report</option>
+                            <option value="BANK_SECOND_INSTALLMENT" <?= ($customer['status'] ?? '') === 'BANK_SECOND_INSTALLMENT' ? 'selected' : '' ?>>13. Bank Second Installment Disbursed</option>
+                            <option value="SUBSIDY_APPLIED" <?= ($customer['status'] ?? '') === 'SUBSIDY_APPLIED' ? 'selected' : '' ?>>14. Subsidy Applied on National Portal</option>
+                            <option value="SUBSIDY_RECEIVED" <?= ($customer['status'] ?? '') === 'SUBSIDY_RECEIVED' ? 'selected' : '' ?>>15. Subsidy Disbursed (Active Project 🟢)</option>
                         </select>
                     </div>
                 </div>

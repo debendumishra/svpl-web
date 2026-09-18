@@ -6,9 +6,11 @@
 
 namespace App\Services;
 
+use App\Helpers\Database;
 use App\Models\User;
 use App\Models\Advisor;
 use App\Models\Customer;
+use App\Models\Engineer;
 use App\Models\AuditLog;
 
 class AuthService
@@ -77,6 +79,16 @@ class AuthService
         } elseif ($user['role'] === 'BOE') {
             $_SESSION['employee_code'] = $user['employee_code'] ?? ('SVPL-BOE-' . $user['id']);
             $_SESSION['designation'] = $user['designation'] ?? 'Back Office Executive';
+        } elseif ($user['role'] === 'ENGINEER') {
+            $eng = Database::fetchOne("SELECT id, engineer_code, designation FROM engineers WHERE user_id = ?", [$user['id']]);
+            if ($eng) {
+                $_SESSION['engineer_id'] = (int) $eng['id'];
+                $_SESSION['engineer_code'] = $eng['engineer_code'];
+                $_SESSION['designation'] = $eng['designation'] ?? 'Site Project Engineer';
+            } else {
+                $_SESSION['engineer_code'] = $user['employee_code'] ?? ('SVPL-ENG-' . $user['id']);
+                $_SESSION['designation'] = $user['designation'] ?? 'Site Project Engineer';
+            }
         }
 
         User::updateLastLogin((int) $user['id']);

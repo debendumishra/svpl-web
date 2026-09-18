@@ -1,7 +1,7 @@
 <?php
 /**
  * Surya Vistaara Pvt. Ltd. (SVPL)
- * Customer Controller - Customer Portal, Live Solar Progress, Quotation, Document Uploads
+ * Customer Controller - Customer Portal, Live Solar Progress, Quotation, Document Uploads, Dispatch Receipt
  */
 
 namespace App\Controllers;
@@ -12,6 +12,8 @@ use App\Models\Customer;
 use App\Models\Lead;
 use App\Models\Document;
 use App\Models\Quotation;
+use App\Models\PackageDispatch;
+use App\Models\AuditLog;
 
 class CustomerController
 {
@@ -28,6 +30,9 @@ class CustomerController
         $lead = Lead::findByCustomerCode($customer['customer_code']);
         $quotation = $lead ? Quotation::findByLeadId((int) $lead['id']) : null;
         $documents = Document::getByCustomerId((int) $customer['id']);
+        
+        // Fetch latest equipment dispatch for this customer
+        $dispatch = PackageDispatch::findByCustomerId((int) $customer['id']);
 
         Response::view('customer/dashboard', [
             'pageTitle' => 'My Solar Portal — SVPL Customer',
@@ -35,7 +40,60 @@ class CustomerController
             'lead' => $lead,
             'quotation' => $quotation,
             'documents' => $documents,
+            'dispatch' => $dispatch,
         ]);
+    }
+
+    public function acknowledgeDispatch(): void
+    {
+        $user = AuthService::user();
+        $customer = Customer::findByUserId((int) $user['id']);
+
+        if (!$customer || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::redirect('/customer/dashboard');
+            return;
+        }
+
+        $dispatchId = (int)($_POST['dispatch_id'] ?? 0);
+        $notes = trim($_POST['notes'] ?? 'Received and verified by customer');
+
+        if ($dispatchId <= 0) {
+            $_SESSION['error_msg'] = "Invalid dispatch selected.";
+            Response::redirect('/customer/dashboard');
+            return;
+        }
+
+        $dispatch = PackageDispatch::findById($dispatchId);
+        if (!$dispatch || (int)$dispatch['customer_id'] !== (int)$customer['id']) {
+            $_SESSION['error_msg'] = "Unauthorized or dispatch record not found.";
+            Response::redirect('/customer/dashboard');
+            return;
+        }
+
+        // Acknowledge receipt
+        PackageDispatch::acknowledgeReceipt($dispatchId, $notes);
+
+        // Advance Lead stage if at Stage 6 (INSTRUMENT_DISPATCHED)
+        $lead = Lead::findByCustomerCode($customer['customer_code']);
+        if ($lead && in_array($lead['lead_stage'] ?? '', ['INSTRUMENT_DISPATCHED', 'FEASIBILITY_APPROVED', 'LOAN_APPROVED'])) {
+            Lead::updateStage(
+                (int)$lead['id'],
+                'INSTALLATION_COMMENCED',
+                7,
+                'Customer acknowledged delivery of solar equipment. Ready for rooftop installation.'
+            );
+        }
+
+        AuditLog::log(
+            $user['id'],
+            'CUSTOMER_ACKNOWLEDGE_RECEIPT',
+            'package_dispatches',
+            $dispatchId,
+            "Customer {$customer['customer_code']} acknowledged receipt of solar equipment (LR: {$dispatch['tracking_number']})"
+        );
+
+        $_SESSION['success_msg'] = "Thank you! Equipment receipt successfully confirmed. Your assigned solar engineer has been notified to commence rooftop installation!";
+        Response::redirect('/customer/dashboard');
     }
 
     public function quotation(): void

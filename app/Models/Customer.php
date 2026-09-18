@@ -39,18 +39,23 @@ class Customer
     public static function create(array $data): int
     {
         $sql = "INSERT INTO customers (
-                    user_id, customer_code, advisor_id, first_name, last_name,
+                    user_id, customer_code, advisor_id, first_name, last_name, dob,
                     mobile, email, state, district, block, gram_panchayat,
                     village, pincode, address_line, discom_name, consumer_number,
+                    electricity_bill_mobile, electricity_bill_dob,
                     sanctioned_load_kw, proposed_solar_kw, monthly_avg_bill,
                     roof_type, roof_area_sqft, status, assigned_boe_id, created_at
                 ) VALUES (
-                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?,
+                    ?, ?,
                     ?, ?, ?,
                     ?, ?, ?, ?, NOW()
                 )";
+
+        $billDob = !empty($data['electricity_bill_dob']) ? $data['electricity_bill_dob'] : (!empty($data['dob']) ? $data['dob'] : null);
+        $dob = !empty($data['dob']) ? $data['dob'] : $billDob;
 
         Database::execute($sql, [
             $data['user_id'] ?? null,
@@ -58,6 +63,7 @@ class Customer
             $data['advisor_id'] ?? null,
             $data['first_name'],
             $data['last_name'],
+            $dob,
             $data['mobile'],
             $data['email'] ?? null,
             $data['state'] ?? 'Odisha',
@@ -69,6 +75,8 @@ class Customer
             $data['address_line'] ?? null,
             $data['discom_name'] ?? 'TPCODL',
             $data['consumer_number'] ?? null,
+            $data['electricity_bill_mobile'] ?? $data['mobile'] ?? null,
+            $billDob,
             $data['sanctioned_load_kw'] ?? 2.0,
             $data['proposed_solar_kw'] ?? 2.0,
             $data['monthly_avg_bill'] ?? null,
@@ -157,10 +165,11 @@ class Customer
     public static function update(int $id, array $data): bool
     {
         $sql = "UPDATE customers SET 
-                    first_name = ?, last_name = ?, full_name = ?, father_husband_name = ?,
+                    first_name = ?, last_name = ?, full_name = ?, father_husband_name = ?, dob = ?,
                     mobile = ?, alt_mobile = ?, email = ?,
                     state = ?, district = ?, block = ?, gram_panchayat = ?, village = ?, pincode = ?, address_line = ?,
                     discom_name = ?, discom = ?, consumer_number = ?, electricity_consumer_no = ?,
+                    electricity_bill_mobile = ?, electricity_bill_dob = ?,
                     sanctioned_load_kw = ?, proposed_solar_kw = ?, monthly_avg_bill = ?,
                     roof_type = ?, roof_area_sqft = ?,
                     bank_name = ?, bank_branch = ?, account_holder = ?, account_number = ?, ifsc_code = ?,
@@ -171,12 +180,16 @@ class Customer
         $discom = $data['discom_name'] ?? 'TPCODL';
         $consumerNo = $data['consumer_number'] ?? null;
         $fullName = trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''));
+        $billDob = !empty($data['electricity_bill_dob']) ? $data['electricity_bill_dob'] : (!empty($data['dob']) ? $data['dob'] : null);
+        $dob = !empty($data['dob']) ? $data['dob'] : $billDob;
+        $billMobile = !empty($data['electricity_bill_mobile']) ? $data['electricity_bill_mobile'] : ($data['mobile'] ?? null);
 
         $res = Database::execute($sql, [
             $data['first_name'],
             $data['last_name'],
             $fullName,
             $data['father_husband_name'] ?? $data['father_spouse_name'] ?? null,
+            $dob,
             $data['mobile'],
             $data['alt_mobile'] ?? null,
             $data['email'] ?? null,
@@ -191,6 +204,8 @@ class Customer
             $discom,
             $consumerNo,
             $consumerNo,
+            $billMobile,
+            $billDob,
             !empty($data['sanctioned_load_kw']) ? (float)$data['sanctioned_load_kw'] : 2.0,
             !empty($data['proposed_solar_kw']) ? (float)$data['proposed_solar_kw'] : 3.0,
             !empty($data['monthly_avg_bill']) ? (float)$data['monthly_avg_bill'] : null,

@@ -187,16 +187,54 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
 
                     </div>
 
-                    <!-- Location -->
+                    <!-- Location & DISCOM Provider -->
                     <h5 class="fw-bold mb-3" style="color: #0B2545; border-bottom: 2px solid #E2E8F0; padding-bottom: 8px;">
-                        3. Installation Address & Land Ownership (Odisha)
+                        3. Installation Address & DISCOM Electricity Connection (Odisha)
                     </h5>
+                    <?php 
+                        $publicDiscoms = \App\Models\Discom::getAllActive();
+                        $publicDiscomMap = \App\Models\Discom::getDistrictLookupMap();
+                    ?>
                     <div class="row g-3 mb-4">
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label fw-semibold">District *</label>
                             <select name="district" id="selectDistrict" class="form-select select-district" data-initial="<?= htmlspecialchars($post['district'] ?? '') ?>" required>
                                 <option value="">Select District</option>
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">DISCOM Provider *</label>
+                            <select name="discom_name" id="selectPublicDiscom" class="form-select fw-bold" required>
+                                <option value="">-- Choose DISCOM --</option>
+                                <?php foreach ($publicDiscoms as $pd): ?>
+                                    <option value="<?= htmlspecialchars($pd['code']) ?>" <?= (($post['discom_name'] ?? '') === $pd['code']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($pd['name']) ?> (<?= htmlspecialchars($pd['code']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <div class="mt-1" id="publicDiscomAutoBadge">
+                                <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Auto-selected on District selection.</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Electricity Consumer / CA Number *</label>
+                            <input type="text" name="consumer_number" class="form-control font-monospace text-primary fw-bold" placeholder="As on electricity bill" value="<?= htmlspecialchars($post['consumer_number'] ?? '') ?>" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Mobile No. as per Electricity Bill *</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-secondary font-monospace">+91</span>
+                                <input type="tel" name="electricity_bill_mobile" id="inputPublicBillMobile" class="form-control font-monospace" placeholder="10-digit Mobile Number on Bill" pattern="[6-9][0-9]{9}" maxlength="10" value="<?= htmlspecialchars($post['electricity_bill_mobile'] ?? $post['mobile'] ?? '') ?>" required>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyPublicPrimaryMobile()" title="Same as Contact Mobile">
+                                    <i class="bi bi-arrow-down-left-square"></i> Same
+                                </button>
+                            </div>
+                            <div class="form-text small" style="font-size: 0.72rem;">Mobile registered with your DISCOM account.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Date of Birth as per Electricity Bill *</label>
+                            <input type="date" name="electricity_bill_dob" id="inputPublicBillDob" class="form-control fw-semibold" value="<?= htmlspecialchars($post['electricity_bill_dob'] ?? $post['dob'] ?? '') ?>" required max="<?= date('Y-m-d', strtotime('-18 years')) ?>">
+                            <div class="form-text small" style="font-size: 0.72rem;">Birth date of electricity connection holder.</div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label fw-semibold">Block / Municipality *</label>
@@ -218,7 +256,7 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
                             <label class="form-label fw-semibold">Pincode *</label>
                             <input type="text" name="pincode" id="inputPincode" class="form-control input-pincode font-monospace" placeholder="6-digit PIN" maxlength="6" data-initial="<?= htmlspecialchars($post['pincode'] ?? '') ?>" value="<?= htmlspecialchars($post['pincode'] ?? '') ?>" required>
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-12">
                             <label class="form-label fw-semibold">Full House / Plot Address</label>
                             <input type="text" name="address_line" class="form-control" placeholder="House No, Street, Landmark" value="<?= htmlspecialchars($post['address_line'] ?? '') ?>">
                         </div>
@@ -261,6 +299,48 @@ $title = "Apply for PM Surya Ghar Rooftop Solar — SVPL Odisha";
 </div>
 
 <script>
+const PUBLIC_DISTRICT_DISCOM_MAP = <?= json_encode($publicDiscomMap ?? \App\Models\Discom::getDistrictLookupMap()) ?>;
+
+function onPublicDistrictChange(districtName) {
+    if (!districtName) return;
+    const cleanDist = districtName.trim();
+    const discomSelect = document.getElementById('selectPublicDiscom');
+    const badgeEl = document.getElementById('publicDiscomAutoBadge');
+    if (!discomSelect) return;
+
+    let matchedCode = null;
+    let matchedName = null;
+
+    if (PUBLIC_DISTRICT_DISCOM_MAP[cleanDist]) {
+        matchedCode = PUBLIC_DISTRICT_DISCOM_MAP[cleanDist].discom_code;
+        matchedName = PUBLIC_DISTRICT_DISCOM_MAP[cleanDist].discom_name;
+    } else {
+        const lower = cleanDist.toLowerCase();
+        for (const [k, v] of Object.entries(PUBLIC_DISTRICT_DISCOM_MAP)) {
+            if (k.toLowerCase() === lower || k.toLowerCase().includes(lower) || lower.includes(k.toLowerCase())) {
+                matchedCode = v.discom_code;
+                matchedName = v.discom_name;
+                break;
+            }
+        }
+    }
+
+    if (matchedCode) {
+        discomSelect.value = matchedCode;
+        if (badgeEl) {
+            badgeEl.innerHTML = `<span class="badge bg-success text-white py-1 px-2 border"><i class="bi bi-check-circle-fill me-1"></i> Auto-selected: <strong>${matchedCode}</strong> (${matchedName})</span>`;
+        }
+    }
+}
+
+function copyPublicPrimaryMobile() {
+    const primaryMobile = document.querySelector('input[name="mobile"]')?.value || '';
+    const billMobileInput = document.getElementById('inputPublicBillMobile');
+    if (billMobileInput) {
+        billMobileInput.value = primaryMobile;
+    }
+}
+
 function onPackageChange(sel) {
     const opt = sel.options[sel.selectedIndex];
     if (!opt || !opt.value) {
@@ -308,6 +388,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const pkgSelect = document.getElementById('selectCustomerPackage');
     if (pkgSelect) {
         onPackageChange(pkgSelect);
+    }
+
+    const distSelect = document.getElementById('selectDistrict');
+    if (distSelect) {
+        distSelect.addEventListener('change', function() {
+            onPublicDistrictChange(this.value);
+        });
+        setTimeout(function() {
+            if (distSelect.value) {
+                onPublicDistrictChange(distSelect.value);
+            }
+        }, 500);
     }
 });
 </script>

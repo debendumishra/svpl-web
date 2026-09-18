@@ -6,16 +6,21 @@ $assignedBoeEmail = $customer['boe_email'] ?? null;
 $assignedBoeDesg = $customer['boe_designation'] ?? 'Back Office Executive';
 
 $stages = [
-    'REGISTRATION' => 'Stage 1: Registration',
-    'DOCUMENTS' => 'Stage 2: Documents Verification',
-    'GOVT_PORTAL' => 'Stage 3: Govt Portal Submission',
-    'LOAN_APPLIED' => 'Stage 4: Loan Applied',
-    'LOAN_SANCTIONED' => 'Stage 5: Loan Sanctioned',
-    'INSTALLATION_COMMENCED' => 'Stage 6: Installation Commenced',
-    'INSTALLATION_COMPLETED' => 'Stage 7: Installation Completed',
-    'JE_REPORT' => 'Stage 8: Joint Inspection (JE Report)',
-    'SUBSIDY_APPLIED' => 'Stage 9: Subsidy Applied',
-    'SUBSIDY_RECEIVED' => 'Stage 10: Subsidy Disbursed',
+    'REGISTRATION'            => 'Stage 1: Registration',
+    'DOCUMENTS'               => 'Stage 2: Documents Verification',
+    'GOVT_PORTAL'             => 'Stage 3: Govt Portal Submission',
+    'LOAN_APPLIED'            => 'Stage 4: Loan Applied',
+    'LOAN_SANCTIONED'         => 'Stage 5: Loan Sanctioned',
+    'INSTRUMENT_DESPATCHED'   => 'Stage 6: Instrument Despatched',
+    'INSTALLATION_COMMENCED'  => 'Stage 7: Installation Commenced',
+    'INSTALLATION_COMPLETED'  => 'Stage 8: Installation Completed',
+    'JE_REPORT'               => 'Stage 9: Joint Inspection (JE Report)',
+    'NET_METER'               => 'Stage 10: Net Meter Installed',
+    'INTIMATION_TO_MMG'       => 'Stage 11: Intimation to MMG',
+    'MMG_METER_REPORT'        => 'Stage 12: MMG Meter Change Report',
+    'BANK_SECOND_INSTALLMENT' => 'Stage 13: Bank 2nd Installment',
+    'SUBSIDY_APPLIED'         => 'Stage 14: Subsidy Applied',
+    'SUBSIDY_RECEIVED'        => 'Stage 15: Subsidy Disbursed (Active 🟢)',
 ];
 
 $requiredDocs = [
@@ -81,6 +86,18 @@ $requiredDocs = [
                         <span class="text-muted"><i class="bi bi-hash me-1"></i> Consumer No:</span>
                         <strong><?= htmlspecialchars($customer['consumer_number'] ?? 'N/A') ?></strong>
                     </li>
+                    <?php if (!empty($customer['electricity_bill_mobile'])): ?>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted"><i class="bi bi-phone text-success me-1"></i> Bill Mobile:</span>
+                        <strong class="font-monospace"><?= htmlspecialchars($customer['electricity_bill_mobile']) ?></strong>
+                    </li>
+                    <?php endif; ?>
+                    <?php if (!empty($customer['electricity_bill_dob'])): ?>
+                    <li class="list-group-item d-flex justify-content-between px-0">
+                        <span class="text-muted"><i class="bi bi-calendar-event text-primary me-1"></i> Bill DOB:</span>
+                        <strong><?= date('d M Y', strtotime($customer['electricity_bill_dob'])) ?></strong>
+                    </li>
+                    <?php endif; ?>
                     <li class="list-group-item d-flex justify-content-between px-0">
                         <span class="text-muted"><i class="bi bi-sun text-warning me-1"></i> Proposed Solar:</span>
                         <strong class="text-success"><?= htmlspecialchars($customer['proposed_solar_kw'] ?? 3.0) ?> kW</strong>

@@ -55,6 +55,8 @@ class Response
         if ($layout === null) {
             if (strpos($cleanView, 'admin/') === 0 || strpos($cleanView, 'manager/') === 0) {
                 $layout = 'layouts/admin';
+            } elseif (strpos($cleanView, 'engineer/') === 0) {
+                $layout = 'layouts/engineer';
             } elseif (strpos($cleanView, 'boe/') === 0) {
                 $layout = 'layouts/boe';
             } elseif (strpos($cleanView, 'advisor/') === 0) {
@@ -80,6 +82,7 @@ class Response
 
         // Map shorthand layout names to layouts/ directory (handles view-level $layout overrides)
         $layoutAliases = [
+            'engineer' => 'layouts/engineer',
             'boe' => 'layouts/boe',
             'admin' => 'layouts/admin',
             'advisor' => 'layouts/advisor',

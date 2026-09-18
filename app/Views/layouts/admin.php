@@ -134,7 +134,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/leads') !== false ? 'active' : '' ?>" href="<?= url('/admin/leads') ?>">
-                                    <i class="bi bi-kanban"></i> <span>10-Stage Pipeline</span>
+                                    <i class="bi bi-kanban"></i> <span>15-Point Pipeline</span>
                                 </a>
                             </li>
                         </ul>
@@ -178,8 +178,23 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/discoms') !== false || strpos($activeUri, '/manager/discoms') !== false) ? 'active' : '' ?>" href="<?= url('/admin/discoms') ?>">
+                                    <i class="bi bi-lightning-charge-fill text-warning"></i> <span>DISCOM Providers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/dispatches') !== false || strpos($activeUri, '/manager/dispatches') !== false) ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
                                     <i class="bi bi-box-seam"></i> <span>Dispatches & Kits</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/instruments') !== false || strpos($activeUri, '/manager/instruments') !== false) ? 'active' : '' ?>" href="<?= url('/admin/instruments') ?>">
+                                    <i class="bi bi-tools text-warning"></i> <span>Instruments & BOS Items</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/engineers') !== false || strpos($activeUri, '/manager/engineers') !== false) ? 'active' : '' ?>" href="<?= url('/admin/engineers') ?>">
+                                    <i class="bi bi-person-badge-fill text-warning"></i> <span>Engineers Desk</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -288,7 +303,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/leads') !== false ? 'active' : '' ?>" href="<?= url('/admin/leads') ?>">
-                                    <i class="bi bi-kanban"></i> <span class="sidebar-text">10-Stage Pipeline</span>
+                                <i class="bi bi-kanban"></i> <span class="sidebar-text">15-Point Pipeline</span>
                                 </a>
                             </li>
                         </ul>
@@ -332,8 +347,23 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/admin/dispatches') !== false ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/discoms') !== false || strpos($activeUri, '/manager/discoms') !== false) ? 'active' : '' ?>" href="<?= url('/admin/discoms') ?>">
+                                    <i class="bi bi-lightning-charge-fill text-warning"></i> <span class="sidebar-text">DISCOM Providers</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/dispatches') !== false || strpos($activeUri, '/manager/dispatches') !== false) ? 'active' : '' ?>" href="<?= url('/admin/dispatches') ?>">
                                     <i class="bi bi-box-seam"></i> <span class="sidebar-text">Dispatches & Kits</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/instruments') !== false || strpos($activeUri, '/manager/instruments') !== false) ? 'active' : '' ?>" href="<?= url('/admin/instruments') ?>">
+                                    <i class="bi bi-tools text-warning"></i> <span class="sidebar-text">Instruments & BOS Items</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/engineers') !== false || strpos($activeUri, '/manager/engineers') !== false) ? 'active' : '' ?>" href="<?= url('/admin/engineers') ?>">
+                                    <i class="bi bi-person-badge-fill text-warning"></i> <span class="sidebar-text">Engineers Desk</span>
                                 </a>
                             </li>
                             <li class="nav-item">

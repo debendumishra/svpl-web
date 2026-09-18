@@ -151,16 +151,21 @@ $title = "Executive Command Center — SVPL Admin";
                         <?php else: ?>
                             <?php 
                             $stageBadgeMap = [
-                                'REGISTRATION'           => ['class' => 'bg-secondary text-white', 'text' => '1. Registration'],
-                                'DOCUMENTS'              => ['class' => 'bg-info text-dark', 'text' => '2. Documents'],
-                                'GOVT_PORTAL'            => ['class' => 'bg-primary text-white', 'text' => '3. Govt Portal'],
-                                'LOAN_APPLIED'           => ['class' => 'bg-warning text-dark', 'text' => '4. Loan Applied'],
-                                'LOAN_SANCTIONED'        => ['class' => 'bg-primary-subtle text-primary border', 'text' => '5. Loan Approved'],
-                                'INSTALLATION_COMMENCED' => ['class' => 'bg-info-subtle text-info-emphasis border', 'text' => '6. Installing'],
-                                'INSTALLATION_COMPLETED' => ['class' => 'bg-primary text-white', 'text' => '7. Installed'],
-                                'JE_REPORT'              => ['class' => 'bg-dark text-white', 'text' => '8. JE Inspected'],
-                                'SUBSIDY_APPLIED'        => ['class' => 'bg-warning-subtle text-warning-emphasis border', 'text' => '9. Subsidy Applied'],
-                                'SUBSIDY_RECEIVED'       => ['class' => 'bg-success text-white', 'text' => '🟢 10. Active Customer'],
+                                'REGISTRATION'            => ['class' => 'bg-secondary text-white', 'text' => '1. Registration'],
+                                'DOCUMENTS'               => ['class' => 'bg-info text-dark', 'text' => '2. Documents'],
+                                'GOVT_PORTAL'             => ['class' => 'bg-primary text-white', 'text' => '3. Govt Portal'],
+                                'LOAN_APPLIED'            => ['class' => 'bg-warning text-dark', 'text' => '4. Loan Applied'],
+                                'LOAN_SANCTIONED'         => ['class' => 'bg-primary-subtle text-primary border', 'text' => '5. Loan Approved'],
+                                'INSTRUMENT_DESPATCHED'   => ['class' => 'bg-warning-subtle text-dark border', 'text' => '6. Despatched'],
+                                'INSTALLATION_COMMENCED'  => ['class' => 'bg-info-subtle text-info-emphasis border', 'text' => '7. Installing'],
+                                'INSTALLATION_COMPLETED'  => ['class' => 'bg-primary text-white', 'text' => '8. Installed'],
+                                'JE_REPORT'               => ['class' => 'bg-dark text-white', 'text' => '9. JE Inspected'],
+                                'NET_METER'               => ['class' => 'bg-info text-white', 'text' => '10. Net Meter'],
+                                'INTIMATION_TO_MMG'       => ['class' => 'bg-secondary-subtle text-dark border', 'text' => '11. MMG Intimated'],
+                                'MMG_METER_REPORT'        => ['class' => 'bg-purple text-white', 'text' => '12. MMG Report'],
+                                'BANK_SECOND_INSTALLMENT' => ['class' => 'bg-success-subtle text-success border', 'text' => '13. Bank 2nd Inst'],
+                                'SUBSIDY_APPLIED'         => ['class' => 'bg-warning-subtle text-warning-emphasis border', 'text' => '14. Subsidy Applied'],
+                                'SUBSIDY_RECEIVED'        => ['class' => 'bg-success text-white', 'text' => '🟢 15. Active Customer'],
                             ];
                             foreach ($recentLeads as $lead): 
                                 $custName = trim(($lead['first_name'] ?? '') . ' ' . ($lead['last_name'] ?? ''));

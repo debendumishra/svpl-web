@@ -23,7 +23,11 @@ use App\Models\Subsidy;
 use App\Models\Payment;
 use App\Models\CompanyLedger;
 use App\Models\Package;
+use App\Models\Discom;
+use App\Models\Location;
 use App\Models\User;
+use App\Models\DispatchInstrument;
+use App\Models\Engineer;
 use App\Services\AuthService;
 
 class AdminController
@@ -295,6 +299,7 @@ class AdminController
         $jeReport = JEReport::findByLeadId((int) $id);
         $loan = Loan::findByLeadId((int) $id);
         $subsidy = Subsidy::findByLeadId((int) $id);
+        $dispatch = Database::fetchOne("SELECT * FROM package_dispatches WHERE lead_id = ? ORDER BY id DESC LIMIT 1", [(int) $id]);
 
         Response::view('admin/lead_detail', [
             'pageTitle' => "Lead Details: {$lead['lead_code']} — SVPL",
@@ -305,6 +310,7 @@ class AdminController
             'jeReport' => $jeReport,
             'loan' => $loan,
             'subsidy' => $subsidy,
+            'dispatch' => $dispatch,
         ]);
     }
 
@@ -394,12 +400,36 @@ class AdminController
         $dispatches = PackageDispatch::getAll(100);
         $advisors = Advisor::getAll(100);
         $leads = Lead::getAll(100);
+        $loanSanctionedLeads = PackageDispatch::getLoanSanctionedLeads();
+        $dbInstruments = DispatchInstrument::getActive();
+        $engineers = Engineer::getActive();
+        
+        // Format instruments array for view
+        $standardInstruments = [];
+        if (!empty($dbInstruments)) {
+            foreach ($dbInstruments as $idx => $inst) {
+                $num = !empty($inst['sort_order']) ? (int)$inst['sort_order'] : ($idx + 1);
+                $standardInstruments[$num] = [
+                    'id'   => $inst['id'],
+                    'code' => $inst['item_code'] ?? 'INST-' . $num,
+                    'item' => $inst['item_name'],
+                    'spec' => $inst['specifications'],
+                    'qty'  => (float)$inst['default_qty'],
+                    'unit' => $inst['unit']
+                ];
+            }
+        } else {
+            $standardInstruments = PackageDispatch::STANDARD_INSTRUMENTS;
+        }
 
         Response::view('admin/dispatches', [
             'pageTitle' => 'Solar Equipment & Kit Dispatches — SVPL Admin',
             'dispatches' => $dispatches,
             'advisors' => $advisors,
             'leads' => $leads,
+            'loanSanctionedLeads' => $loanSanctionedLeads,
+            'standardInstruments' => $standardInstruments,
+            'engineers' => $engineers,
             'success' => $_GET['success'] ?? null,
             'error' => $_GET['error'] ?? null,
         ]);
@@ -408,36 +438,74 @@ class AdminController
     public function createDispatch(): void
     {
         $post = $_POST;
-        $dispatchType = trim($post['dispatch_type'] ?? 'ADVISOR_KIT');
+        $dispatchType = trim($post['dispatch_type'] ?? 'SOLAR_EQUIPMENT');
         $advisorId = !empty($post['advisor_id']) ? (int)$post['advisor_id'] : null;
         $leadId = !empty($post['lead_id']) ? (int)$post['lead_id'] : null;
+        $engineerId = !empty($post['engineer_id']) ? (int)$post['engineer_id'] : null;
         $trackingNumber = trim($post['tracking_number'] ?? '');
         $courierPartner = trim($post['courier_partner'] ?? 'SVPL Logistics Odisha');
-        $itemsIncluded = trim($post['items_included'] ?? '');
         $deliveryAddress = trim($post['delivery_address'] ?? '');
         $status = trim($post['status'] ?? 'Dispatched');
         $dispatchDate = trim($post['dispatch_date'] ?? date('Y-m-d'));
+        $vehicleNumber = trim($post['vehicle_number'] ?? '');
+        $driverName = trim($post['driver_name'] ?? '');
+        $driverMobile = trim($post['driver_mobile'] ?? '');
+        $vendorName = trim($post['vendor_name'] ?? 'Dhwajja Solar & Tier-1 OEMs');
+        $remarks = trim($post['remarks'] ?? '');
 
         if (empty($trackingNumber)) {
-            $trackingNumber = 'TRK-SVPL-' . date('Ymd') . '-' . rand(100, 999);
+            $trackingNumber = 'DSP-' . date('Ymd') . '-' . rand(100, 999);
+        }
+
+        // Process dynamic item checklist
+        $processedItems = [];
+        if (!empty($post['items']) && is_array($post['items'])) {
+            foreach ($post['items'] as $idx => $itemData) {
+                $isSelected = isset($itemData['selected']) && ($itemData['selected'] == '1' || $itemData['selected'] == 'on');
+                if ($isSelected) {
+                    $processedItems[] = [
+                        'item_no'     => (int)$idx,
+                        'item'        => trim($itemData['item'] ?? ''),
+                        'spec'        => trim($itemData['spec'] ?? ''),
+                        'qty'         => (float)($itemData['qty'] ?? 1),
+                        'unit'        => trim($itemData['unit'] ?? 'Nos.'),
+                        'selected'    => true
+                    ];
+                }
+            }
         }
 
         $id = PackageDispatch::create([
-            'advisor_id' => $advisorId,
-            'lead_id' => $leadId,
-            'dispatch_type' => $dispatchType,
-            'tracking_number' => $trackingNumber,
-            'courier_partner' => $courierPartner,
-            'items_included' => $itemsIncluded,
-            'delivery_address' => $deliveryAddress,
-            'status' => $status,
-            'dispatch_date' => $dispatchDate,
+            'advisor_id'        => $advisorId,
+            'lead_id'           => $leadId,
+            'engineer_id'       => $engineerId,
+            'dispatch_type'     => $dispatchType,
+            'tracking_number'   => $trackingNumber,
+            'vehicle_number'    => $vehicleNumber,
+            'driver_name'       => $driverName,
+            'driver_mobile'     => $driverMobile,
+            'vendor_name'       => $vendorName,
+            'courier_partner'   => $courierPartner,
+            'items'             => $processedItems,
+            'delivery_address'  => $deliveryAddress,
+            'status'            => $status,
+            'dispatch_date'     => $dispatchDate,
+            'remarks'           => $remarks
         ]);
 
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? '/manager/dispatches' : '/admin/dispatches';
+
         if ($id) {
-            Response::redirect('/admin/dispatches?success=' . urlencode("Dispatch record {$trackingNumber} created successfully!"));
+            AuditLog::log(
+                $_SESSION['user_id'] ?? null,
+                'CREATE_DISPATCH',
+                'DISPATCH',
+                $id,
+                "Created Dispatch #{$trackingNumber} for Lead #{$leadId} (Engineer ID: {$engineerId}, Vehicle: {$vehicleNumber}, Driver: {$driverName}, Vendor: {$vendorName}, Items: " . count($processedItems) . ")"
+            );
+            Response::redirect($redirectUrl . '?success=' . urlencode("Instrument Dispatch #{$trackingNumber} created and Lead advanced to Stage 6 (Instrument Despatched)!"));
         } else {
-            Response::redirect('/admin/dispatches?error=' . urlencode("Failed to create dispatch record."));
+            Response::redirect($redirectUrl . '?error=' . urlencode("Failed to create dispatch record."));
         }
     }
 
@@ -457,6 +525,137 @@ class AdminController
             Response::redirect('/admin/dispatches?success=' . urlencode("Dispatch #{$dispatchId} updated to {$status}."));
         } else {
             Response::redirect('/admin/dispatches?error=' . urlencode("Failed to update dispatch status."));
+        }
+    }
+
+    // =========================================================================
+    // SOLAR INSTRUMENTS & 20-POINT BOS BILL OF MATERIALS (BOM) ITEMS MANAGEMENT
+    // =========================================================================
+
+    public function instruments(): void
+    {
+        $items = DispatchInstrument::getAll();
+
+        Response::view('admin/instruments', [
+            'pageTitle' => 'Solar Installation Instruments & BOM Items — SVPL Admin',
+            'items'     => $items,
+            'success'   => $_GET['success'] ?? null,
+            'error'     => $_GET['error'] ?? null,
+        ]);
+    }
+
+    public function createInstrument(): void
+    {
+        $itemName = trim($_POST['item_name'] ?? '');
+        $specifications = trim($_POST['specifications'] ?? '');
+        $defaultQty = (float)($_POST['default_qty'] ?? 1.0);
+        $unit = trim($_POST['unit'] ?? 'Nos.');
+        $category = trim($_POST['category'] ?? 'BOS & Hardware');
+        $itemCode = trim($_POST['item_code'] ?? '');
+        $sortOrder = (int)($_POST['sort_order'] ?? 0);
+
+        if (empty($itemName) || empty($specifications)) {
+            $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? '/manager/instruments' : '/admin/instruments';
+            Response::redirect($redirectUrl . '?error=' . urlencode("Item Name and Specifications are required."));
+            return;
+        }
+
+        $id = DispatchInstrument::create([
+            'item_code'      => $itemCode,
+            'item_name'      => $itemName,
+            'specifications' => $specifications,
+            'default_qty'    => $defaultQty,
+            'unit'           => $unit,
+            'category'       => $category,
+            'sort_order'     => $sortOrder,
+            'is_active'      => 1
+        ]);
+
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? '/manager/instruments' : '/admin/instruments';
+
+        if ($id) {
+            AuditLog::log('CREATE_INSTRUMENT', "Added new solar instrument item: {$itemName} ({$specifications}, Qty: {$defaultQty} {$unit})");
+            Response::redirect($redirectUrl . '?success=' . urlencode("Item '{$itemName}' added successfully to the standard dispatch list."));
+        } else {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Failed to add instrument item."));
+        }
+    }
+
+    public function updateInstrument(string $id): void
+    {
+        $itemId = (int)$id;
+        $itemName = trim($_POST['item_name'] ?? '');
+        $specifications = trim($_POST['specifications'] ?? '');
+        $defaultQty = (float)($_POST['default_qty'] ?? 1.0);
+        $unit = trim($_POST['unit'] ?? 'Nos.');
+        $category = trim($_POST['category'] ?? 'BOS & Hardware');
+        $itemCode = trim($_POST['item_code'] ?? '');
+        $sortOrder = (int)($_POST['sort_order'] ?? 0);
+        $isActive = isset($_POST['is_active']) ? (int)$_POST['is_active'] : 1;
+
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? '/manager/instruments' : '/admin/instruments';
+
+        if ($itemId <= 0 || empty($itemName)) {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Invalid item parameters."));
+            return;
+        }
+
+        $res = DispatchInstrument::update($itemId, [
+            'item_code'      => $itemCode,
+            'item_name'      => $itemName,
+            'specifications' => $specifications,
+            'default_qty'    => $defaultQty,
+            'unit'           => $unit,
+            'category'       => $category,
+            'sort_order'     => $sortOrder,
+            'is_active'      => $isActive
+        ]);
+
+        if ($res) {
+            AuditLog::log('UPDATE_INSTRUMENT', "Updated solar instrument item #{$itemId}: {$itemName}");
+            Response::redirect($redirectUrl . '?success=' . urlencode("Item '{$itemName}' updated successfully."));
+        } else {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Failed to update item."));
+        }
+    }
+
+    public function deleteInstrument(string $id): void
+    {
+        $itemId = (int)$id;
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? '/manager/instruments' : '/admin/instruments';
+
+        if ($itemId <= 0) {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Invalid item ID."));
+            return;
+        }
+
+        $item = DispatchInstrument::findById($itemId);
+        $res = DispatchInstrument::delete($itemId);
+
+        if ($res) {
+            AuditLog::log('DELETE_INSTRUMENT', "Deleted solar instrument item #{$itemId}: " . ($item['item_name'] ?? ''));
+            Response::redirect($redirectUrl . '?success=' . urlencode("Item deleted successfully from the standard dispatch list."));
+        } else {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Failed to delete item."));
+        }
+    }
+
+    public function toggleInstrumentStatus(string $id): void
+    {
+        $itemId = (int)$id;
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? '/manager/instruments' : '/admin/instruments';
+
+        if ($itemId <= 0) {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Invalid item ID."));
+            return;
+        }
+
+        $res = DispatchInstrument::toggleStatus($itemId);
+        if ($res) {
+            AuditLog::log('TOGGLE_INSTRUMENT_STATUS', "Toggled status for solar instrument item #{$itemId}");
+            Response::redirect($redirectUrl . '?success=' . urlencode("Item status toggled successfully."));
+        } else {
+            Response::redirect($redirectUrl . '?error=' . urlencode("Failed to toggle item status."));
         }
     }
 
@@ -1451,6 +1650,356 @@ class AdminController
         }
 
         Response::redirect(url('/admin/packages'));
+    }
+
+    // ==========================================
+    // DISCOM PROVIDERS & DISTRICT MAPPINGS DESK
+    // ==========================================
+
+    public function discoms(): void
+    {
+        $providers = Discom::getAll();
+        $mappings = Discom::getDistrictMappings();
+        $stats = Discom::getStats();
+        $allDistricts = Location::getDistricts();
+
+        Response::view('admin/discoms', [
+            'pageTitle' => 'DISCOM Providers & District Mappings — SVPL',
+            'providers' => $providers,
+            'mappings' => $mappings,
+            'stats' => $stats,
+            'allDistricts' => $allDistricts,
+            'success_msg' => $_SESSION['success_msg'] ?? null,
+            'error_msg' => $_SESSION['error_msg'] ?? null,
+            'warning_msg' => $_SESSION['warning_msg'] ?? null,
+        ]);
+        unset($_SESSION['success_msg'], $_SESSION['error_msg'], $_SESSION['warning_msg']);
+    }
+
+    public function createDiscom(): void
+    {
+        $code = strtoupper(trim($_POST['code'] ?? ''));
+        $name = trim($_POST['name'] ?? '');
+
+        if (empty($code) || empty($name)) {
+            $_SESSION['error_msg'] = "DISCOM Code and Full Name are required.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        $existing = Discom::findByCode($code);
+        if ($existing) {
+            $_SESSION['error_msg'] = "A DISCOM with code '{$code}' already exists.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        $discomId = Discom::create($_POST);
+
+        AuditLog::log(
+            'CREATE_DISCOM',
+            "Created DISCOM provider #{$discomId}: {$code} - {$name}"
+        );
+
+        $_SESSION['success_msg'] = "DISCOM Provider '{$code}' created successfully!";
+        Response::redirect(url('/admin/discoms'));
+    }
+
+    public function updateDiscom(string $id): void
+    {
+        $discomId = (int)$id;
+        $provider = Discom::findById($discomId);
+        if (!$provider) {
+            $_SESSION['error_msg'] = "DISCOM provider #{$id} not found.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        $code = strtoupper(trim($_POST['code'] ?? ''));
+        $name = trim($_POST['name'] ?? '');
+
+        if (empty($code) || empty($name)) {
+            $_SESSION['error_msg'] = "DISCOM Code and Full Name are required.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        Discom::update($discomId, $_POST);
+
+        AuditLog::log(
+            'UPDATE_DISCOM',
+            "Updated DISCOM provider #{$discomId}: {$code} - {$name}"
+        );
+
+        $_SESSION['success_msg'] = "DISCOM Provider '{$code}' updated successfully!";
+        Response::redirect(url('/admin/discoms'));
+    }
+
+    public function toggleDiscomStatus(string $id): void
+    {
+        $discomId = (int)$id;
+        $provider = Discom::findById($discomId);
+        if (!$provider) {
+            $_SESSION['error_msg'] = "DISCOM provider #{$id} not found.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        Discom::toggleStatus($discomId);
+        $newStatus = $provider['is_active'] == 1 ? 'Inactive' : 'Active';
+
+        AuditLog::log(
+            'TOGGLE_DISCOM_STATUS',
+            "Toggled status for DISCOM #{$discomId} ({$provider['code']}) to {$newStatus}"
+        );
+
+        $_SESSION['success_msg'] = "DISCOM Provider '{$provider['code']}' is now {$newStatus}!";
+        Response::redirect(url('/admin/discoms'));
+    }
+
+    public function deleteDiscom(string $id): void
+    {
+        $discomId = (int)$id;
+        $provider = Discom::findById($discomId);
+        if (!$provider) {
+            $_SESSION['error_msg'] = "DISCOM provider #{$id} not found.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        Discom::delete($discomId);
+
+        AuditLog::log(
+            'DELETE_DISCOM',
+            "Deleted DISCOM provider #{$discomId} ({$provider['code']}) and unlinked its districts"
+        );
+
+        $_SESSION['success_msg'] = "DISCOM Provider '{$provider['code']}' and its mappings have been deleted.";
+        Response::redirect(url('/admin/discoms'));
+    }
+
+    public function assignDistrictDiscom(): void
+    {
+        $district = trim($_POST['district_name'] ?? '');
+        $discomId = (int)($_POST['discom_id'] ?? 0);
+
+        if (empty($district) || $discomId <= 0) {
+            $_SESSION['error_msg'] = "Please select both District and DISCOM Provider.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        $provider = Discom::findById($discomId);
+        if (!$provider) {
+            $_SESSION['error_msg'] = "Selected DISCOM Provider not found.";
+            Response::redirect(url('/admin/discoms'));
+            return;
+        }
+
+        Discom::assignDistrict($district, $discomId);
+
+        AuditLog::log(
+            'ASSIGN_DISTRICT_DISCOM',
+            "Assigned District '{$district}' to DISCOM Provider '{$provider['code']}'"
+        );
+
+        $_SESSION['success_msg'] = "District '{$district}' successfully mapped to {$provider['code']} ({$provider['name']})!";
+        Response::redirect(url('/admin/discoms'));
+    }
+
+    public function deleteDistrictDiscom(string $id): void
+    {
+        $mappingId = (int)$id;
+        Discom::deleteDistrictMapping($mappingId);
+
+        AuditLog::log(
+            'DELETE_DISTRICT_DISCOM',
+            "Removed district mapping #{$mappingId}"
+        );
+
+        $_SESSION['success_msg'] = "District mapping removed.";
+        Response::redirect(url('/admin/discoms'));
+    }
+
+    // =========================================================================
+    // SOLAR SITE & PROJECT ENGINEERS MASTER MANAGEMENT (ADMIN & MANAGER)
+    // =========================================================================
+
+    public function engineers(): void
+    {
+        $filters = [
+            'status'   => $_GET['status'] ?? 'ALL',
+            'district' => $_GET['district'] ?? '',
+            'search'   => $_GET['search'] ?? '',
+        ];
+        $engineers = Engineer::getAll($filters);
+        $stats = Engineer::getStats();
+        $districts = Location::getDistricts();
+
+        Response::view('admin/engineers', [
+            'pageTitle' => 'Solar Site & Project Engineers Master — SVPL',
+            'engineers' => $engineers,
+            'stats'     => $stats,
+            'districts' => $districts,
+            'filters'   => $filters,
+            'success'   => $_GET['success'] ?? null,
+            'error'     => $_GET['error'] ?? null,
+        ]);
+    }
+
+    public function createEngineer(): void
+    {
+        $fullName = trim($_POST['full_name'] ?? '');
+        $mobile = trim($_POST['mobile'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $designation = trim($_POST['designation'] ?? 'Field Solar Engineer');
+        $qualification = trim($_POST['qualification'] ?? 'B.Tech / Diploma Electrical');
+        
+        $assignedDistricts = $_POST['assigned_districts'] ?? [];
+        if (is_array($assignedDistricts)) {
+            $districts = !empty($assignedDistricts) ? implode(', ', $assignedDistricts) : 'All Odisha Districts';
+        } else {
+            $districts = trim((string)$assignedDistricts);
+        }
+
+        $aadhaar = trim($_POST['aadhaar_number'] ?? '');
+        $expYears = (float)($_POST['experience_years'] ?? 2.0);
+        $password = trim($_POST['password'] ?? 'Engineer@123');
+        $code = trim($_POST['engineer_code'] ?? '');
+        $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? url('/manager/engineers') : url('/admin/engineers');
+
+        if (empty($fullName) || empty($mobile)) {
+            $_SESSION['error_msg'] = "Full Name and Mobile Number are required.";
+            Response::redirect($redirectUrl);
+            return;
+        }
+
+        $id = Engineer::create([
+            'engineer_code'      => $code,
+            'full_name'          => $fullName,
+            'mobile'             => $mobile,
+            'alt_mobile'         => trim($_POST['alt_mobile'] ?? ''),
+            'email'              => $email,
+            'designation'        => $designation,
+            'qualification'      => $qualification,
+            'assigned_districts' => $districts,
+            'aadhaar_number'     => $aadhaar,
+            'experience_years'   => $expYears,
+            'password'           => $password,
+            'is_active'          => $isActive
+        ]);
+
+        if ($id) {
+            AuditLog::log(
+                $_SESSION['user_id'] ?? null,
+                'CREATE_ENGINEER',
+                'ENGINEER',
+                $id,
+                "Added new site engineer: {$fullName} (Mobile: {$mobile}, Districts: {$districts})"
+            );
+            $_SESSION['success_msg'] = "Engineer '{$fullName}' registered successfully with login credentials generated!";
+        } else {
+            $_SESSION['error_msg'] = "Failed to register engineer. Please check if mobile/code already exists.";
+        }
+
+        Response::redirect($redirectUrl);
+    }
+
+    public function updateEngineer(string $id = ''): void
+    {
+        $engId = !empty($id) ? (int)$id : (int)($_POST['id'] ?? 0);
+        $eng = Engineer::findById($engId);
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? url('/manager/engineers') : url('/admin/engineers');
+
+        if (!$eng) {
+            $_SESSION['error_msg'] = "Engineer record #{$engId} not found.";
+            Response::redirect($redirectUrl);
+            return;
+        }
+
+        $assignedDistricts = $_POST['assigned_districts'] ?? null;
+        if (is_array($assignedDistricts)) {
+            $districts = !empty($assignedDistricts) ? implode(', ', $assignedDistricts) : 'All Odisha Districts';
+        } elseif ($assignedDistricts !== null) {
+            $districts = trim((string)$assignedDistricts);
+        } else {
+            $districts = $eng['assigned_districts'];
+        }
+
+        $res = Engineer::update($engId, [
+            'full_name'          => trim($_POST['full_name'] ?? $eng['full_name']),
+            'mobile'             => trim($_POST['mobile'] ?? $eng['mobile']),
+            'alt_mobile'         => trim($_POST['alt_mobile'] ?? ($eng['alt_mobile'] ?? '')),
+            'email'              => trim($_POST['email'] ?? $eng['email']),
+            'designation'        => trim($_POST['designation'] ?? $eng['designation']),
+            'qualification'      => trim($_POST['qualification'] ?? $eng['qualification']),
+            'assigned_districts' => $districts,
+            'aadhaar_number'     => trim($_POST['aadhaar_number'] ?? ($eng['aadhaar_number'] ?? '')),
+            'experience_years'   => (float)($_POST['experience_years'] ?? $eng['experience_years']),
+            'password'           => !empty($_POST['password']) ? trim($_POST['password']) : null,
+            'is_active'          => isset($_POST['is_active']) ? 1 : 0
+        ]);
+
+        if ($res) {
+            AuditLog::log(
+                $_SESSION['user_id'] ?? null,
+                'UPDATE_ENGINEER',
+                'ENGINEER',
+                $engId,
+                "Updated engineer details for {$eng['engineer_code']}"
+            );
+            $_SESSION['success_msg'] = "Engineer {$eng['engineer_code']} ({$eng['full_name']}) updated successfully.";
+        } else {
+            $_SESSION['error_msg'] = "Failed to update engineer record.";
+        }
+
+        Response::redirect($redirectUrl);
+    }
+
+    public function toggleEngineerStatus(string $id = ''): void
+    {
+        $engId = !empty($id) ? (int)$id : (int)($_POST['id'] ?? 0);
+        $res = Engineer::toggleStatus($engId);
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? url('/manager/engineers') : url('/admin/engineers');
+
+        if ($res) {
+            AuditLog::log(
+                $_SESSION['user_id'] ?? null,
+                'TOGGLE_ENGINEER_STATUS',
+                'ENGINEER',
+                $engId,
+                "Toggled active status for engineer #{$engId}"
+            );
+            $_SESSION['success_msg'] = "Engineer status updated successfully.";
+        } else {
+            $_SESSION['error_msg'] = "Failed to toggle engineer status.";
+        }
+
+        Response::redirect($redirectUrl);
+    }
+
+    public function deleteEngineer(string $id = ''): void
+    {
+        $engId = !empty($id) ? (int)$id : (int)($_POST['id'] ?? 0);
+        $res = Engineer::delete($engId);
+        $redirectUrl = (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? url('/manager/engineers') : url('/admin/engineers');
+
+        if ($res) {
+            AuditLog::log(
+                $_SESSION['user_id'] ?? null,
+                'DELETE_ENGINEER',
+                'ENGINEER',
+                $engId,
+                "Deleted engineer record #{$engId}"
+            );
+            $_SESSION['success_msg'] = "Engineer record removed successfully.";
+        } else {
+            $_SESSION['warning_msg'] = "Cannot delete engineer who has active dispatched site assignments. Account deactivated instead.";
+        }
+
+        Response::redirect($redirectUrl);
     }
 }
 

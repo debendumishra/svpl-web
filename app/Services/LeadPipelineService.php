@@ -14,16 +14,21 @@ use App\Services\QualificationService;
 class LeadPipelineService
 {
     const STAGES = [
-        'REGISTRATION'              => 'Customer Registered',
-        'DOCUMENTS'                 => 'Documents Uploaded & Verified',
-        'GOVT_PORTAL'               => 'PM Surya Ghar Portal Submitted',
-        'LOAN_APPLIED'              => 'Bank Loan Applied',
-        'LOAN_SANCTIONED'           => 'Bank Loan Sanctioned',
-        'INSTALLATION_COMMENCED'    => 'Solar Installation Commenced',
-        'INSTALLATION_COMPLETED'    => 'Solar Installation Completed',
-        'JE_REPORT'                 => 'DISCOM JE Inspection Completed',
-        'SUBSIDY_APPLIED'           => 'Central Subsidy Applied (DBT)',
-        'SUBSIDY_RECEIVED'          => 'Central Subsidy Disbursed & Received',
+        'REGISTRATION'              => '1. Customer Registered',
+        'DOCUMENTS'                 => '2. Documents Uploaded & Verified',
+        'GOVT_PORTAL'               => '3. PM Surya Ghar Portal Submitted',
+        'LOAN_APPLIED'              => '4. Bank Loan Applied',
+        'LOAN_SANCTIONED'           => '5. Bank Loan Sanctioned',
+        'INSTRUMENT_DESPATCHED'     => '6. Instrument Despatched',
+        'INSTALLATION_COMMENCED'    => '7. Solar Installation Commenced',
+        'INSTALLATION_COMPLETED'    => '8. Solar Installation Completed',
+        'JE_REPORT'                 => '9. DISCOM JE Inspection Completed',
+        'NET_METER'                 => '10. Net Meter Installed',
+        'INTIMATION_TO_MMG'         => '11. Intimation to MMG',
+        'MMG_METER_REPORT'          => '12. MMG Meter Change Report Completed',
+        'BANK_SECOND_INSTALLMENT'   => '13. Bank Second Installment Released',
+        'SUBSIDY_APPLIED'           => '14. Central Subsidy Applied (DBT)',
+        'SUBSIDY_RECEIVED'          => '15. Central Subsidy Disbursed & Received',
     ];
 
     public static function advanceStage(int $leadId, string $newStage, string $status, ?string $notes = null): array

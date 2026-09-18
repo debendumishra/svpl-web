@@ -19,6 +19,7 @@ use App\Controllers\ReportController;
 use App\Controllers\LocationController;
 use App\Controllers\BoeController;
 use App\Controllers\DatabaseController;
+use App\Controllers\EngineerController;
 
 // ==========================================
 // 1. PUBLIC WEBSITE ROUTES
@@ -79,13 +80,16 @@ Router::post('/register/customer', [AuthController::class, 'registerCustomer']);
 Router::get('/api/validate-referral', [AuthController::class, 'validateReferralCode']);
 Router::post('/api/convert-customer', [AuthController::class, 'convertCustomer'], [AuthMiddleware::class]);
 
-// Location Cascading API (51,804 Odisha Locations)
+// Location Cascading API (51,804 Odisha Locations & DISCOM Lookup)
 Router::get('/api/locations/districts', [LocationController::class, 'getDistricts']);
 Router::get('/api/locations/blocks', [LocationController::class, 'getBlocks']);
 Router::get('/api/locations/gps', [LocationController::class, 'getGPs']);
 Router::get('/api/locations/villages', [LocationController::class, 'getVillages']);
 Router::get('/api/locations/pincode', [LocationController::class, 'getByPincode']);
 Router::get('/api/locations/search', [LocationController::class, 'search']);
+Router::get('/api/locations/discom-by-district', [LocationController::class, 'getDiscomByDistrict']);
+Router::get('/api/locations/district-discom-map', [LocationController::class, 'getDistrictDiscomMap']);
+Router::get('/api/locations/discoms', [LocationController::class, 'getDiscomList']);
 
 // ==========================================
 // 3. ADMIN / MANAGER / ACCOUNTS / OPERATIONS ROUTES
@@ -116,10 +120,25 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/admin/payments/confirm', [AdminController::class, 'confirmPayment']);
     Router::post('/admin/payments/reject', [AdminController::class, 'rejectPayment']);
     
-    // Dispatches & Kits
+    // Dispatches & Kits (Admin & Manager)
     Router::get('/admin/dispatches', [AdminController::class, 'dispatches']);
+    Router::get('/manager/dispatches', [AdminController::class, 'dispatches']);
     Router::post('/admin/dispatches/create', [AdminController::class, 'createDispatch']);
+    Router::post('/manager/dispatches/create', [AdminController::class, 'createDispatch']);
     Router::post('/admin/dispatches/update-status', [AdminController::class, 'updateDispatchStatus']);
+    Router::post('/manager/dispatches/update-status', [AdminController::class, 'updateDispatchStatus']);
+
+    // Solar Instruments & BOS Kit Items Management (Admin & Manager)
+    Router::get('/admin/instruments', [AdminController::class, 'instruments']);
+    Router::get('/manager/instruments', [AdminController::class, 'instruments']);
+    Router::post('/admin/instruments/create', [AdminController::class, 'createInstrument']);
+    Router::post('/manager/instruments/create', [AdminController::class, 'createInstrument']);
+    Router::post('/admin/instruments/update/{id}', [AdminController::class, 'updateInstrument']);
+    Router::post('/manager/instruments/update/{id}', [AdminController::class, 'updateInstrument']);
+    Router::post('/admin/instruments/delete/{id}', [AdminController::class, 'deleteInstrument']);
+    Router::post('/manager/instruments/delete/{id}', [AdminController::class, 'deleteInstrument']);
+    Router::get('/admin/instruments/toggle/{id}', [AdminController::class, 'toggleInstrumentStatus']);
+    Router::get('/manager/instruments/toggle/{id}', [AdminController::class, 'toggleInstrumentStatus']);
 
     // Solar Packages & Products Desk (Admin & Manager)
     Router::get('/admin/packages', [AdminController::class, 'packages']);
@@ -132,6 +151,22 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/manager/packages/toggle/{id}', [AdminController::class, 'togglePackageStatus']);
     Router::post('/admin/packages/delete/{id}', [AdminController::class, 'deletePackage']);
     Router::post('/manager/packages/delete/{id}', [AdminController::class, 'deletePackage']);
+
+    // DISCOM Providers & District Mappings Desk (Admin & Manager)
+    Router::get('/admin/discoms', [AdminController::class, 'discoms']);
+    Router::get('/manager/discoms', [AdminController::class, 'discoms']);
+    Router::post('/admin/discoms/create', [AdminController::class, 'createDiscom']);
+    Router::post('/manager/discoms/create', [AdminController::class, 'createDiscom']);
+    Router::post('/admin/discoms/update/{id}', [AdminController::class, 'updateDiscom']);
+    Router::post('/manager/discoms/update/{id}', [AdminController::class, 'updateDiscom']);
+    Router::get('/admin/discoms/toggle/{id}', [AdminController::class, 'toggleDiscomStatus']);
+    Router::get('/manager/discoms/toggle/{id}', [AdminController::class, 'toggleDiscomStatus']);
+    Router::post('/admin/discoms/delete/{id}', [AdminController::class, 'deleteDiscom']);
+    Router::post('/manager/discoms/delete/{id}', [AdminController::class, 'deleteDiscom']);
+    Router::post('/admin/discoms/assign-district', [AdminController::class, 'assignDistrictDiscom']);
+    Router::post('/manager/discoms/assign-district', [AdminController::class, 'assignDistrictDiscom']);
+    Router::post('/admin/discoms/delete-district/{id}', [AdminController::class, 'deleteDistrictDiscom']);
+    Router::post('/manager/discoms/delete-district/{id}', [AdminController::class, 'deleteDistrictDiscom']);
 
     // Company Financial Books & Account Ledger
     Router::get('/admin/ledger', [AdminController::class, 'ledger']);
@@ -150,6 +185,10 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/admin/leads/update-stage', [LeadController::class, 'updateStage']);
     Router::post('/admin/leads/je-report', [LeadController::class, 'saveJeReport']);
     Router::post('/admin/leads/loan', [LeadController::class, 'saveLoan']);
+    Router::post('/admin/leads/net-meter', [LeadController::class, 'saveNetMeter']);
+    Router::post('/admin/leads/mmg-intimation', [LeadController::class, 'saveMmgIntimation']);
+    Router::post('/admin/leads/mmg-report', [LeadController::class, 'saveMmgReport']);
+    Router::post('/admin/leads/bank-second-installment', [LeadController::class, 'saveBankSecondInstallment']);
     Router::post('/admin/leads/subsidy', [LeadController::class, 'saveSubsidy']);
 
     // Reports Export
@@ -196,8 +235,17 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/manager/id-cards/create', [AdminController::class, 'createCustomIdCard']);
     Router::post('/admin/id-cards/update/{id}', [AdminController::class, 'updateCustomIdCard']);
     Router::post('/manager/id-cards/update/{id}', [AdminController::class, 'updateCustomIdCard']);
-    Router::post('/admin/id-cards/delete/{id}', [AdminController::class, 'deleteCustomIdCard']);
-    Router::post('/manager/id-cards/delete/{id}', [AdminController::class, 'deleteCustomIdCard']);
+    // Field Solar Engineers Master Management (Admin & Manager)
+    Router::get('/admin/engineers', [AdminController::class, 'engineers']);
+    Router::get('/manager/engineers', [AdminController::class, 'engineers']);
+    Router::post('/admin/engineers/create', [AdminController::class, 'createEngineer']);
+    Router::post('/manager/engineers/create', [AdminController::class, 'createEngineer']);
+    Router::post('/admin/engineers/update', [AdminController::class, 'updateEngineer']);
+    Router::post('/manager/engineers/update', [AdminController::class, 'updateEngineer']);
+    Router::post('/admin/engineers/toggle-status', [AdminController::class, 'toggleEngineerStatus']);
+    Router::post('/manager/engineers/toggle-status', [AdminController::class, 'toggleEngineerStatus']);
+    Router::post('/admin/engineers/delete', [AdminController::class, 'deleteEngineer']);
+    Router::post('/manager/engineers/delete', [AdminController::class, 'deleteEngineer']);
 });
 
 // ==========================================
@@ -238,9 +286,22 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ADVIS
 // ==========================================
 Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('CUSTOMER')]], function() {
     Router::get('/customer/dashboard', [CustomerController::class, 'dashboard']);
+    Router::post('/customer/acknowledge-dispatch', [CustomerController::class, 'acknowledgeDispatch']);
     Router::get('/customer/quotation', [CustomerController::class, 'quotation']);
     Router::get('/customer/documents', [CustomerController::class, 'documents']);
     Router::post('/customer/upload-document', [CustomerController::class, 'uploadDocument']);
+});
+
+// ==========================================
+// 5B. FIELD SOLAR ENGINEER PORTAL ROUTES
+// ==========================================
+Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ENGINEER', 'ADMIN', 'SUPER_ADMIN')]], function() {
+    Router::get('/engineer/dashboard', [EngineerController::class, 'dashboard']);
+    Router::get('/engineer/installations', [EngineerController::class, 'installations']);
+    Router::post('/engineer/update-stage', [EngineerController::class, 'updateStage']);
+    Router::get('/engineer/profile', [EngineerController::class, 'profile']);
+    Router::post('/engineer/profile', [EngineerController::class, 'profile']);
+    Router::get('/engineer/id-card', [EngineerController::class, 'idCard']);
 });
 
 // ==========================================
@@ -253,4 +314,7 @@ Router::get('/print/appointment/{id}', [DocumentController::class, 'printAppoint
 Router::get('/print/receipt/{id}', [DocumentController::class, 'printReceipt']);
 Router::get('/print/quotation/{id}', [DocumentController::class, 'printQuotation']);
 Router::get('/print/je-report/{id}', [DocumentController::class, 'printJeReport']);
+Router::get('/print/eway-bill/{id}', [DocumentController::class, 'printEwayBill']);
+Router::get('/print/dispatch-invoice/{id}', [DocumentController::class, 'printDispatchInvoice']);
+Router::get('/print/dispatch-challan/{id}', [DocumentController::class, 'printDispatchChallan']);
 Router::get('/document/download', [DocumentController::class, 'download'], [AuthMiddleware::class]);

@@ -6,6 +6,25 @@
 $title = "My Solar Journey — SVPL Customer Portal";
 ?>
 
+<!-- FLASH MESSAGES -->
+<?php if (!empty($_SESSION['success_msg'])): ?>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+        <div><?= htmlspecialchars($_SESSION['success_msg']) ?></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php unset($_SESSION['success_msg']); ?>
+<?php endif; ?>
+
+<?php if (!empty($_SESSION['error_msg'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm d-flex align-items-center gap-2 mb-4" role="alert">
+        <i class="bi bi-x-circle-fill fs-5 text-danger"></i>
+        <div><?= htmlspecialchars($_SESSION['error_msg']) ?></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <?php unset($_SESSION['error_msg']); ?>
+<?php endif; ?>
+
 <!-- BENEFICIARY WELCOME HEADER -->
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 animate-fade-in">
     <div>
@@ -27,35 +46,40 @@ $title = "My Solar Journey — SVPL Customer Portal";
     </div>
 </div>
 
-<!-- 10-STAGE LIVE INSTALLATION PROGRESS TRACKER -->
+<!-- 15-STAGE LIVE INSTALLATION PROGRESS TRACKER -->
 <div class="card card-svpl p-4 bg-white border-0 shadow-sm mb-4 animate-fade-in stagger-1">
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <div>
             <h5 class="font-heading fw-bold mb-0 text-navy">Live Rooftop Solar Installation Milestones</h5>
-            <span class="text-secondary small">Real-time status updates synced with OREDA & Odisha DISCOM</span>
+            <span class="text-secondary small">Real-time 15-point status updates synced with OREDA & Odisha DISCOM</span>
         </div>
         <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fw-bold">
-            <i class="bi bi-clock-history me-1"></i> Current Stage: <?= htmlspecialchars($lead['stage'] ?? 'STAGE 7: NET-METERING INSPECTION') ?>
+            <i class="bi bi-clock-history me-1"></i> Current Stage: <?= htmlspecialchars($lead['stage'] ?? 'REGISTRATION') ?>
         </span>
     </div>
 
     <?php
     $stages = [
-        'REGISTRATION' => '1. Registration',
-        'DOCUMENTS' => '2. KYC Upload',
-        'GOVT_PORTAL' => '3. MNRE Portal',
-        'LOAN_SANCTIONED' => '4. 5.6% Loan',
-        'DISPATCH' => '5. Dhwajja Panels',
-        'INSTALLATION_COMPLETED' => '6. Installation',
-        'JE_REPORT' => '7. Net Metering',
-        'GRID_SYNC' => '8. Grid Synced',
-        'COMMISSIONED' => '9. Cert Issued',
-        'SUBSIDY_RECEIVED' => '10. Dual Subsidy DBT',
+        'REGISTRATION'            => '1. Registration',
+        'DOCUMENTS'               => '2. KYC Upload',
+        'GOVT_PORTAL'             => '3. Govt Portal',
+        'LOAN_APPLIED'            => '4. Loan Applied',
+        'LOAN_SANCTIONED'         => '5. Loan Approved',
+        'INSTRUMENT_DESPATCHED'   => '6. Despatched',
+        'INSTALLATION_COMMENCED'  => '7. Installing',
+        'INSTALLATION_COMPLETED'  => '8. Installed',
+        'JE_REPORT'               => '9. JE Report',
+        'NET_METER'               => '10. Net Meter',
+        'INTIMATION_TO_MMG'       => '11. MMG Notice',
+        'MMG_METER_REPORT'        => '12. MMG Report',
+        'BANK_SECOND_INSTALLMENT' => '13. 2nd Tranche',
+        'SUBSIDY_APPLIED'         => '14. Subsidy Claim',
+        'SUBSIDY_RECEIVED'        => '15. Dual Subsidy DBT 🟢',
     ];
-    $currentStage = $lead['stage'] ?? 'JE_REPORT';
+    $currentStage = $lead['stage'] ?? 'REGISTRATION';
     $stageKeys = array_keys($stages);
     $currentIndex = array_search($currentStage, $stageKeys);
-    if ($currentIndex === false) $currentIndex = 4; // Default to mid-stage for pleasant preview
+    if ($currentIndex === false) $currentIndex = 0;
     ?>
     
     <div class="d-flex justify-content-between text-center overflow-x-auto pb-2 pt-3">
@@ -73,6 +97,231 @@ $title = "My Solar Journey — SVPL Customer Portal";
         <?php endforeach; ?>
     </div>
 </div>
+
+<!-- ========================================================================= -->
+<!-- DISPATCHED SOLAR EQUIPMENT & 20-ITEM BOM SECTION WITH ACKNOWLEDGMENT -->
+<!-- ========================================================================= -->
+<?php if (!empty($dispatch)): 
+    $itemsList = !empty($dispatch['items_json']) ? json_decode($dispatch['items_json'], true) : [];
+    $isAcknowledged = (int)($dispatch['customer_acknowledged'] ?? 0) === 1;
+?>
+<div class="card card-svpl border-0 shadow-sm mb-4 animate-fade-in overflow-hidden" style="border-left: 6px solid <?= $isAcknowledged ? '#10B981' : '#F59E0B' ?> !important;">
+    <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <div class="p-2 rounded-3 bg-warning-subtle text-dark">
+                <i class="bi bi-box-seam-fill fs-5"></i>
+            </div>
+            <div>
+                <h5 class="font-heading fw-bold text-navy mb-0">Dispatched Solar Equipment & Bill of Materials</h5>
+                <span class="text-secondary small">Materials transit details, assigned field solar engineer, and itemized kit verification</span>
+            </div>
+        </div>
+
+        <div>
+            <?php if ($isAcknowledged): ?>
+                <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-1 shadow-sm">
+                    <i class="bi bi-check-circle-fill"></i> Receipt Confirmed on <?= date('d M Y', strtotime($dispatch['customer_acknowledged_at'] ?? 'now')) ?>
+                </span>
+            <?php else: ?>
+                <button type="button" class="btn btn-success btn-sm fw-bold px-3 py-2 shadow-sm d-inline-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#modalAcknowledgeReceipt">
+                    <i class="bi bi-check2-circle fs-6"></i> Acknowledge & Confirm Receipt
+                </button>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="card-body p-3 p-md-4 bg-white">
+        <div class="row g-4 mb-3">
+            
+            <!-- Transit & Logistics Info -->
+            <div class="col-md-6 col-lg-4 border-end-md">
+                <h6 class="fw-bold text-navy mb-2 small text-uppercase" style="letter-spacing: 0.5px;">
+                    <i class="bi bi-truck text-warning me-1"></i> Transit & Transporter
+                </h6>
+                <div class="p-3 rounded-3 bg-light border small">
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                        <span class="text-muted">LR / Consignment No:</span>
+                        <span class="font-monospace fw-bold text-navy"><?= htmlspecialchars($dispatch['tracking_number'] ?? 'LR-SVPL') ?></span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                        <span class="text-muted">Vehicle Number:</span>
+                        <span class="font-monospace fw-bold text-primary"><?= htmlspecialchars($dispatch['vehicle_number'] ?: 'Direct Transit') ?></span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                        <span class="text-muted">Person / Driver:</span>
+                        <span class="fw-semibold text-dark">
+                            <?= htmlspecialchars($dispatch['driver_name'] ?: 'Driver') ?>
+                            <?php if (!empty($dispatch['driver_mobile'])): ?>
+                                • <a href="tel:<?= htmlspecialchars($dispatch['driver_mobile']) ?>" class="text-success text-decoration-none fw-bold"><i class="bi bi-telephone"></i> Call</a>
+                            <?php endif; ?>
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                        <span class="text-muted">Vendor / Make:</span>
+                        <span class="fw-semibold text-dark"><?= htmlspecialchars($dispatch['vendor_name'] ?? 'OEM Authorized Store') ?></span>
+                    </div>
+                    <div class="d-flex justify-content-between py-1">
+                        <span class="text-muted">Dispatch Date:</span>
+                        <span class="fw-semibold text-dark"><?= htmlspecialchars($dispatch['dispatch_date'] ?? 'N/A') ?></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Field Solar Engineer Info -->
+            <div class="col-md-6 col-lg-4 border-end-lg">
+                <h6 class="fw-bold text-navy mb-2 small text-uppercase" style="letter-spacing: 0.5px;">
+                    <i class="bi bi-person-badge-fill text-warning me-1"></i> Assigned Field Solar Engineer
+                </h6>
+                <div class="p-3 rounded-3 bg-light border small h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="avatar-circle bg-navy text-warning fw-bold d-flex align-items-center justify-content-center rounded-circle" style="width: 36px; height: 36px; font-size: 0.85rem;">
+                                <?= strtoupper(substr($dispatch['engineer_name'] ?? 'SE', 0, 2)) ?>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-navy"><?= htmlspecialchars($dispatch['engineer_name'] ?? 'SVPL Field Engineer Desk') ?></div>
+                                <div class="badge bg-white text-dark border font-monospace" style="font-size: 0.68rem;"><?= htmlspecialchars($dispatch['engineer_code'] ?? 'SVPL-ENG') ?></div>
+                            </div>
+                        </div>
+                        <div class="text-secondary small mb-1"><?= htmlspecialchars($dispatch['engineer_designation'] ?? 'Certified Solar Engineer') ?></div>
+                    </div>
+                    <div>
+                        <?php if (!empty($dispatch['engineer_mobile'])): ?>
+                            <a href="tel:<?= htmlspecialchars($dispatch['engineer_mobile']) ?>" class="btn btn-outline-success btn-sm w-100 fw-bold">
+                                <i class="bi bi-telephone-fill me-1"></i> Call Engineer (<?= htmlspecialchars($dispatch['engineer_mobile']) ?>)
+                            </a>
+                        <?php else: ?>
+                            <div class="text-muted small"><i class="bi bi-headset me-1"></i> Engineer assigned for on-site commissioning.</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Official Documents Links -->
+            <div class="col-md-12 col-lg-4">
+                <h6 class="fw-bold text-navy mb-2 small text-uppercase" style="letter-spacing: 0.5px;">
+                    <i class="bi bi-file-earmark-check-fill text-primary me-1"></i> Official Dispatch Invoices & Bills
+                </h6>
+                <div class="d-grid gap-2">
+                    <a href="<?= url('/print/eway-bill/' . $dispatch['id']) ?>" target="_blank" class="btn btn-outline-warning text-dark btn-sm fw-bold text-start d-flex align-items-center justify-content-between p-2">
+                        <span><i class="bi bi-truck text-warning me-2"></i> Official E-Way Bill (EWB-01)</span>
+                        <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                    <a href="<?= url('/print/dispatch-invoice/' . $dispatch['id']) ?>" target="_blank" class="btn btn-outline-navy btn-sm fw-bold text-start d-flex align-items-center justify-content-between p-2">
+                        <span><i class="bi bi-receipt text-primary me-2"></i> Equipment Tax Invoice (GST)</span>
+                        <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                    <a href="<?= url('/print/dispatch-challan/' . $dispatch['id']) ?>" target="_blank" class="btn btn-outline-secondary btn-sm fw-bold text-start d-flex align-items-center justify-content-between p-2">
+                        <span><i class="bi bi-card-checklist text-secondary me-2"></i> Delivery Challan & BOM</span>
+                        <i class="bi bi-box-arrow-up-right small"></i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 20-ITEM BILL OF MATERIALS (BOM) ACCORDION/TABLE -->
+        <div class="border rounded-3 overflow-hidden">
+            <div class="bg-navy text-white px-3 py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="fw-bold small d-flex align-items-center gap-2">
+                    <i class="bi bi-card-checklist text-warning"></i> Complete Bill of Materials (BOM) — 20 Solar Components
+                </div>
+                <span class="badge bg-warning text-dark fw-bold"><?= count($itemsList) ?: 20 ?> Components Transported</span>
+            </div>
+            <div class="table-responsive" style="max-height: 320px; overflow-y: auto;">
+                <table class="table table-hover table-striped align-middle mb-0 small">
+                    <thead class="table-light sticky-top">
+                        <tr>
+                            <th style="width: 50px;" class="text-center">S.No</th>
+                            <th style="min-width: 180px;">Item Description</th>
+                            <th>Technical Specifications</th>
+                            <th style="width: 100px;" class="text-center">Quantity</th>
+                            <th style="width: 80px;" class="text-center">Unit</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($itemsList)): ?>
+                            <?php foreach ($itemsList as $idx => $it): ?>
+                                <tr>
+                                    <td class="text-center text-muted fw-bold"><?= $it['s_no'] ?? ($idx + 1) ?></td>
+                                    <td class="fw-bold text-navy"><?= htmlspecialchars($it['name'] ?? 'Solar Component') ?></td>
+                                    <td class="text-secondary"><?= htmlspecialchars($it['spec'] ?? '') ?></td>
+                                    <td class="text-center font-monospace fw-bold text-primary"><?= htmlspecialchars($it['qty'] ?? 1) ?></td>
+                                    <td class="text-center"><span class="badge bg-light text-dark border"><?= htmlspecialchars($it['unit'] ?? 'Nos') ?></span></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">Standard 20-item solar installation kit dispatched.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL: ACKNOWLEDGE RECEIPT -->
+<div class="modal fade" id="modalAcknowledgeReceipt" tabindex="-1" aria-labelledby="modalAcknowledgeReceiptLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-navy text-white py-3">
+                <h5 class="modal-title font-heading fw-bold d-flex align-items-center gap-2" id="modalAcknowledgeReceiptLabel">
+                    <i class="bi bi-box-seam-fill text-warning"></i> Confirm Solar Equipment Receipt
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="<?= url('/customer/acknowledge-dispatch') ?>">
+                <input type="hidden" name="dispatch_id" value="<?= $dispatch['id'] ?>">
+                <div class="modal-body p-4">
+                    <div class="text-center mb-3">
+                        <div class="avatar-circle bg-success-subtle text-success fw-bold d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 54px; height: 54px; font-size: 1.5rem;">
+                            <i class="bi bi-check-lg"></i>
+                        </div>
+                        <h6 class="fw-bold text-navy mb-1">Confirm Delivery at Your Rooftop Site</h6>
+                        <p class="small text-muted mb-0">Please verify that all materials (Solar Panels, Inverter, MMS, Cables, BOS items) have reached your residence safely.</p>
+                    </div>
+
+                    <div class="p-3 bg-light rounded-3 mb-3 small">
+                        <div class="d-flex justify-content-between py-1 border-bottom">
+                            <span class="text-muted">LR Number:</span>
+                            <span class="font-monospace fw-bold text-navy"><?= htmlspecialchars($dispatch['tracking_number'] ?? 'LR-SVPL') ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1 border-bottom">
+                            <span class="text-muted">Vehicle:</span>
+                            <span class="font-monospace text-primary fw-bold"><?= htmlspecialchars($dispatch['vehicle_number'] ?: 'Direct Transit') ?></span>
+                        </div>
+                        <div class="d-flex justify-content-between py-1">
+                            <span class="text-muted">Assigned Engineer:</span>
+                            <span class="fw-bold text-dark"><?= htmlspecialchars($dispatch['engineer_name'] ?? 'SVPL Solar Engineer') ?></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-navy">Remarks / Comments (Optional)</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="e.g. All 6 panels, inverter and mounting structure received in good condition."></textarea>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="ackConfirmCheck" required checked>
+                        <label class="form-check-label small text-navy fw-semibold" for="ackConfirmCheck">
+                            I confirm that the solar equipment has arrived at my premises and I am ready for mounting installation.
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-3">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success fw-bold px-4">
+                        <i class="bi bi-check-circle-fill me-1"></i> Confirm & Notify Engineer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- SUBSIDY BREAKDOWN & DOCUMENT LOCKER -->
 <div class="row g-4 mb-4 animate-fade-in stagger-2">
@@ -170,7 +419,7 @@ $title = "My Solar Journey — SVPL Customer Portal";
             </div>
         </div>
 
-        <!-- Assigned Back Office Executive (BOE) Dealing with Request (Req 10) -->
+        <!-- Assigned Back Office Executive (BOE) -->
         <div class="card card-svpl p-3 bg-white border-0 shadow-sm border-start border-4 border-info">
             <div class="d-flex align-items-center gap-3">
                 <div style="width: 46px; height: 46px; border-radius: 50%; background: #0284C7; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">

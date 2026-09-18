@@ -156,19 +156,50 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
             DISCOM Electricity & Proposed Solar Plant
         </h5>
         <div class="row g-3">
+            <?php 
+                $discomProviders = \App\Models\Discom::getAllActive();
+                $districtDiscomMap = \App\Models\Discom::getDistrictLookupMap();
+            ?>
             <div class="col-md-4">
                 <label class="form-label small fw-bold text-navy">Assigned DISCOM Provider <span class="text-danger">*</span></label>
-                <select name="discom_name" class="form-select" required>
-                    <option value="TPCODL" <?= ($post['discom_name'] ?? '') === 'TPCODL' ? 'selected' : '' ?>>TP Central Odisha (TPCODL - Khordha, Cuttack, Puri, Dhenkanal)</option>
-                    <option value="TPNODL" <?= ($post['discom_name'] ?? '') === 'TPNODL' ? 'selected' : '' ?>>TP Northern Odisha (TPNODL - Balasore, Bhadrak, Mayurbhanj, Keonjhar)</option>
-                    <option value="TPSODL" <?= ($post['discom_name'] ?? '') === 'TPSODL' ? 'selected' : '' ?>>TP Southern Odisha (TPSODL - Ganjam, Gajapati, Rayagada, Koraput)</option>
-                    <option value="TPWODL" <?= ($post['discom_name'] ?? '') === 'TPWODL' ? 'selected' : '' ?>>TP Western Odisha (TPWODL - Sambalpur, Bargarh, Jharsuguda, Rourkela)</option>
+                <select name="discom_name" id="selectAdvisorCustDiscom" class="form-select fw-bold" required>
+                    <option value="">-- Select DISCOM Provider --</option>
+                    <?php foreach ($discomProviders as $dp): ?>
+                        <option value="<?= htmlspecialchars($dp['code']) ?>" <?= (($post['discom_name'] ?? '') === $dp['code']) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($dp['name']) ?> (<?= htmlspecialchars($dp['code']) ?>)
+                        </option>
+                    <?php endforeach; ?>
                 </select>
+                <div class="mt-1" id="advisorDiscomAutoBadge">
+                    <small class="text-muted"><i class="bi bi-info-circle me-1"></i> Automatically detected when District is selected.</small>
+                </div>
             </div>
 
             <div class="col-md-4">
                 <label class="form-label small fw-bold text-navy">Electricity Consumer / CA Number <span class="text-danger">*</span></label>
                 <input type="text" name="consumer_number" class="form-control font-monospace fw-bold text-primary" placeholder="Found on Electricity Bill" value="<?= htmlspecialchars($post['consumer_number'] ?? '') ?>" required>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-navy">
+                    Mobile No. as per Electricity Bill <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light text-secondary font-monospace">+91</span>
+                    <input type="tel" name="electricity_bill_mobile" id="inputAdvisorBillMobile" class="form-control font-monospace" placeholder="10-digit Mobile on Bill" pattern="[6-9][0-9]{9}" maxlength="10" value="<?= htmlspecialchars($post['electricity_bill_mobile'] ?? $post['mobile'] ?? '') ?>" required>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="copyPrimaryMobileToBill()" title="Copy Primary Mobile">
+                        <i class="bi bi-arrow-down-left-square"></i> Same
+                    </button>
+                </div>
+                <div class="form-text small" style="font-size: 0.72rem;">Registered contact on DISCOM record.</div>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-navy">
+                    Date of Birth as per Electricity Bill <span class="text-danger">*</span>
+                </label>
+                <input type="date" name="electricity_bill_dob" id="inputAdvisorBillDob" class="form-control fw-semibold" value="<?= htmlspecialchars($post['electricity_bill_dob'] ?? $post['dob'] ?? '') ?>" required max="<?= date('Y-m-d', strtotime('-18 years')) ?>">
+                <div class="form-text small" style="font-size: 0.72rem;">As recorded in official DISCOM connection.</div>
             </div>
 
             <div class="col-md-4">
@@ -180,6 +211,11 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
                     <option value="5.0">5 kW Three Phase</option>
                     <option value="10.0">10 kW Three Phase</option>
                 </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-navy">Average Monthly Bill (₹)</label>
+                <input type="number" name="monthly_avg_bill" class="form-control" placeholder="e.g. 2500" value="<?= htmlspecialchars($post['monthly_avg_bill'] ?? '2500') ?>">
             </div>
 
             <!-- Package Selection (All Vendor Brands) -->
@@ -408,6 +444,48 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
 </form>
 
 <script>
+const DISTRICT_DISCOM_MAP = <?= json_encode($districtDiscomMap ?? \App\Models\Discom::getDistrictLookupMap()) ?>;
+
+function onAdvisorDistrictChange(districtName) {
+    if (!districtName) return;
+    const cleanDist = districtName.trim();
+    const discomSelect = document.getElementById('selectAdvisorCustDiscom');
+    const badgeEl = document.getElementById('advisorDiscomAutoBadge');
+    if (!discomSelect) return;
+
+    let matchedCode = null;
+    let matchedName = null;
+
+    if (DISTRICT_DISCOM_MAP[cleanDist]) {
+        matchedCode = DISTRICT_DISCOM_MAP[cleanDist].discom_code;
+        matchedName = DISTRICT_DISCOM_MAP[cleanDist].discom_name;
+    } else {
+        const lower = cleanDist.toLowerCase();
+        for (const [k, v] of Object.entries(DISTRICT_DISCOM_MAP)) {
+            if (k.toLowerCase() === lower || k.toLowerCase().includes(lower) || lower.includes(k.toLowerCase())) {
+                matchedCode = v.discom_code;
+                matchedName = v.discom_name;
+                break;
+            }
+        }
+    }
+
+    if (matchedCode) {
+        discomSelect.value = matchedCode;
+        if (badgeEl) {
+            badgeEl.innerHTML = `<span class="badge bg-success text-white py-1 px-2 border"><i class="bi bi-check-circle-fill me-1"></i> Auto-selected: <strong>${matchedCode}</strong> (${matchedName})</span>`;
+        }
+    }
+}
+
+function copyPrimaryMobileToBill() {
+    const primaryMobile = document.querySelector('input[name="mobile"]')?.value || '';
+    const billMobileInput = document.getElementById('inputAdvisorBillMobile');
+    if (billMobileInput) {
+        billMobileInput.value = primaryMobile;
+    }
+}
+
 function onAdvisorPackageChange(sel) {
     const opt = sel.options[sel.selectedIndex];
     if (!opt || !opt.value) {
@@ -455,6 +533,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const pkgSelect = document.getElementById('selectAdvisorCustPackage');
     if (pkgSelect) {
         onAdvisorPackageChange(pkgSelect);
+    }
+
+    const distSelect = document.getElementById('selectAdvisorCustDistrict');
+    if (distSelect) {
+        distSelect.addEventListener('change', function() {
+            onAdvisorDistrictChange(this.value);
+        });
+        // Initial auto-detection if district is pre-selected
+        setTimeout(function() {
+            if (distSelect.value) {
+                onAdvisorDistrictChange(distSelect.value);
+            }
+        }, 500);
     }
 });
 </script>
