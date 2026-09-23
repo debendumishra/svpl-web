@@ -11,9 +11,9 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
         <div class="col-lg-9">
             <div class="card card-svpl p-4 p-md-5 shadow-sm border-0" style="border-radius: 16px;">
                 <div class="text-center mb-4">
-                    <span class="badge bg-warning text-dark px-3 py-2 fw-bold mb-2">SOLAR ADVISOR ONBOARDING</span>
-                    <h2 class="fw-bold" style="color: #0B2545;">Register as an Authorized SVPL Solar Advisor</h2>
-                    <p class="text-muted">Earn direct commissions, build your multi-level network, and power Odisha's rooftop solar revolution.</p>
+                    <span class="badge bg-success text-white px-3 py-2 fw-bold mb-2"><i class="bi bi-gift-fill me-1"></i> FREE REGISTRATION • INSTANT NETWORK ACCESS</span>
+                    <h2 class="fw-bold" style="color: #0B2545;">Join as an Authorized SVPL Solar Advisor</h2>
+                    <p class="text-muted">Register free today, receive your login credentials via email, and start building your 9-level solar downline network immediately.</p>
                 </div>
 
                 <?php if (!empty($error)): ?>
@@ -257,80 +257,20 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                         </div>
                     </div>
 
-                    <!-- 4. Registration Fee Payment Details & UTR Entry -->
-                    <div class="card p-4 rounded-3 mb-4 border border-warning bg-warning-subtle shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <!-- 4. Free Registration & Network Activation Notice -->
+                    <div class="card p-4 rounded-3 mb-4 border border-success-subtle bg-success-subtle shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
                             <div>
-                                <span class="badge bg-warning text-dark fw-bold px-2 py-1">MANDATORY ONBOARDING FEE</span>
-                                <h5 class="font-heading fw-bold text-navy mb-0 mt-1">Advisor Registration & ID License: ₹<?= number_format(advisor_joining_fee()) ?></h5>
+                                <span class="badge bg-success text-white fw-bold px-2 py-1"><i class="bi bi-gift-fill me-1"></i> 100% FREE ONBOARDING</span>
+                                <h5 class="font-heading fw-bold text-navy mb-0 mt-1">Instant Network Building Privileges</h5>
                             </div>
-                            <span class="badge bg-dark text-white px-3 py-2"><i class="bi bi-shield-lock-fill text-warning me-1"></i> Admin Verification Required</span>
+                            <span class="badge bg-primary text-white px-3 py-2"><i class="bi bi-envelope-check-fill me-1"></i> Instant Credentials via Email</span>
                         </div>
                         
-                        <p class="small text-secondary mb-3">
-                            Please transfer the one-time registration fee of <strong>₹<?= number_format(advisor_joining_fee()) ?></strong> to the official <?= htmlspecialchars(company_short_name()) ?> corporate account below via UPI, IMPS, NEFT, or Cash, and submit the <strong>UTR / Transaction Reference Number</strong>. Your account will be activated by the Manager/Admin upon payment confirmation.
+                        <p class="small text-secondary mb-0">
+                            • <strong>Free Advisor Network:</strong> You can register for free, log in immediately, and start building your 9-level downline network right away.<br>
+                            • <strong>Customer Sales Activation:</strong> To register rooftop solar customers and earn project commissions, you can submit your one-time Registration Fee of <strong>₹<?= number_format(advisor_joining_fee()) ?></strong> anytime inside your Advisor Dashboard after logging in.
                         </p>
-
-                        <!-- Official Payment Bank & UPI Details -->
-                        <div class="row g-3 p-3 bg-white rounded-3 border mb-3">
-                            <div class="col-md-6 border-end-md">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <i class="bi bi-bank fs-4 text-primary"></i>
-                                    <strong class="text-navy"><?= htmlspecialchars(company_short_name()) ?> Official Bank Account</strong>
-                                </div>
-                                <div class="small">
-                                    <div><strong>Account Name:</strong> <?= htmlspecialchars(company_name()) ?></div>
-                                    <div><strong>Bank:</strong> State Bank of India (SBI)</div>
-                                    <div><strong>Account No:</strong> <span class="font-monospace fw-bold text-primary">42398712345</span></div>
-                                    <div><strong>IFSC Code:</strong> <span class="font-monospace fw-bold text-primary">SBIN0001234</span></div>
-                                    <div class="text-muted" style="font-size: 0.75rem;">Branch: Bhubaneswar Main, Odisha</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <i class="bi bi-qr-code fs-4 text-success"></i>
-                                    <strong class="text-navy">UPI / QR Scan & Pay</strong>
-                                </div>
-                                <div class="small">
-                                    <div><strong>Corporate UPI ID:</strong></div>
-                                    <div class="p-2 bg-light rounded border font-monospace fw-bold text-success d-flex justify-content-between align-items-center mt-1">
-                                        <span>suryavistaara@sbi</span>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="navigator.clipboard.writeText('suryavistaara@sbi'); alert('UPI ID copied to clipboard!');">
-                                            <i class="bi bi-clipboard"></i> Copy
-                                        </button>
-                                    </div>
-                                    <div class="text-muted mt-1" style="font-size: 0.75rem;">Accepted: Google Pay, PhonePe, Paytm, BHIM, Cred, All UPI Apps</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Advisor Payment Entry Inputs -->
-                        <h6 class="fw-bold text-navy mb-2"><i class="bi bi-receipt-cutoff text-primary me-1"></i> Enter Your Payment Transaction Details</h6>
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold small">Payment Mode *</label>
-                                <select name="payment_method" class="form-select" required>
-                                    <option value="UPI" <?= ($post['payment_method'] ?? '') === 'UPI' ? 'selected' : '' ?>>UPI (GPay / PhonePe / Paytm / BHIM)</option>
-                                    <option value="BANK_TRANSFER" <?= ($post['payment_method'] ?? '') === 'BANK_TRANSFER' ? 'selected' : '' ?>>Bank Transfer (IMPS / NEFT / RTGS)</option>
-                                    <option value="CASH" <?= ($post['payment_method'] ?? '') === 'CASH' ? 'selected' : '' ?>>Cash Deposit / SVPL Office</option>
-                                    <option value="CARD" <?= ($post['payment_method'] ?? '') === 'CARD' ? 'selected' : '' ?>>Debit / Credit Card</option>
-                                    <option value="OTHER" <?= ($post['payment_method'] ?? '') === 'OTHER' ? 'selected' : '' ?>>Other</option>
-                                </select>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label fw-semibold small">UTR / Transaction ID / Reference No. *</label>
-                                <input type="text" name="transaction_ref" class="form-control font-monospace fw-bold text-uppercase" placeholder="e.g. 425612348970 or UPI Ref" value="<?= htmlspecialchars($post['transaction_ref'] ?? '') ?>" required>
-                                <small class="text-muted" style="font-size: 0.72rem;">12-digit UTR from UPI app receipt or bank transaction slip.</small>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-semibold small">Payment Date *</label>
-                                <input type="date" name="payment_date" class="form-control" value="<?= htmlspecialchars($post['payment_date'] ?? date('Y-m-d')) ?>" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label fw-semibold small">Payment Remarks (Optional)</label>
-                                <input type="text" name="payment_remarks" class="form-control form-control-sm" placeholder="e.g. Paid via PhonePe from Mobile 98XXXXXX" value="<?= htmlspecialchars($post['payment_remarks'] ?? '') ?>">
-                            </div>
-                        </div>
                     </div>
 
                     <!-- 5. Security Password & CAPTCHA -->
@@ -340,7 +280,8 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Account Password *</label>
-                            <input type="password" name="password" class="form-control" placeholder="Create a secure password" value="Password@123" required>
+                            <input type="password" name="password" class="form-control" placeholder="Create a secure password" value="<?= htmlspecialchars($post['password'] ?? 'Password@123') ?>" required>
+                            <small class="text-muted" style="font-size: 0.74rem;">This password will also be emailed to you along with your Advisor ID.</small>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold">Security Verification (CAPTCHA) *</label>
@@ -362,7 +303,7 @@ $title = "Join as Solar Advisor — Surya Vistaara Pvt. Ltd.";
                     </div>
 
                     <button type="submit" class="btn btn-svpl-solar btn-lg w-100 py-3 fw-bold">
-                        <i class="bi bi-shield-lock-fill me-2"></i> Complete Advisor Registration & Generate ID Card
+                        <i class="bi bi-person-check-fill me-2"></i> Complete Free Advisor Registration
                     </button>
                 </form>
             </div>

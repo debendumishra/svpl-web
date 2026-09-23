@@ -15,7 +15,7 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($pageTitle ?? 'Field Engineer Command — SVPL') ?></title>
     
     <!-- Google Fonts & Icons -->
@@ -31,9 +31,9 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
 
     <meta name="base-url" content="<?= base_path_url() ?>">
     
-    <!-- Bootstrap 5 CSS & Solar Theme -->
+    <!-- Bootstrap 5 CSS & Solar Theme with Cache-Busting -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css') ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
     
     <style>
         :root {
@@ -50,6 +50,49 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
             min-height: 100vh;
             overflow-x: hidden;
         }
+
+        /* Top Navbar & Header Guard */
+        .top-navbar {
+            background: #FFFFFF !important;
+            border-bottom: 1px solid #E2E8F0 !important;
+            min-height: 56px !important;
+            height: 56px !important;
+            max-height: 56px !important;
+            padding: 0 16px !important;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 1030 !important;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+            box-sizing: border-box !important;
+        }
+
+        .app-header-left { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 8px !important; min-width: 0 !important; flex: 1 1 auto !important; overflow: hidden !important; }
+        .app-header-emblem { width: 36px !important; height: 36px !important; min-width: 36px !important; border-radius: 9px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; font-weight: 800 !important; font-size: 1.1rem !important; flex-shrink: 0 !important; }
+        .app-header-title-wrap { display: flex !important; flex-direction: column !important; justify-content: center !important; min-width: 0 !important; overflow: hidden !important; line-height: 1.2 !important; }
+        .app-header-title-row { display: flex !important; align-items: center !important; gap: 6px !important; overflow: hidden !important; white-space: nowrap !important; }
+        .app-header-title { font-family: 'Outfit', sans-serif !important; font-weight: 700 !important; font-size: 0.92rem !important; color: #0F172A !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin: 0 !important; }
+        .app-header-subtitle { font-size: 0.7rem !important; color: #64748B !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: flex !important; align-items: center !important; gap: 4px !important; margin-top: 1px !important; }
+        .app-header-btn { width: 36px; height: 36px; min-width: 36px; max-width: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.92rem; font-weight: 600; flex-shrink: 0; text-decoration: none; border: 1px solid #E2E8F0; background: #F8FAFC; color: #334155; }
+        .app-header-btn.d-none { display: none !important; }
+        @media (min-width: 992px) {
+            .app-header-btn.d-lg-none { display: none !important; }
+            .app-header-btn.d-none.d-lg-inline-flex,
+            .app-header-btn.d-lg-inline-flex { display: inline-flex !important; }
+        }
+        @media (max-width: 991.98px) {
+            .app-header-btn.d-none.d-lg-inline-flex { display: none !important; }
+            .app-header-btn.d-lg-none { display: inline-flex !important; }
+        }
+        .app-header-logout { border: 1px solid #FCA5A5 !important; background-color: #FEF2F2 !important; color: #DC2626 !important; }
+        .app-header-logout:hover { background-color: #DC2626 !important; color: #FFFFFF !important; border-color: #DC2626 !important; }
+
         .font-heading {
             font-family: 'Outfit', 'Inter', sans-serif;
         }
@@ -118,8 +161,8 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
         }
         .eng-sidebar .brand-header {
             padding: 1.25rem 1.5rem;
-            background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
-            border-bottom: 2px solid #F59E0B;
+            background: #D97706;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .eng-sidebar .nav-link {
             color: #94A3B8;
@@ -143,37 +186,29 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
             color: #F59E0B;
         }
 
-        /* Top Navbar */
-        .top-navbar {
-            background: #FFFFFF;
-            border-bottom: 1px solid #E2E8F0;
-            padding: 0.85rem 2rem;
-            margin-left: var(--sidebar-width);
-            transition: margin-left 0.3s ease;
-        }
-
         /* Main Content */
         .eng-content {
             margin-left: var(--sidebar-width);
-            padding: 2rem;
-            min-height: calc(100vh - 70px);
+            padding: 1.5rem;
+            min-height: calc(100vh - 56px);
             transition: margin-left 0.3s ease;
         }
 
         /* Responsive Mobile Layout */
         @media (max-width: 991.98px) {
             .eng-sidebar {
-                transform: translateX(-100%);
+                display: none !important;
             }
-            .eng-sidebar.show {
-                transform: translateX(0);
-            }
-            .top-navbar, .eng-content {
-                margin-left: 0;
+            .top-navbar {
+                margin-left: 0 !important;
+                padding: 0.5rem 0.75rem !important;
+                width: 100% !important;
             }
             .eng-content {
-                padding: 1rem;
-                padding-bottom: 5rem;
+                margin-left: 0 !important;
+                padding: 0.75rem 0.5rem 85px 0.5rem !important;
+                width: 100% !important;
+                overflow-x: hidden !important;
             }
         }
 
@@ -272,26 +307,29 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
     </aside>
 
     <!-- TOP NAVBAR -->
-    <header class="top-navbar d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileEngineerDrawer">
-                <i class="bi bi-list fs-4"></i>
+    <header class="top-navbar shadow-sm sticky-top">
+        <div class="app-header-left">
+            <button class="btn btn-light border btn-sm app-header-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileEngineerDrawer" aria-label="Toggle Navigation">
+                <i class="bi bi-list fs-5"></i>
             </button>
-            <h5 class="mb-0 fw-bold text-navy d-none d-sm-block">
-                <i class="bi bi-shield-shaded text-warning me-1"></i> Field Engineering & Commissioning Desk
-            </h5>
-            <span class="badge bg-warning-subtle text-dark border border-warning d-none d-md-inline-block">
-                Odisha PM Surya Ghar Operations
-            </span>
+            <div class="d-flex align-items-center gap-2 min-w-0 overflow-hidden">
+                <div class="app-header-emblem" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #061528;">
+                    ⚡
+                </div>
+                <div class="app-header-title-wrap">
+                    <span class="app-header-title"><?= htmlspecialchars($pageTitle ?? 'Field Engineer Desk') ?></span>
+                    <span class="app-header-subtitle">
+                        <span class="badge bg-warning-subtle text-dark border border-warning-subtle font-monospace px-1" style="font-size: 0.65rem;"><?= htmlspecialchars($engineerCode) ?></span>
+                        <span class="d-none d-sm-inline text-muted">• <?= htmlspecialchars($designation ?? 'Field Engineer') ?></span>
+                    </span>
+                </div>
+            </div>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge bg-dark text-warning font-monospace px-2 py-1">
-                <?= htmlspecialchars($engineerCode) ?>
-            </span>
-            <div class="dropdown">
-                <button class="btn btn-light border btn-sm dropdown-toggle fw-semibold" type="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle text-primary me-1"></i> <?= htmlspecialchars($userName) ?>
+        <div class="app-header-right">
+            <div class="dropdown d-none d-md-inline-block">
+                <button class="btn btn-light border btn-sm dropdown-toggle fw-semibold text-truncate d-flex align-items-center gap-1" style="height: 36px; max-width: 170px;" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-person-circle text-primary"></i> <span class="text-truncate"><?= htmlspecialchars($userName) ?></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                     <li><h6 class="dropdown-header"><?= htmlspecialchars($designation) ?></h6></li>
@@ -301,6 +339,9 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
                     <li><a class="dropdown-item text-danger" href="<?= url('/logout') ?>"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
                 </ul>
             </div>
+            <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm app-header-btn" title="Sign Out">
+                <i class="bi bi-box-arrow-right"></i>
+            </a>
         </div>
     </header>
 

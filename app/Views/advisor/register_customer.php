@@ -62,6 +62,41 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
     </div>
 <?php endif; ?>
 
+<?php if (empty($joiningFeePaid)): ?>
+    <!-- LOCKED CUSTOMER REGISTRATION NOTICE -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4 border-start border-4 border-warning bg-warning-subtle">
+        <div class="card-body p-4">
+            <div class="d-flex align-items-start gap-3">
+                <div class="p-3 bg-warning text-dark rounded-circle flex-shrink-0">
+                    <i class="bi bi-lock-fill fs-3"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h5 class="fw-bold text-navy mb-1">Customer Registration Locked</h5>
+                    <p class="text-secondary small mb-3">
+                        You are registered on the <strong>Free Advisor Network Tier</strong>. While you are free to refer advisors and build your 9-level network, registering rooftop solar customers and earning project commissions requires payment and admin approval of your one-time Registration Fee of <strong>₹<?= number_format((float)($joiningFeeAmount ?? advisor_joining_fee())) ?></strong>.
+                    </p>
+
+                    <?php if (!empty($pendingJoiningPayment)): ?>
+                        <div class="p-3 bg-white rounded-3 border mb-3 small">
+                            <div class="fw-bold text-primary mb-1"><i class="bi bi-hourglass-split me-1"></i> Payment Verification in Progress</div>
+                            <div>Your payment of <strong>₹<?= number_format((float)$pendingJoiningPayment['amount']) ?></strong> (UTR: <span class="font-monospace fw-bold"><?= htmlspecialchars($pendingJoiningPayment['transaction_ref']) ?></span>) submitted on <?= htmlspecialchars($pendingJoiningPayment['payment_date']) ?> is currently awaiting verification by SVPL Accounts. Once confirmed, you can register customers immediately.</div>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="<?= url('/advisor/dashboard') ?>" class="btn btn-warning text-dark fw-bold btn-sm shadow-sm">
+                            <i class="bi bi-credit-card me-1"></i> Submit / View Registration Fee on Dashboard
+                        </a>
+                        <a href="<?= url('/advisor/my-network') ?>" class="btn btn-outline-dark btn-sm">
+                            <i class="bi bi-diagram-3 me-1"></i> Build Advisor Network
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <form action="<?= url('/advisor/register-customer') ?>" method="POST" enctype="multipart/form-data" class="animate-fade-in stagger-2" id="advisorCustomerForm">
     <!-- Hidden Locked Referral Code -->
     <input type="hidden" name="advisor_code" value="<?= $referralCode ?>">
@@ -426,13 +461,204 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
         </div>
     </div>
 
+    <!-- SECTION 5: CUSTOMER E-SIGNATURE & VISIBLE 4-PAGE AGREEMENT (ANNEXURE 2) -->
+    <div class="card card-svpl bg-white border-0 shadow-sm p-4 mb-4 rounded-3 border-start border-4 border-primary">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom flex-wrap gap-2">
+            <div>
+                <h5 class="font-heading fw-bold text-navy mb-0 d-flex align-items-center gap-2">
+                    <span class="badge bg-primary rounded-circle px-2 py-1 fs-6">5</span>
+                    Customer E-Signature & PM Surya Ghar Model Draft Agreement (Annexure 2)
+                </h5>
+                <span class="text-secondary small">Mandatory legal contract executed between consumer and Dhwajja Solar India Pvt. Ltd.</span>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalAgreementPreview">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Fullscreen Agreement Modal
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Signature Pad & Consent Gate -->
+            <div class="col-lg-5">
+                <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <label class="form-label small fw-bold text-navy d-flex justify-content-between align-items-center mb-2">
+                            <span><i class="bi bi-pen-fill text-primary me-1"></i> Capture Customer E-Signature <span class="text-danger">*</span></span>
+                            <button type="button" class="btn btn-outline-danger btn-sm py-0 px-2" style="font-size: 0.75rem;" onclick="clearSignatureCanvas()">
+                                <i class="bi bi-arrow-counterclockwise me-1"></i> Clear / Redo
+                            </button>
+                        </label>
+                        
+                        <div class="border rounded-3 p-2 bg-white text-center position-relative shadow-sm">
+                            <canvas id="advisorSignaturePad" style="width: 100%; height: 160px; background: #ffffff; border: 1px dashed #94a3b8; border-radius: 6px; cursor: crosshair; touch-action: none;"></canvas>
+                            <div class="d-flex justify-content-between align-items-center text-muted small mt-1 px-1" style="font-size: 0.72rem;">
+                                <span><i class="bi bi-fingerprint text-primary me-1"></i> Touch / Stylus / Mouse</span>
+                                <span class="text-success fw-semibold" id="sigDrawnStatusBadge"><i class="bi bi-pencil me-1"></i> Sign above</span>
+                            </div>
+                        </div>
+                        <input type="hidden" name="customer_signature_base64" id="inputAdvisorSignatureBase64" value="">
+
+                        <div class="alert alert-info py-2 px-3 mt-3 mb-3 small d-flex align-items-start gap-2" style="font-size: 0.78rem;">
+                            <i class="bi bi-info-circle-fill text-primary fs-6 mt-1 flex-shrink-0"></i>
+                            <div>
+                                <strong>Live Agreement Stamping:</strong> The signature drawn above is stamped in real-time on <strong>all 4 pages</strong> of the legal agreement displayed on the right.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-top">
+                        <div class="form-check p-2 bg-white rounded border">
+                            <input class="form-check-input ms-0 me-2" type="checkbox" name="agreement_accepted" id="checkAgreementAccepted" value="1" required checked>
+                            <label class="form-check-label small fw-bold text-navy" for="checkAgreementAccepted">
+                                I confirm that the consumer has read/accepted the 4-page PM Surya Ghar Model Draft Agreement (Annexure 2) and authorized this registration with digital signature. <span class="text-danger">*</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Live Visible 4-Page Agreement Viewer -->
+            <div class="col-lg-7">
+                <div class="card border border-2 shadow-sm rounded-3 overflow-hidden h-100" style="border-color: #cbd5e1 !important;">
+                    <div class="card-header bg-navy text-white px-3 py-2 d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-file-earmark-text-fill text-warning"></i>
+                            <span class="fw-bold small font-outfit">Live Agreement Document Preview (Annexure 2)</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success border border-success-subtle py-1" style="font-size: 0.68rem;">
+                            <i class="bi bi-check-circle-fill me-1"></i> Auto-Populated
+                        </span>
+                    </div>
+
+                    <div class="card-body p-3 overflow-auto" style="max-height: 400px; background-color: #f8fafc; font-family: 'Times New Roman', serif; font-size: 11.5px; line-height: 1.45; color: #1e293b;">
+                        
+                        <!-- Page 1 Preview -->
+                        <div class="p-3 bg-white border rounded shadow-sm mb-3 position-relative">
+                            <div class="text-center mb-2">
+                                <strong style="font-size: 13px;">Annexure 2</strong><br>
+                                <strong class="text-uppercase" style="font-size: 11px;">Model Draft Agreement between Consumer & Vendor for installation of grid connected rooftop solar (RTS) project under PM Surya Ghar: Muft Bijli Yojana</strong>
+                            </div>
+                            <p class="mb-2">
+                                This agreement is executed on <strong><?= date('d/m/Y') ?></strong> for design, supply, installation, commissioning and 5-year comprehensive maintenance of RTS project/system along with warranty under PM Surya Ghar: Muft Bijli Yojana.
+                            </p>
+                            <div class="text-center fw-bold my-1">Between</div>
+                            <div class="mb-2 p-2 bg-light rounded border">
+                                <div><strong class="adv-preview-custname text-primary">[CUSTOMER NAME]</strong> S/O, W/O, D/O <strong class="adv-preview-careof">[FATHER/HUSBAND NAME]</strong></div>
+                                <div>AT - <strong class="adv-preview-village">[VILLAGE]</strong>, PO - <strong class="adv-preview-block">[BLOCK]</strong>, DIST - <strong class="adv-preview-district text-uppercase">[DISTRICT]</strong>, PIN - <strong class="adv-preview-pin">[PINCODE]</strong>, ODISHA</div>
+                                <div>Existing Consumer Number: <strong class="adv-preview-consumerno text-primary">[CONSUMER NO]</strong> | Notification No: <strong>PMSGY/OD/<?= date('Y') ?>/PENDING</strong></div>
+                            </div>
+                            <div class="text-center fw-bold my-1">AND</div>
+                            <div class="mb-2">
+                                COMPANY - <strong>DHWAJJA SOLAR INDIA PRIVATE LIMITED</strong>, MIG-84, Pokhariput, BDA Colony, Phase-1, Pokhariput, Bhubaneswar, Khordha - 751020, Odisha (Second Party i.e. Vendor).
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2 small text-muted" style="font-size: 10px;">
+                                <span>Guidelines for PM-Surya Ghar: Muft Bijli Yojana</span>
+                                <div class="text-end">
+                                    <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                        <img class="live-agreement-esign-img" src="" style="display:none; max-height: 28px; max-width: 90px;" alt="E-Sign">
+                                        <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                                    </div>
+                                    <div>Page 1 of 4</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Page 2 Preview -->
+                        <div class="p-3 bg-white border rounded shadow-sm mb-3 position-relative">
+                            <div class="fw-bold mb-1">Undertakings & Obligations:</div>
+                            <p class="mb-1"><strong>First Party (Consumer) Undertakes:</strong> 1. Online application on National Portal, 2. Secure material storage at site, 3. Rooftop access for installation, 4. Electricity & water for testing/cleaning, 5. 5-Year malfunction reporting, 6. Timely milestone payment.</p>
+                            <p class="mb-1"><strong>Second Party (Dhwajja Solar) Undertakes:</strong> 1. Compliance with MNRE & DISCOM safety standards, 2. Detailed roof feasibility & shadow study, 3. Design & SLD engineering, 4. ALMM/MNRE approved Mono-PERC panels & Inverters.</p>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2 small text-muted" style="font-size: 10px;">
+                                <span>Central Financial Assistance to Residential RTS</span>
+                                <div class="text-end">
+                                    <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                        <img class="live-agreement-esign-img" src="" style="display:none; max-height: 28px; max-width: 90px;" alt="E-Sign">
+                                        <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                                    </div>
+                                    <div>Page 2 of 4</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Page 3 Preview -->
+                        <div class="p-3 bg-white border rounded shadow-sm mb-3 position-relative">
+                            <div class="fw-bold mb-1">Technical Specifications & 5-Year O&M (Clauses 5 to 17):</div>
+                            <p class="mb-1"><strong>Clause 9 Warranty:</strong> Complete 5-Year Comprehensive System Warranty from date of DISCOM synchronization.</p>
+                            <p class="mb-1"><strong>Clause 10 Net Metering:</strong> Net meter procurement, testing, and DISCOM grid integration in scope of vendor.</p>
+                            <p class="mb-1"><strong>Clause 12 O&M:</strong> 5 Years comprehensive maintenance, wear & tear overhaul, and consumer training.</p>
+                            <p class="mb-1"><strong>Clause 17 Subsidy:</strong> Vendor assistance for swift National Portal DBT subsidy claim release.</p>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2 small text-muted" style="font-size: 10px;">
+                                <span>PM Surya Ghar Model Draft Agreement</span>
+                                <div class="text-end">
+                                    <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                        <img class="live-agreement-esign-img" src="" style="display:none; max-height: 28px; max-width: 90px;" alt="E-Sign">
+                                        <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                                    </div>
+                                    <div>Page 3 of 4</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Page 4 Preview: Payment & Execution Blocks -->
+                        <div class="p-3 bg-white border rounded shadow-sm position-relative">
+                            <div class="fw-bold mb-1">Clause 19: Mutually Agreed Terms of Payment:</div>
+                            <p class="mb-1">a. After Supply of materials at site – <strong>90% of Project Cost</strong></p>
+                            <p class="mb-2">b. After Installation & DISCOM Commissioning – <strong>10% Final Value</strong></p>
+                            
+                            <div class="row g-2 border border-dark p-2 mt-2 bg-light">
+                                <div class="col-6 border-end pe-2">
+                                    <div class="fw-bold">First Party (Consumer):</div>
+                                    <div class="adv-preview-custname text-primary fw-bold">[CUSTOMER NAME]</div>
+                                    <div class="mt-1 d-flex align-items-center gap-1">
+                                        <span>Sign:</span>
+                                        <img class="live-agreement-esign-img" src="" style="display:none; max-height: 32px; max-width: 100px;" alt="E-Sign">
+                                        <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Pending Signature]</span>
+                                    </div>
+                                    <div>Date: <?= date('d/m/Y') ?></div>
+                                </div>
+                                <div class="col-6 ps-2">
+                                    <div class="fw-bold">Second Party (Vendor):</div>
+                                    <div class="fw-bold text-navy">DHWAJJA SOLAR INDIA PVT LTD</div>
+                                    <div class="mt-1 d-flex align-items-center gap-1">
+                                        <span>Sign:</span>
+                                        <img src="<?= function_exists('company_signature_url') ? company_signature_url() : '/assets/images/authorised_signatory.png' ?>" alt="Vendor Sign" style="max-height: 28px; max-width: 90px;">
+                                    </div>
+                                    <div>Date: <?= date('d/m/Y') ?></div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top mt-2 small text-muted" style="font-size: 10px;">
+                                <span>Execution & Handover Block</span>
+                                <div class="text-end">
+                                    <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                        <img class="live-agreement-esign-img" src="" style="display:none; max-height: 28px; max-width: 90px;" alt="E-Sign">
+                                        <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                                    </div>
+                                    <div>Page 4 of 4</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer bg-light px-3 py-2 d-flex justify-content-between align-items-center">
+                        <small class="text-muted"><i class="bi bi-shield-check text-success me-1"></i> Conforms to MNRE & OREDA Annexure 2 Guidelines</small>
+                        <button type="button" class="btn btn-outline-primary btn-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalAgreementPreview">
+                            <i class="bi bi-arrows-fullscreen me-1"></i> Expand Fullscreen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SUBMISSION CARD -->
     <div class="card card-svpl bg-white border-0 shadow-sm p-4 mb-4 rounded-3 text-center">
         <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
             <a href="<?= url('/advisor/customers') ?>" class="btn btn-outline-secondary px-4 py-2">
                 Cancel
             </a>
-            <button type="submit" class="btn btn-svpl-solar btn-lg px-5 py-2 fw-bold shadow">
+            <button type="submit" class="btn btn-svpl-solar btn-lg px-5 py-2 fw-bold shadow" id="btnSubmitAdvisorCustomer">
                 <i class="bi bi-cloud-arrow-up-fill me-2"></i> Submit Customer Application & Upload Documents
             </button>
         </div>
@@ -442,6 +668,189 @@ $district = htmlspecialchars($advisor['district'] ?? 'Khordha');
         </div>
     </div>
 </form>
+
+<!-- MODAL: FULLSCREEN 4-PAGE MODEL DRAFT AGREEMENT (ANNEXURE 2) - PLACED AT ROOT OUTSIDE FORM -->
+<div class="modal fade" id="modalAgreementPreview" tabindex="-1" aria-labelledby="modalAgreementPreviewLabel" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" style="max-width: 950px; z-index: 1065;">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden" style="z-index: 1070; pointer-events: auto;">
+            <div class="modal-header bg-navy text-white px-4 py-3">
+                <div class="d-flex align-items-center gap-2">
+                    <div style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem;">
+                        <i class="bi bi-file-earmark-text-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title font-heading fw-bold mb-0 text-white" id="modalAgreementPreviewLabel">
+                            PM Surya Ghar Model Draft Agreement (Annexure 2)
+                        </h5>
+                        <span class="text-white-50 small" style="font-size: 0.75rem;">Official 4-Page Tripartite Consumer-Vendor Contract</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="background-color: #f1f5f9; font-family: 'Times New Roman', Times, serif; font-size: 13px; line-height: 1.5; color: #000; max-height: calc(100vh - 170px); overflow-y: auto !important; -webkit-overflow-scrolling: touch;">
+                
+                <!-- Page 1 -->
+                <div class="bg-white p-4 p-md-5 mb-4 rounded shadow-sm border">
+                    <div class="text-center mb-4">
+                        <h5 class="fw-bold mb-2">Annexure 2</h5>
+                        <h5 class="fw-bold text-uppercase px-2" style="font-size: 14px; line-height: 1.4;">
+                            Model Draft Agreement between Consumer & Vendor for installation of grid connected rooftop solar (RTS) project under PM Surya Ghar: Muft Bijli Yojana
+                        </h5>
+                    </div>
+                    <p class="text-justify mb-4">
+                        This agreement is executed on <strong><?= date('d') ?>/<?= date('m') ?>/<?= date('Y') ?></strong> for design, supply, installation, commissioning and 5-year comprehensive maintenance of RTS project/system along with warranty under PM Surya Ghar: Muft Bijli Yojana.
+                    </p>
+                    <div class="text-center fw-bold my-3" style="font-size: 14px;">Between</div>
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <div><strong class="adv-preview-custname text-primary">[CUSTOMER NAME]</strong> /O - <strong class="adv-preview-careof">[FATHER/HUSBAND NAME]</strong></div>
+                        <div>AT - <strong class="adv-preview-village">[VILLAGE]</strong> PO - <strong class="adv-preview-block">[BLOCK]</strong></div>
+                        <div>DIST - <strong class="adv-preview-district text-uppercase">[DISTRICT]</strong> PINCODE - <strong class="adv-preview-pin">[PINCODE]</strong> ODISHA</div>
+                        <div>(Herein after called as 'The eligible consumer') Existing consumer number - <strong class="adv-preview-consumerno text-primary">[CONSUMER NO]</strong></div>
+                        <div>& Notification number: <strong>PMSGY/OD/<?= date('Y') ?>/PENDING</strong></div>
+                    </div>
+                    <div class="text-center fw-bold my-3" style="font-size: 14px;">AND</div>
+                    <div class="mb-4 text-justify">
+                        COMPANY - <strong>DHWAJJA SOLAR INDIA PRIVATE LIMITED</strong>, MIG-84, POKHARIPUT, BDA COLONY, PHASE-1, Pokhariput, Bhubaneswar, Khorda - 751020, Odisha (Hereinafter referred to as Second Party i.e. Vendor/Contractor/System Integrator).
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end pt-3 border-top mt-4 text-muted" style="font-size: 11px;">
+                        <div>Guidelines for PM-Surya Ghar: Muft Bijli Yojana<br>Central Financial Assistance to Residential</div>
+                        <div class="text-end">
+                            <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                <img class="live-agreement-esign-img" src="" style="display:none; max-height: 36px; max-width: 120px;" alt="E-Sign">
+                                <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                            </div>
+                            <div class="fw-bold">1</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 2 -->
+                <div class="bg-white p-4 p-md-5 mb-4 rounded shadow-sm border">
+                    <div class="mb-3">
+                        <div class="fw-bold mb-1">Whereas</div>
+                        <div class="text-justify">First Party wishes to install a Grid Connected Rooftop Solar Plant on the rooftop of the residential building of the consumer under PM Surya Ghar: Muft Bijli Yojana;</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="fw-bold mb-1">And whereas</div>
+                        <div class="text-justify">Second Party has verified availability of appropriate roof and found it feasible to install a Grid Connected Rooftop Solar Plant and that the Second Party is willing to design, supply, install, test, commission and carry out operation and maintenance of the Rooftop Solar Plant for 5 year period. On this day, the First Party and Second Party agree to the following:</div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="fw-bold mb-1">The First Party hereby undertakes to perform the following activities:</div>
+                        <p class="mb-1"><strong>1.</strong> Submission of online application on the National Portal for installation of RTS project/system, Net-Metering, system inspection, and uploading relevant documents.</p>
+                        <p class="mb-1"><strong>2.</strong> Provide secure storage for RTS materials delivered at premises till handover of system.</p>
+                        <p class="mb-1"><strong>3.</strong> Provide access to rooftop during installation, O&M, testing, and meter reading.</p>
+                        <p class="mb-1"><strong>4.</strong> Provide electricity during plant installation and water for cleaning of panels.</p>
+                        <p class="mb-1"><strong>5.</strong> Report any malfunctioning to vendor during warranty period.</p>
+                        <p class="mb-1"><strong>6.</strong> Pay the amount as per the mutually agreed payment schedule.</p>
+                    </div>
+                    <div class="mb-2">
+                        <div class="fw-bold mb-1">The Second Party hereby undertakes to perform the following activities:</div>
+                        <p class="mb-1"><strong>1.</strong> Compliance with all standards and safety guidelines prescribed under state regulations and technical standards prescribed by MNRE.</p>
+                        <p class="mb-1"><strong>2. Site Survey:</strong> Site visit, shadow analysis, and detailed project report preparation.</p>
+                        <p class="mb-1"><strong>3. Design and Engineering:</strong> System engineering adhering to DISCOM/SERC/MNRE safety norms.</p>
+                        <p class="mb-1"><strong>4. Module and Inverter:</strong> Domestic Content Requirement (DCR) Mono PERC modules and BIS inverters.</p>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end pt-3 border-top mt-4 text-muted" style="font-size: 11px;">
+                        <div>Guidelines for PM-Surya Ghar: Muft Bijli Yojana<br>Central Financial Assistance to Residential</div>
+                        <div class="text-end">
+                            <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                <img class="live-agreement-esign-img" src="" style="display:none; max-height: 36px; max-width: 120px;" alt="E-Sign">
+                                <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                            </div>
+                            <div class="fw-bold">2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 3 -->
+                <div class="bg-white p-4 p-md-5 mb-4 rounded shadow-sm border">
+                    <p class="mb-2"><strong>5. Procurement and Supply:</strong> BIS/IS/IEC certified BoS components conforming to MNRE specifications.</p>
+                    <p class="mb-2"><strong>6. Installation and Civil Work:</strong> Hot Dip Galvanized structure mounting with wind resistance up to 150 km/h.</p>
+                    <p class="mb-2"><strong>7. Documentation:</strong> Providing technical catalogues, warranty cards, and SLD drawings to consumer.</p>
+                    <p class="mb-2"><strong>8. Project Completion Report (PCR):</strong> Assisting consumer in filling and uploading signed documents on National Portal.</p>
+                    <p class="mb-2"><strong>9. Warranty:</strong> Complete 5-Year Comprehensive System Warranty from DISCOM commissioning date.</p>
+                    <p class="mb-2"><strong>10. Net Meter and Grid Connectivity:</strong> Supply, testing, and DISCOM grid synchronization in vendor scope.</p>
+                    <p class="mb-2"><strong>11. Testing and Commissioning:</strong> Vendor presence during DISCOM joint inspection.</p>
+                    <p class="mb-2"><strong>12. Operation & Maintenance:</strong> 5 Years comprehensive O&M including regular preventive maintenance.</p>
+                    <p class="mb-2"><strong>13. Insurance:</strong> Material transit and storage insurance coverage prior to commissioning.</p>
+                    <p class="mb-2"><strong>14. Standards:</strong> Rigorous adherence to MNRE and DISCOM benchmark technical specifications.</p>
+                    <p class="mb-2"><strong>15. Payment Schedule:</strong> Mutual milestone payments as agreed in Clause 19.</p>
+                    <p class="mb-2"><strong>16. Dispute:</strong> Mutual resolution between parties in accordance with applicable laws.</p>
+                    <p class="mb-0"><strong>17. Subsidy Documentation:</strong> Vendor assistance for seamless direct benefit transfer (DBT).</p>
+                    <div class="d-flex justify-content-between align-items-end pt-3 border-top mt-4 text-muted" style="font-size: 11px;">
+                        <div>Guidelines for PM-Surya Ghar: Muft Bijli Yojana<br>Central Financial Assistance to Residential</div>
+                        <div class="text-end">
+                            <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                <img class="live-agreement-esign-img" src="" style="display:none; max-height: 36px; max-width: 120px;" alt="E-Sign">
+                                <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                            </div>
+                            <div class="fw-bold">3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Page 4 -->
+                <div class="bg-white p-4 p-md-5 rounded shadow-sm border">
+                    <p class="mb-3"><strong>18. Performance of Plant:</strong> Minimum Performance Ratio (PR) of 75% at DISCOM commissioning and maintained across 5-year warranty.</p>
+                    
+                    <div class="mb-4">
+                        <p class="fw-bold mb-1">19. Mutually Agreed Terms of Payment:</p>
+                        <p class="mb-1 ms-3">a. After Supply of materials at premises – <strong>90% of Project Cost</strong></p>
+                        <p class="mb-0 ms-3">b. After Installation and Commissioning of Project – <strong>10% of Final Value</strong></p>
+                    </div>
+
+                    <div class="row g-0 border border-dark p-3 bg-light mb-3">
+                        <div class="col-6 border-end border-dark pe-3">
+                            <div class="fw-bold mb-2">First Party (Consumer)</div>
+                            <div>Name: <strong class="adv-preview-custname text-primary">[CUSTOMER NAME]</strong></div>
+                            <div class="mt-1">Address: <strong class="adv-preview-village">[VILLAGE]</strong>, <strong class="adv-preview-block">[BLOCK]</strong>, <strong class="adv-preview-district text-uppercase">[DISTRICT]</strong></div>
+                            <div class="mt-1">PIN: <strong class="adv-preview-pin">[PINCODE]</strong> (ODISHA)</div>
+                            <div class="mt-3">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span>Sign:</span>
+                                    <img class="live-agreement-esign-img" src="" style="display:none; max-height: 42px; max-width: 140px;" alt="E-Sign">
+                                    <span class="live-agreement-esign-placeholder text-secondary">[Consumer E-Sign Pending]</span>
+                                </div>
+                                <div>Date: <?= date('d/m/Y') ?></div>
+                            </div>
+                        </div>
+                        <div class="col-6 ps-3">
+                            <div class="fw-bold mb-2">Second Party (Vendor)</div>
+                            <div>Name: <strong>DHWAJJA SOLAR INDIA PVT LTD</strong></div>
+                            <div class="mt-1">MIG-84, POKHARIPUT, BDA COLONY, PHASE-1, POKHARIPUT, BHUBANESWAR</div>
+                            <div class="mt-1">PIN: 751020 (ODISHA)</div>
+                            <div class="mt-3">
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span>Sign:</span>
+                                    <img src="<?= function_exists('company_signature_url') ? company_signature_url() : '/assets/images/authorised_signatory.png' ?>" alt="Authorised Signatory" style="max-height: 42px; max-width: 140px;">
+                                </div>
+                                <div>Date: <?= date('d/m/Y') ?></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-end pt-3 border-top mt-4 text-muted" style="font-size: 11px;">
+                        <div>Guidelines for PM-Surya Ghar: Muft Bijli Yojana<br>Central Financial Assistance to Residential</div>
+                        <div class="text-end">
+                            <div class="adv-live-esign-badge border p-1 rounded bg-light d-inline-block text-center mb-1">
+                                <img class="live-agreement-esign-img" src="" style="display:none; max-height: 36px; max-width: 120px;" alt="E-Sign">
+                                <span class="live-agreement-esign-placeholder text-secondary" style="font-size: 9px;">[Consumer E-Sign Pending]</span>
+                            </div>
+                            <div class="fw-bold">4</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer bg-light px-4 py-2 d-flex justify-content-between">
+                <span class="text-muted small"><i class="bi bi-patch-check-fill text-success me-1"></i> Digitally executed with captured consumer touch signature</span>
+                <button type="button" class="btn btn-primary btn-sm fw-bold px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-check-lg me-1"></i> I Understand & Accept Agreement
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 const DISTRICT_DISCOM_MAP = <?= json_encode($districtDiscomMap ?? \App\Models\Discom::getDistrictLookupMap()) ?>;
@@ -528,8 +937,168 @@ function onAdvisorPackageChange(sel) {
     document.getElementById('advisorPkgLiveCard').style.display = 'block';
 }
 
+// Signature Pad Implementation for Touch / Mobile Stylus / Mouse
+let sigCanvas, sigCtx, isDrawing = false, hasSignatureDrawn = false;
+
+function initSignaturePad() {
+    sigCanvas = document.getElementById('advisorSignaturePad');
+    if (!sigCanvas) return;
+    
+    // Handle High DPI displays
+    const rect = sigCanvas.getBoundingClientRect();
+    sigCanvas.width = rect.width || 400;
+    sigCanvas.height = 160;
+
+    sigCtx = sigCanvas.getContext('2d');
+    sigCtx.strokeStyle = '#092c4c';
+    sigCtx.lineWidth = 2.5;
+    sigCtx.lineCap = 'round';
+    sigCtx.lineJoin = 'round';
+
+    function getPos(e) {
+        const r = sigCanvas.getBoundingClientRect();
+        if (e.touches && e.touches.length > 0) {
+            return {
+                x: e.touches[0].clientX - r.left,
+                y: e.touches[0].clientY - r.top
+            };
+        }
+        return {
+            x: e.clientX - r.left,
+            y: e.clientY - r.top
+        };
+    }
+
+    function startDraw(e) {
+        isDrawing = true;
+        hasSignatureDrawn = true;
+        const pos = getPos(e);
+        sigCtx.beginPath();
+        sigCtx.moveTo(pos.x, pos.y);
+        e.preventDefault();
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        const pos = getPos(e);
+        sigCtx.lineTo(pos.x, pos.y);
+        sigCtx.stroke();
+        e.preventDefault();
+    }
+
+    function updateLiveAgreementSignature(dataUrl) {
+        const imgs = document.querySelectorAll('.live-agreement-esign-img');
+        const placeholders = document.querySelectorAll('.live-agreement-esign-placeholder');
+        const statusBadge = document.getElementById('sigDrawnStatusBadge');
+
+        if (dataUrl) {
+            imgs.forEach(img => {
+                img.src = dataUrl;
+                img.style.display = 'inline-block';
+            });
+            placeholders.forEach(el => el.style.display = 'none');
+            if (statusBadge) {
+                statusBadge.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> <span class="text-success fw-bold">E-Signature Stamped ✓</span>';
+            }
+        } else {
+            imgs.forEach(img => {
+                img.src = '';
+                img.style.display = 'none';
+            });
+            placeholders.forEach(el => el.style.display = 'inline-block');
+            if (statusBadge) {
+                statusBadge.innerHTML = '<i class="bi bi-pencil me-1"></i> Sign above';
+            }
+        }
+    }
+
+    function endDraw(e) {
+        if (!isDrawing) return;
+        isDrawing = false;
+        sigCtx.closePath();
+        const dataUrl = sigCanvas.toDataURL('image/png');
+        document.getElementById('inputAdvisorSignatureBase64').value = dataUrl;
+        updateLiveAgreementSignature(dataUrl);
+    }
+
+    sigCanvas.addEventListener('mousedown', startDraw);
+    sigCanvas.addEventListener('mousemove', draw);
+    sigCanvas.addEventListener('mouseup', endDraw);
+    sigCanvas.addEventListener('mouseleave', endDraw);
+
+    sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+    sigCanvas.addEventListener('touchmove', draw, { passive: false });
+    sigCanvas.addEventListener('touchcancel', endDraw, { passive: false });
+    sigCanvas.addEventListener('touchend', endDraw, { passive: false });
+}
+
+function clearSignatureCanvas() {
+    if (!sigCanvas || !sigCtx) return;
+    sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    hasSignatureDrawn = false;
+    document.getElementById('inputAdvisorSignatureBase64').value = '';
+    
+    const imgs = document.querySelectorAll('.live-agreement-esign-img');
+    const placeholders = document.querySelectorAll('.live-agreement-esign-placeholder');
+    const statusBadge = document.getElementById('sigDrawnStatusBadge');
+    
+    imgs.forEach(img => {
+        img.src = '';
+        img.style.display = 'none';
+    });
+    placeholders.forEach(el => el.style.display = 'inline-block');
+    if (statusBadge) {
+        statusBadge.innerHTML = '<i class="bi bi-pencil me-1"></i> Sign above';
+    }
+}
+
+function syncAgreementFormDetails() {
+    const fn = (document.querySelector('input[name="first_name"]')?.value || '').trim();
+    const ln = (document.querySelector('input[name="last_name"]')?.value || '').trim();
+    const careOf = (document.querySelector('input[name="father_husband_name"]')?.value || '').trim();
+    const village = (document.querySelector('input[name="village"]')?.value || '').trim();
+    const block = (document.querySelector('select[name="block"]')?.value || document.querySelector('input[name="block"]')?.value || '').trim();
+    const district = (document.querySelector('select[name="district"]')?.value || document.querySelector('input[name="district"]')?.value || '').trim();
+    const pin = (document.querySelector('input[name="pincode"]')?.value || '').trim();
+    const cno = (document.querySelector('input[name="consumer_number"]')?.value || '').trim();
+
+    const fullName = (fn + ' ' + ln).trim() || '[CUSTOMER NAME]';
+
+    document.querySelectorAll('.adv-preview-custname').forEach(el => el.innerText = fullName.toUpperCase());
+    document.querySelectorAll('.adv-preview-careof').forEach(el => el.innerText = careOf ? careOf.toUpperCase() : '[FATHER/HUSBAND NAME]');
+    document.querySelectorAll('.adv-preview-village').forEach(el => el.innerText = village ? village.toUpperCase() : '[VILLAGE]');
+    document.querySelectorAll('.adv-preview-block').forEach(el => el.innerText = block ? block.toUpperCase() : '[BLOCK]');
+    document.querySelectorAll('.adv-preview-district').forEach(el => el.innerText = district ? district.toUpperCase() : '[DISTRICT]');
+    document.querySelectorAll('.adv-preview-pin').forEach(el => el.innerText = pin || '[PINCODE]');
+    document.querySelectorAll('.adv-preview-consumerno').forEach(el => el.innerText = cno ? cno.toUpperCase() : '[CONSUMER NO]');
+}
+
 // Trigger initial load
 document.addEventListener('DOMContentLoaded', function() {
+    initSignaturePad();
+
+    // Listen to form input changes for live agreement updates
+    const inputsToWatch = ['first_name', 'last_name', 'father_husband_name', 'village', 'block', 'district', 'pincode', 'consumer_number'];
+    inputsToWatch.forEach(name => {
+        const el = document.querySelector(`[name="${name}"]`);
+        if (el) {
+            el.addEventListener('input', syncAgreementFormDetails);
+            el.addEventListener('change', syncAgreementFormDetails);
+        }
+    });
+
+    // Initial sync
+    syncAgreementFormDetails();
+
+    const form = document.getElementById('advisorCustomerForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (hasSignatureDrawn && sigCanvas) {
+                document.getElementById('inputAdvisorSignatureBase64').value = sigCanvas.toDataURL('image/png');
+            }
+        });
+    }
+
     const pkgSelect = document.getElementById('selectAdvisorCustPackage');
     if (pkgSelect) {
         onAdvisorPackageChange(pkgSelect);
@@ -539,13 +1108,20 @@ document.addEventListener('DOMContentLoaded', function() {
     if (distSelect) {
         distSelect.addEventListener('change', function() {
             onAdvisorDistrictChange(this.value);
+            syncAgreementFormDetails();
         });
-        // Initial auto-detection if district is pre-selected
         setTimeout(function() {
             if (distSelect.value) {
                 onAdvisorDistrictChange(distSelect.value);
+                syncAgreementFormDetails();
             }
         }, 500);
+    }
+
+    // Ensure modal is directly attached to body to prevent stacking context/backdrop overlay issues
+    const agreementModalEl = document.getElementById('modalAgreementPreview');
+    if (agreementModalEl && agreementModalEl.parentElement !== document.body) {
+        document.body.appendChild(agreementModalEl);
     }
 });
 </script>

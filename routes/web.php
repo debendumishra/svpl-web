@@ -20,6 +20,7 @@ use App\Controllers\LocationController;
 use App\Controllers\BoeController;
 use App\Controllers\DatabaseController;
 use App\Controllers\EngineerController;
+use App\Controllers\CommissionController;
 
 // ==========================================
 // 1. PUBLIC WEBSITE ROUTES
@@ -115,7 +116,31 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::get('/admin/leads/{id}', [AdminController::class, 'leadDetail']);
     Router::get('/admin/lead/{id}', [AdminController::class, 'leadDetail']);
     Router::get('/admin/network-tree', [AdminController::class, 'networkTree']);
-    Router::get('/admin/commissions', [AdminController::class, 'commissions']);
+    
+    // Commission Control Center, Dual Trees, Rules, Simulator & Ledger
+    Router::get('/admin/commissions', [CommissionController::class, 'index']);
+    Router::get('/manager/commissions', [CommissionController::class, 'index']);
+    Router::get('/admin/commissions/settings', [CommissionController::class, 'settings']);
+    Router::post('/admin/commissions/settings', [CommissionController::class, 'updateSettings']);
+    Router::post('/admin/commissions/product-rule/save', [CommissionController::class, 'saveProductRule']);
+    Router::post('/admin/commissions/approve', [CommissionController::class, 'approve']);
+    Router::post('/admin/commissions/bulk-approve', [CommissionController::class, 'bulkApprove']);
+    Router::post('/admin/commissions/reject', [CommissionController::class, 'reject']);
+    Router::post('/admin/commissions/hold', [CommissionController::class, 'hold']);
+    Router::post('/admin/commissions/reverse', [CommissionController::class, 'reverse']);
+    Router::get('/admin/commissions/pool-tree', [CommissionController::class, 'poolTree']);
+    Router::get('/manager/commissions/pool-tree', [CommissionController::class, 'poolTree']);
+    Router::get('/admin/commissions/advisor-tree', [CommissionController::class, 'advisorTree']);
+    Router::get('/manager/commissions/advisor-tree', [CommissionController::class, 'advisorTree']);
+    Router::get('/admin/commissions/simulator', [CommissionController::class, 'simulator']);
+    Router::post('/admin/commissions/simulator/ajax', [CommissionController::class, 'simulateAjax']);
+    Router::get('/admin/commissions/cycles', [CommissionController::class, 'cycles']);
+    Router::post('/admin/commissions/cycles/lock', [CommissionController::class, 'lockCycle']);
+    Router::post('/admin/commissions/cycles/unlock', [CommissionController::class, 'unlockCycle']);
+    Router::get('/admin/commissions/rewards', [CommissionController::class, 'rewards']);
+    Router::post('/admin/commissions/rewards/approve', [CommissionController::class, 'approveReward']);
+    Router::get('/admin/commissions/reports', [CommissionController::class, 'reports']);
+
     Router::get('/admin/payments', [AdminController::class, 'payments']);
     Router::post('/admin/payments/confirm', [AdminController::class, 'confirmPayment']);
     Router::post('/admin/payments/reject', [AdminController::class, 'rejectPayment']);
@@ -223,6 +248,10 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     // Withdrawal Requests Management (Admin & Manager)
     Router::get('/admin/withdrawals', [AdminController::class, 'withdrawals']);
     Router::get('/manager/withdrawals', [AdminController::class, 'withdrawals']);
+    Router::get('/admin/withdrawals/export', [AdminController::class, 'exportWithdrawals']);
+    Router::get('/manager/withdrawals/export', [AdminController::class, 'exportWithdrawals']);
+    Router::get('/admin/withdrawals/print', [AdminController::class, 'printWithdrawals']);
+    Router::get('/manager/withdrawals/print', [AdminController::class, 'printWithdrawals']);
     Router::post('/admin/withdrawals/approve/{id}', [AdminController::class, 'approveWithdrawal']);
     Router::post('/manager/withdrawals/approve/{id}', [AdminController::class, 'approveWithdrawal']);
     Router::post('/admin/withdrawals/reject/{id}', [AdminController::class, 'rejectWithdrawal']);
@@ -246,6 +275,20 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('SUPER
     Router::post('/manager/engineers/toggle-status', [AdminController::class, 'toggleEngineerStatus']);
     Router::post('/admin/engineers/delete', [AdminController::class, 'deleteEngineer']);
     Router::post('/manager/engineers/delete', [AdminController::class, 'deleteEngineer']);
+
+    // Back Office Executive (BOE) Staff Management (Admin & Manager)
+    Router::get('/admin/boe-management', [AdminController::class, 'boeManagement']);
+    Router::get('/admin/boe', [AdminController::class, 'boeManagement']);
+    Router::get('/manager/boe-management', [AdminController::class, 'boeManagement']);
+    Router::get('/manager/boe', [AdminController::class, 'boeManagement']);
+    Router::post('/admin/boe/create', [AdminController::class, 'createBoe']);
+    Router::post('/manager/boe/create', [AdminController::class, 'createBoe']);
+    Router::post('/admin/boe/update/{id}', [AdminController::class, 'updateBoe']);
+    Router::post('/manager/boe/update/{id}', [AdminController::class, 'updateBoe']);
+    Router::get('/admin/boe/toggle/{id}', [AdminController::class, 'toggleBoeStatus']);
+    Router::get('/manager/boe/toggle/{id}', [AdminController::class, 'toggleBoeStatus']);
+    Router::get('/admin/boe/reports', [AdminController::class, 'boeReports']);
+    Router::get('/manager/boe/reports', [AdminController::class, 'boeReports']);
 });
 
 // ==========================================
@@ -256,6 +299,8 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('BOE',
     Router::get('/boe/customers', [BoeController::class, 'customers']);
     Router::get('/boe/customers/{id}', [BoeController::class, 'customerDetail']);
     Router::post('/boe/update-status', [BoeController::class, 'updateStatus']);
+    Router::post('/boe/customers/{id}/update-pm-id', [BoeController::class, 'updatePmSuryaGharId']);
+    Router::post('/boe/customers/{id}/upload-pm-doc', [BoeController::class, 'uploadPmDocument']);
     Router::post('/boe/upload-document', [BoeController::class, 'uploadDocument']);
     Router::post('/boe/replace-document', [BoeController::class, 'replaceDocument']);
     Router::post('/boe/request-document', [BoeController::class, 'requestDocument']);
@@ -273,12 +318,29 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ADVIS
     Router::get('/advisor/register-customer', [AdvisorController::class, 'showRegisterCustomer']);
     Router::post('/advisor/register-customer', [AdvisorController::class, 'registerCustomer']);
     Router::get('/advisor/network', [AdvisorController::class, 'myNetwork']);
+    Router::get('/advisor/my-network', [AdvisorController::class, 'myNetwork']);
+    Router::get('/advisor/rewards', [AdvisorController::class, 'rewards']);
+    Router::post('/advisor/rewards/claim', [AdvisorController::class, 'submitRewardClaim']);
     Router::get('/advisor/customers', [AdvisorController::class, 'myCustomers']);
+    Router::get('/advisor/customers/{id}/edit', [AdvisorController::class, 'editCustomer']);
+    Router::post('/advisor/customers/{id}/edit', [AdvisorController::class, 'updateCustomer']);
+    Router::get('/advisor/customers/{id}/documents', [AdvisorController::class, 'customerDocuments']);
+    Router::post('/advisor/customers/{id}/documents/upload', [AdvisorController::class, 'uploadCustomerDocument']);
+    Router::post('/advisor/customers/{id}/documents/{docId}/replace', [AdvisorController::class, 'replaceCustomerDocument']);
     Router::get('/advisor/leads', [AdvisorController::class, 'leads']);
     Router::get('/advisor/wallet', [AdvisorController::class, 'wallet']);
+    Router::get('/advisor/wallet/export-ledger', [AdvisorController::class, 'exportLedger']);
+    Router::get('/advisor/wallet/print-ledger', [AdvisorController::class, 'printLedger']);
+    Router::get('/advisor/wallet/export-payouts', [AdvisorController::class, 'exportPayouts']);
+    Router::get('/advisor/wallet/print-payouts', [AdvisorController::class, 'printPayouts']);
     Router::post('/advisor/wallet/request-withdrawal', [AdvisorController::class, 'requestWithdrawal']);
     Router::get('/advisor/id-card', [AdvisorController::class, 'idCard']);
+    Router::get('/advisor/invoice', [AdvisorController::class, 'myInvoice']);
+    Router::get('/advisor/leaflet', [AdvisorController::class, 'myLeaflet']);
     Router::get('/advisor/qr-code', [AdvisorController::class, 'qrCode']);
+    Router::get('/advisor/my-solar', [AdvisorController::class, 'mySolar']);
+    Router::post('/advisor/acknowledge-dispatch', [AdvisorController::class, 'acknowledgeDispatch']);
+    Router::post('/advisor/submit-payment', [AdvisorController::class, 'submitJoiningPayment']);
 });
 
 // ==========================================
@@ -286,10 +348,14 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ADVIS
 // ==========================================
 Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('CUSTOMER')]], function() {
     Router::get('/customer/dashboard', [CustomerController::class, 'dashboard']);
+    Router::get('/customer/become-advisor', [CustomerController::class, 'showBecomeAdvisor']);
+    Router::get('/customer/upgrade-advisor', [CustomerController::class, 'showBecomeAdvisor']);
     Router::post('/customer/acknowledge-dispatch', [CustomerController::class, 'acknowledgeDispatch']);
     Router::get('/customer/quotation', [CustomerController::class, 'quotation']);
+    Router::get('/customer/agreement', [CustomerController::class, 'agreement']);
     Router::get('/customer/documents', [CustomerController::class, 'documents']);
     Router::post('/customer/upload-document', [CustomerController::class, 'uploadDocument']);
+    Router::post('/customer/convert-to-advisor', [CustomerController::class, 'convertToAdvisor']);
 });
 
 // ==========================================
@@ -308,11 +374,14 @@ Router::group(['middleware' => [AuthMiddleware::class, new RoleMiddleware('ENGIN
 // 6. PRINTABLE DOCUMENTS & VERIFIED DOWNLOADS
 // ==========================================
 Router::get('/print/id-card/{id}', [DocumentController::class, 'printIdCard']);
+Router::get('/print/advisor-invoice/{id}', [DocumentController::class, 'printAdvisorInvoice']);
+Router::get('/print/leaflet/{id}', [DocumentController::class, 'printLeaflet']);
 Router::get('/print/boe-id-card/{id}', [DocumentController::class, 'printBoeIdCard']);
 Router::get('/print/custom-id-card/{id}', [AdminController::class, 'printCustomIdCard']);
 Router::get('/print/appointment/{id}', [DocumentController::class, 'printAppointment']);
 Router::get('/print/receipt/{id}', [DocumentController::class, 'printReceipt']);
 Router::get('/print/quotation/{id}', [DocumentController::class, 'printQuotation']);
+Router::get('/print/agreement/{id}', [DocumentController::class, 'printAgreement']);
 Router::get('/print/je-report/{id}', [DocumentController::class, 'printJeReport']);
 Router::get('/print/eway-bill/{id}', [DocumentController::class, 'printEwayBill']);
 Router::get('/print/dispatch-invoice/{id}', [DocumentController::class, 'printDispatchInvoice']);

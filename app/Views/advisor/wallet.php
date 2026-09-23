@@ -62,9 +62,20 @@ $title = "My Wallet & Payouts — SVPL Advisor";
 
 <!-- BANK WITHDRAWAL REQUESTS HISTORY -->
 <div class="card card-svpl p-4 bg-white border-0 shadow-sm mb-4 animate-fade-in stagger-2">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="font-heading fw-bold m-0 text-navy">Bank Payout Requests & Status</h5>
-        <span class="badge bg-light text-dark border">Total Requests: <?= count($withdrawals ?? []) ?></span>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h5 class="font-heading fw-bold m-0 text-navy"><i class="bi bi-bank me-2 text-success"></i>Bank Payout Requests & Status</h5>
+            <p class="text-muted small mb-0">Record of all withdrawal requests, statutory 5% TDS deductions, and bank disbursals</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light text-dark border me-1">Total: <?= count($withdrawals ?? []) ?></span>
+            <a href="<?= url('/advisor/wallet/export-payouts') ?>" class="btn btn-outline-success btn-sm fw-bold">
+                <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+            </a>
+            <a href="<?= url('/advisor/wallet/print-payouts') ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Print / PDF
+            </a>
+        </div>
     </div>
     
     <div class="table-responsive">
@@ -127,42 +138,75 @@ $title = "My Wallet & Payouts — SVPL Advisor";
 </div>
 
 <!-- TRANSACTION HISTORY -->
+<!-- COMPREHENSIVE WALLET LEDGER TRANSACTIONS -->
 <div class="card card-svpl p-4 bg-white border-0 shadow-sm animate-fade-in stagger-3">
-    <h5 class="font-heading fw-bold mb-3 text-navy">All Wallet Ledger Transactions</h5>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <div>
+            <h5 class="font-heading fw-bold m-0 text-navy"><i class="bi bi-journal-text me-2 text-primary"></i>Immutable Wallet Ledger Statement</h5>
+            <p class="text-muted small mb-0">Double-entry audit ledger tracking every credit, commission, bonus and payout</p>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-light text-dark border font-monospace"><?= count($transactions ?? []) ?> Entries</span>
+            <a href="<?= url('/advisor/wallet/export-ledger') ?>" class="btn btn-outline-success btn-sm fw-bold">
+                <i class="bi bi-file-earmark-excel me-1"></i> Export Excel
+            </a>
+            <a href="<?= url('/advisor/wallet/print-ledger') ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Print / PDF
+            </a>
+        </div>
+    </div>
+    
     <div class="table-responsive">
         <table class="table table-hover align-middle small mb-0">
-            <thead class="table-light">
-                <tr class="text-secondary text-uppercase">
-                    <th>Txn #</th>
+            <thead class="table-light text-uppercase">
+                <tr class="text-secondary">
+                    <th>Date</th>
+                    <th>Txn Ref</th>
                     <th>Type</th>
-                    <th>Amount</th>
-                    <th>Balance After</th>
                     <th>Description</th>
-                    <th>Date & Time</th>
+                    <th class="text-end">Credit (+)</th>
+                    <th class="text-end">Debit (-)</th>
+                    <th class="text-end">Balance After</th>
+                    <th class="text-center">Audit</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($transactions)): ?>
                     <tr>
-                        <td colspan="6" class="text-center py-4 text-secondary">No wallet transactions recorded yet.</td>
+                        <td colspan="8" class="text-center py-4 text-secondary">No ledger transactions recorded yet.</td>
                     </tr>
                 <?php else: ?>
                     <?php foreach ($transactions as $t): ?>
                         <tr>
-                            <td><span class="badge bg-light text-dark border font-monospace">#<?= $t['id'] ?></span></td>
+                            <td class="text-secondary font-monospace"><?= date('d-M-Y H:i', strtotime($t['created_at'])) ?></td>
+                            <td><span class="badge bg-light text-dark border font-monospace"><?= htmlspecialchars($t['transaction_ref'] ?? ('TXN-' . $t['id'])) ?></span></td>
+                            <td><span class="badge bg-primary-subtle text-primary fw-semibold"><?= str_replace('_', ' ', $t['transaction_type']) ?></span></td>
                             <td>
-                                <?php if ($t['amount'] < 0): ?>
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle"><?= htmlspecialchars($t['txn_type']) ?></span>
-                                <?php else: ?>
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle"><?= htmlspecialchars($t['txn_type']) ?></span>
+                                <div><?= htmlspecialchars($t['description']) ?></div>
+                                <?php if (!empty($t['product_name'])): ?>
+                                    <span class="text-muted small"><?= htmlspecialchars($t['product_name']) ?> <?= !empty($t['level']) ? '(L' . $t['level'] . ')' : '' ?></span>
                                 <?php endif; ?>
                             </td>
-                            <td class="<?= $t['amount'] < 0 ? 'text-danger' : 'text-success' ?> fw-bold fs-6">
-                                <?= $t['amount'] < 0 ? '- ₹' . number_format(abs((float)$t['amount']), 2) : '+ ₹' . number_format((float)$t['amount'], 2) ?>
+                            <td class="text-end fw-bold text-success fs-6">
+                                <?= (float)$t['credit_amount'] > 0 ? '+₹' . number_format((float)$t['credit_amount'], 2) : '—' ?>
                             </td>
-                            <td class="text-navy fw-semibold">₹<?= number_format((float)$t['balance_after'], 2) ?></td>
-                            <td class="text-secondary"><?= htmlspecialchars($t['description']) ?></td>
-                            <td class="text-secondary"><?= date('d M Y, h:i A', strtotime($t['created_at'] ?? 'now')) ?></td>
+                            <td class="text-end fw-bold text-danger fs-6">
+                                <?= (float)$t['debit_amount'] > 0 ? '-₹' . number_format((float)$t['debit_amount'], 2) : '—' ?>
+                            </td>
+                            <td class="text-end fw-bold text-dark font-monospace">
+                                ₹<?= number_format((float)$t['balance_after'], 2) ?>
+                            </td>
+                            <td class="text-center">
+                                <?php if (!empty($t['rule_snapshot_json'])): ?>
+                                    <button type="button" class="btn btn-outline-info btn-sm view-adv-snapshot" 
+                                            data-snapshot="<?= htmlspecialchars($t['rule_snapshot_json']) ?>"
+                                            title="View Commission Breakdown">
+                                        <i class="bi bi-file-text"></i>
+                                    </button>
+                                <?php else: ?>
+                                    <span class="text-muted">—</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -262,5 +306,38 @@ document.addEventListener('DOMContentLoaded', function() {
             calcNet.textContent = '₹' + net.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         });
     }
+
+    // Snapshot Modal Trigger
+    document.querySelectorAll('.view-adv-snapshot').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const raw = this.getAttribute('data-snapshot');
+            try {
+                const parsed = JSON.parse(raw);
+                document.getElementById('advSnapshotJson').textContent = JSON.stringify(parsed, null, 4);
+            } catch(e) {
+                document.getElementById('advSnapshotJson').textContent = raw;
+            }
+            const modal = new bootstrap.Modal(document.getElementById('advSnapshotModal'));
+            modal.show();
+        });
+    });
 });
 </script>
+
+<!-- Snapshot Modal for Advisor -->
+<div class="modal fade" id="advSnapshotModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-navy text-white">
+                <h5 class="modal-title h6 mb-0"><i class="bi bi-shield-check me-2"></i>Commission Calculation Snapshot</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <pre class="bg-light p-3 rounded small font-monospace border" id="advSnapshotJson" style="max-height: 350px; overflow-y: auto;"></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -39,23 +39,29 @@ class Customer
     public static function create(array $data): int
     {
         $sql = "INSERT INTO customers (
-                    user_id, customer_code, advisor_id, first_name, last_name, dob,
+                    user_id, customer_code, advisor_id, first_name, last_name, full_name, father_husband_name, dob,
                     mobile, email, state, district, block, gram_panchayat,
-                    village, pincode, address_line, discom_name, consumer_number,
+                    village, pincode, address_line, discom_name, consumer_number, pm_surya_ghar_id, notification_number,
                     electricity_bill_mobile, electricity_bill_dob,
                     sanctioned_load_kw, proposed_solar_kw, monthly_avg_bill,
-                    roof_type, roof_area_sqft, status, assigned_boe_id, created_at
+                    roof_type, roof_area_sqft, photo_url, customer_signature, status,
+                    agreement_accepted, agreement_accepted_at, assigned_boe_id, created_at
                 ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, ?, ?, ?, ?,
                     ?, ?,
                     ?, ?, ?,
-                    ?, ?, ?, ?, NOW()
+                    ?, ?, ?, ?, ?,
+                    ?, ?, ?, NOW()
                 )";
 
         $billDob = !empty($data['electricity_bill_dob']) ? $data['electricity_bill_dob'] : (!empty($data['dob']) ? $data['dob'] : null);
         $dob = !empty($data['dob']) ? $data['dob'] : $billDob;
+        $fullName = trim(($data['first_name'] ?? '') . ' ' . ($data['last_name'] ?? ''));
+        $fatherHusband = !empty($data['father_husband_name']) ? trim($data['father_husband_name']) : (!empty($data['father_spouse_name']) ? trim($data['father_spouse_name']) : null);
+        $agreementAccepted = !empty($data['agreement_accepted']) ? 1 : 0;
+        $agreementAcceptedAt = $agreementAccepted ? (!empty($data['agreement_accepted_at']) ? $data['agreement_accepted_at'] : date('Y-m-d H:i:s')) : null;
 
         Database::execute($sql, [
             $data['user_id'] ?? null,
@@ -63,6 +69,8 @@ class Customer
             $data['advisor_id'] ?? null,
             $data['first_name'],
             $data['last_name'],
+            $fullName,
+            $fatherHusband,
             $dob,
             $data['mobile'],
             $data['email'] ?? null,
@@ -75,25 +83,48 @@ class Customer
             $data['address_line'] ?? null,
             $data['discom_name'] ?? 'TPCODL',
             $data['consumer_number'] ?? null,
+            $data['pm_surya_ghar_id'] ?? null,
+            $data['notification_number'] ?? null,
             $data['electricity_bill_mobile'] ?? $data['mobile'] ?? null,
             $billDob,
             $data['sanctioned_load_kw'] ?? 2.0,
-            $data['proposed_solar_kw'] ?? 2.0,
+            $data['proposed_solar_kw'] ?? 3.0,
             $data['monthly_avg_bill'] ?? null,
             $data['roof_type'] ?? 'RCC Roof',
             $data['roof_area_sqft'] ?? 300,
+            $data['photo_url'] ?? null,
+            $data['customer_signature'] ?? null,
             $data['status'] ?? 'New',
+            $agreementAccepted,
+            $agreementAcceptedAt,
             $data['assigned_boe_id'] ?? null,
         ]);
 
         return (int) Database::lastInsertId();
     }
 
+    public static function updatePmSuryaGharId(int $customerId, string $pmId, ?string $notificationNo = null): bool
+    {
+        return Database::execute(
+            "UPDATE customers SET pm_surya_ghar_id = ?, notification_number = COALESCE(?, notification_number), updated_at = NOW() WHERE id = ?",
+            [$pmId, $notificationNo, $customerId]
+        );
+    }
+
     public static function getByAdvisorId(int $advisorId): array
+    {
+        return self::getDirectCustomersWithIssues($advisorId);
+    }
+
+    public static function getDirectCustomersWithIssues(int $advisorId): array
     {
         return Database::fetchAll(
             "SELECT c.*, l.stage as lead_stage, l.status as lead_status, l.id as lead_id,
-                    boe.full_name as boe_name, boe.employee_code as boe_code, boe.mobile as boe_mobile, boe.email as boe_email, boe.designation as boe_designation
+                    boe.full_name as boe_name, boe.employee_code as boe_code, boe.mobile as boe_mobile, boe.email as boe_email, boe.designation as boe_designation,
+                    (SELECT remarks FROM customer_status_history WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) as latest_boe_remark,
+                    (SELECT to_status FROM customer_status_history WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) as boe_audit_status,
+                    (SELECT COUNT(*) FROM documents WHERE entity_type = 'CUSTOMER' AND entity_id = c.id) as doc_count,
+                    (SELECT COUNT(*) FROM documents WHERE entity_type = 'CUSTOMER' AND entity_id = c.id AND status IN ('Rejected', 'Action Required')) as issue_doc_count
              FROM customers c
              LEFT JOIN leads l ON l.customer_id = c.id
              LEFT JOIN users boe ON c.assigned_boe_id = boe.id
@@ -101,6 +132,28 @@ class Customer
              ORDER BY c.id DESC",
             [$advisorId]
         );
+    }
+
+    public static function getTeamCustomersForAdvisor(int $advisorId, int $maxDepth = 9): array
+    {
+        $sql = "SELECT c.id, c.customer_code, c.first_name, c.last_name, c.district, c.block,
+                       c.discom_name, c.sanctioned_load_kw, c.proposed_solar_kw, c.created_at,
+                       g.depth as level_depth,
+                       a.id as direct_advisor_id, a.advisor_code, a.referral_code, 
+                       CONCAT(a.first_name, ' ', a.last_name) as direct_advisor_name,
+                       a.mobile as direct_advisor_mobile, a.email as direct_advisor_email,
+                       l.id as lead_id, l.stage as lead_stage, l.status as lead_status,
+                       (SELECT remarks FROM customer_status_history WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) as latest_boe_remark,
+                       (SELECT user_name FROM customer_status_history WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) as boe_auditor_name,
+                       (SELECT to_status FROM customer_status_history WHERE customer_id = c.id ORDER BY id DESC LIMIT 1) as boe_audit_status
+                FROM advisor_genealogy g
+                JOIN customers c ON c.advisor_id = g.descendant_id
+                JOIN advisors a ON c.advisor_id = a.id
+                LEFT JOIN leads l ON l.customer_id = c.id
+                WHERE g.ancestor_id = ? AND g.depth > 0 AND g.depth <= ?
+                ORDER BY c.id DESC";
+
+        return Database::fetchAll($sql, [$advisorId, $maxDepth]);
     }
 
     public static function getAll(int $limit = 100, int $offset = 0, ?string $search = null): array

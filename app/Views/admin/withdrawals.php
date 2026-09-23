@@ -15,6 +15,14 @@ $prefix = $prefix ?? '/admin';
         </div>
         <p class="text-secondary small mb-0">Process NEFT / IMPS bank payouts to advisors, track UTR numbers, and approve/reject withdrawal requests.</p>
     </div>
+    <div class="d-flex align-items-center gap-2">
+        <a href="<?= url($prefix . '/withdrawals/export?status=' . urlencode($statusFilter)) ?>" class="btn btn-outline-success btn-sm fw-bold">
+            <i class="bi bi-file-earmark-excel me-1"></i> Export Excel (CSV)
+        </a>
+        <a href="<?= url($prefix . '/withdrawals/print?status=' . urlencode($statusFilter)) ?>" target="_blank" class="btn btn-outline-danger btn-sm fw-bold">
+            <i class="bi bi-file-earmark-pdf me-1"></i> Print / PDF Report
+        </a>
+    </div>
 </div>
 
 <?php if (!empty($successMsg)): ?>

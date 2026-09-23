@@ -26,6 +26,11 @@ class DocumentController
             return;
         }
 
+        if (empty($advisor['joining_fee_paid'])) {
+            Response::forbidden('Official Advisor ID Card generation is locked until the one-time registration fee payment of ₹' . number_format(advisor_joining_fee()) . ' is received and approved by admin.');
+            return;
+        }
+
         $qrUrl = DocumentGenerator::getQrCodeUrl(DocumentGenerator::getVerificationUrl('ADVISOR', $advisor['referral_code']));
         Response::view('printable/id_card', [
             'advisor' => $advisor,
@@ -58,6 +63,11 @@ class DocumentController
             return;
         }
 
+        if (empty($advisor['joining_fee_paid'])) {
+            Response::forbidden('Official Advisor Appointment Letter is locked until the one-time registration fee payment of ₹' . number_format(advisor_joining_fee()) . ' is received and approved by admin.');
+            return;
+        }
+
         Response::view('printable/appointment_letter', [
             'advisor' => $advisor,
         ]);
@@ -71,6 +81,51 @@ class DocumentController
         ]);
     }
 
+    public function printAdvisorInvoice(string $id): void
+    {
+        $advisor = Advisor::findById((int) $id);
+        if (!$advisor) {
+            Response::notFound("Advisor ID #{$id} not found.");
+            return;
+        }
+
+        if (empty($advisor['joining_fee_paid'])) {
+            Response::forbidden('GST Tax Invoice is generated exclusively after one-time registration fee payment of ₹' . number_format(advisor_joining_fee()) . ' is received and approved by admin.');
+            return;
+        }
+
+        $payment = \App\Helpers\Database::fetchOne(
+            "SELECT * FROM payments WHERE entity_type = 'ADVISOR' AND entity_id = ? AND purpose = 'JOINING_FEE' AND status = 'CONFIRMED' ORDER BY id DESC LIMIT 1",
+            [$advisor['id']]
+        );
+
+        $qrUrl = DocumentGenerator::getQrCodeUrl(DocumentGenerator::getVerificationUrl('ADVISOR', $advisor['referral_code']));
+
+        Response::view('printable/advisor_gst_invoice', [
+            'advisor' => $advisor,
+            'payment' => $payment,
+            'qrUrl' => $qrUrl,
+        ]);
+    }
+
+    public function printLeaflet(string $id): void
+    {
+        $advisor = Advisor::findById((int) $id);
+        if (!$advisor) {
+            Response::notFound("Advisor ID #{$id} not found.");
+            return;
+        }
+
+        if (empty($advisor['joining_fee_paid'])) {
+            Response::forbidden('Personalized Marketing Brochure / Leaflet generation is locked until the one-time registration fee payment of ₹' . number_format(advisor_joining_fee()) . ' is received and approved by admin.');
+            return;
+        }
+
+        Response::view('printable/advisor_leaflet', [
+            'advisor' => $advisor,
+        ]);
+    }
+
     public function printQuotation(string $id): void
     {
         $lead = Lead::findById((int) $id);
@@ -79,10 +134,30 @@ class DocumentController
             return;
         }
 
+        $customer = !empty($lead['customer_id']) ? Customer::findById((int) $lead['customer_id']) : null;
         $quotation = Quotation::findByLeadId((int) $id);
         Response::view('printable/quotation', [
             'lead' => $lead,
+            'customer' => $customer,
             'quotation' => $quotation,
+        ]);
+    }
+
+    public function printAgreement(string $id): void
+    {
+        $customerId = (int) $id;
+        $customer = Customer::findById($customerId);
+        if (!$customer) {
+            Response::notFound("Customer #{$id} not found.");
+            return;
+        }
+
+        $lead = !empty($customer['lead_id']) ? Lead::findById((int)$customer['lead_id']) : Lead::findByCustomerCode($customer['customer_code']);
+
+        Response::view('printable/consumer_agreement', [
+            'pageTitle' => 'PM Surya Ghar Consumer Agreement — ' . $customer['customer_code'],
+            'customer' => $customer,
+            'lead' => $lead,
         ]);
     }
 

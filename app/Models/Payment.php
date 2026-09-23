@@ -103,6 +103,8 @@ class Payment
             return false;
         }
 
+        $userId = (int) $advisor['user_id'];
+
         Database::beginTransaction();
         try {
             // 1. Mark payment as SUCCESS
@@ -116,10 +118,16 @@ class Payment
                                    updated_at = NOW() 
                                WHERE id = ?", [$advisorId]);
 
-            // 3. Activate User login
-            Database::execute("UPDATE users SET is_active = 1, updated_at = NOW() WHERE id = ?", [$advisor['user_id']]);
+            // 3. Promote User login role to ADVISOR
+            Database::execute("UPDATE users SET role = 'ADVISOR', is_active = 1, updated_at = NOW() WHERE id = ?", [$userId]);
 
-            // 4. Auto-post to Company Account Ledger
+            // 4. Update linked Customer record if converted
+            Database::execute(
+                "UPDATE customers SET converted_to_advisor = 1, converted_advisor_id = ?, updated_at = NOW() WHERE user_id = ? OR converted_advisor_id = ?",
+                [$advisorId, $userId, $advisorId]
+            );
+
+            // 5. Auto-post to Company Account Ledger
             $confirmedAmount = (float) ($payment['amount'] ?? (function_exists('advisor_joining_fee') ? advisor_joining_fee() : 2700.00));
             CompanyLedger::autoPostAdvisorFee(
                 $advisorId,
@@ -129,13 +137,80 @@ class Payment
                 $adminUserId
             );
 
-            // 5. Log Audit
+            // 6. Trigger Direct Advisor Joining Commission Calculation
+            \App\Services\CommissionCalculationService::processAdvisorJoining(
+                $advisorId,
+                $payment['payment_date'] ?? date('Y-m-d'),
+                $paymentId
+            );
+
+            // 7. Log Audit
             AuditLog::log(
                 $adminUserId,
                 'PAYMENT_CONFIRMED',
                 'ADVISOR',
                 $advisorId,
                 "Onboarding fee ₹" . number_format($confirmedAmount, 2) . " confirmed for Advisor {$advisor['advisor_code']} (UTR: {$payment['transaction_ref']})"
+            );
+
+            Database::commit();
+            return true;
+        } catch (\Throwable $e) {
+            Database::rollBack();
+            return false;
+        }
+    }
+
+    public static function confirmCustomerPayment(int $paymentId, int $adminUserId, ?string $creditDate = null): bool
+    {
+        $payment = self::findById($paymentId);
+        if (!$payment || $payment['entity_type'] !== 'CUSTOMER') {
+            return false;
+        }
+
+        $customerId = (int) $payment['entity_id'];
+        $customer = Customer::findById($customerId);
+        if (!$customer) {
+            return false;
+        }
+
+        $creditDate = $creditDate ?: ($payment['payment_date'] ?? date('Y-m-d'));
+
+        Database::beginTransaction();
+        try {
+            Database::execute("UPDATE payments SET status = 'CONFIRMED', payment_date = ? WHERE id = ?", [$creditDate, $paymentId]);
+
+            // Auto-post to Company Account Ledger
+            $amount = (float) ($payment['amount'] ?? 0.00);
+            CompanyLedger::create([
+                'entry_type' => 'CREDIT',
+                'category' => 'CUSTOMER_PAYMENT',
+                'amount' => $amount,
+                'entity_type' => 'CUSTOMER',
+                'entity_id' => $customerId,
+                'payment_method' => $payment['payment_method'] ?? 'BANK_TRANSFER',
+                'reference_no' => $payment['transaction_ref'] ?? 'N/A',
+                'description' => "Customer payment confirmed for {$customer['customer_code']}",
+                'created_by' => $adminUserId
+            ]);
+
+            // Trigger 9-Level Customer Referral Commission Calculation
+            \App\Services\CommissionCalculationService::processCustomerReferral(
+                $customerId,
+                $creditDate,
+                $paymentId,
+                $amount,
+                $customer['proposed_solar_kw'] ? $customer['proposed_solar_kw'] . ' kW System' : null,
+                (float)($customer['proposed_solar_kw'] ?? 3.0),
+                'On-Grid'
+            );
+
+            AuditLog::log(
+                $adminUserId,
+                'CUSTOMER_PAYMENT_CONFIRMED',
+                'CUSTOMER',
+                $customerId,
+                "Payment of ₹" . number_format($amount, 2) . " confirmed on {$creditDate} for Customer {$customer['customer_code']}"
             );
 
             Database::commit();
@@ -159,8 +234,40 @@ class Payment
         Database::beginTransaction();
         try {
             Database::execute("UPDATE payments SET status = 'FAILED' WHERE id = ?", [$paymentId]);
+            
             if ($advisor) {
-                Database::execute("UPDATE advisors SET status = 'PAYMENT_REJECTED' WHERE id = ?", [$advisorId]);
+                $userId = (int) $advisor['user_id'];
+
+                Database::execute(
+                    "UPDATE advisors SET status = 'PAYMENT_REJECTED', joining_fee_paid = 0, updated_at = NOW() WHERE id = ?",
+                    [$advisorId]
+                );
+
+                // Check if this advisor was converted from a customer or has a linked customer profile
+                $customer = Database::fetchOne(
+                    "SELECT * FROM customers WHERE user_id = ? OR converted_advisor_id = ? LIMIT 1",
+                    [$userId, $advisorId]
+                );
+
+                if ($customer) {
+                    // 1. Revert customer flags
+                    Database::execute(
+                        "UPDATE customers SET converted_to_advisor = 0, converted_advisor_id = NULL, updated_at = NOW() WHERE id = ?",
+                        [$customer['id']]
+                    );
+
+                    // 2. Revert User login role back to CUSTOMER
+                    Database::execute(
+                        "UPDATE users SET role = 'CUSTOMER', is_active = 1, updated_at = NOW() WHERE id = ?",
+                        [$userId]
+                    );
+
+                    // 3. Remove unapproved genealogy node
+                    Database::execute(
+                        "DELETE FROM advisor_genealogy WHERE descendant_id = ?",
+                        [$advisorId]
+                    );
+                }
             }
 
             AuditLog::log(
@@ -168,7 +275,7 @@ class Payment
                 'PAYMENT_REJECTED',
                 'ADVISOR',
                 $advisorId,
-                "Onboarding payment rejected for Advisor " . ($advisor['advisor_code'] ?? "#{$advisorId}") . ". Reason: " . ($reason ?: 'Invalid UTR / Payment not received')
+                "Onboarding payment rejected for Advisor " . ($advisor['advisor_code'] ?? "#{$advisorId}") . ". Reason: " . ($reason ?: 'Invalid UTR / Payment not received') . (isset($customer) && $customer ? " (Reverted to Customer {$customer['customer_code']})" : "")
             );
 
             Database::commit();

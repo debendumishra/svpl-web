@@ -200,6 +200,108 @@ class BoeController
         Response::redirect("/boe/customers/{$customerId}");
     }
 
+    public function updatePmSuryaGharId(string $id): void
+    {
+        $user = $this->authUser();
+        $boeUserId = (int)$user['id'];
+        $customerId = (int)$id;
+
+        $pmId = trim($_POST['pm_surya_ghar_id'] ?? '');
+        $notificationNo = trim($_POST['notification_number'] ?? '');
+
+        if (empty($pmId)) {
+            $_SESSION['error_msg'] = "PM Surya Ghar Application / Registration ID is required.";
+            Response::redirect("/boe/customers/{$customerId}");
+            return;
+        }
+
+        $customer = Customer::findById($customerId);
+        if (!$customer) {
+            Response::notFound("Customer record not found.");
+            return;
+        }
+
+        Customer::updatePmSuryaGharId($customerId, $pmId, $notificationNo);
+
+        $auditText = "Updated PM Surya Ghar Portal ID to [{$pmId}]" . (!empty($notificationNo) ? " (Notification No: {$notificationNo})" : "");
+        AuditLog::log($boeUserId, 'PM_SURYA_GHAR_ID_UPDATED', 'CUSTOMER', $customerId, $auditText);
+
+        $_SESSION['success_msg'] = "PM Surya Ghar Registration ID '{$pmId}' successfully updated and linked to Customer Profile!";
+        Response::redirect("/boe/customers/{$customerId}");
+    }
+
+    public function uploadPmDocument(string $id): void
+    {
+        $user = $this->authUser();
+        $boeUserId = (int)$user['id'];
+        $customerId = (int)$id;
+
+        $docType = trim($_POST['document_type'] ?? '');
+        $remarks = trim($_POST['remarks'] ?? '');
+
+        $titles = [
+            'FEASIBILITY_REPORT' => 'DISCOM Technical Feasibility Report',
+            'BANK_CONGRATULATION_LETTER' => 'Bank Sanction & Congratulation Letter',
+            'PM_SURYA_GHAR_CONGRATS' => 'PM Surya Ghar National Portal Congratulation Page',
+            'APPLICATION_ACKNOWLEDGEMENT' => 'Acknowledgement of Application',
+        ];
+
+        $title = $titles[$docType] ?? ($docType ? ucwords(str_replace('_', ' ', $docType)) : 'PM Surya Ghar Document');
+
+        if (!$customerId || !$docType || empty($_FILES['document_file']['tmp_name'])) {
+            $_SESSION['error_msg'] = "Please select a PM Surya Ghar document type and file to upload.";
+            Response::redirect("/boe/customers/{$customerId}");
+            return;
+        }
+
+        $file = $_FILES['document_file'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'pdf', 'webp'];
+
+        if (!in_array($ext, $allowed)) {
+            $_SESSION['error_msg'] = "Invalid file format. Allowed: PDF, JPG, PNG, WEBP.";
+            Response::redirect("/boe/customers/{$customerId}");
+            return;
+        }
+
+        $uploadDir = dirname(__DIR__, 2) . '/public/uploads/documents/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $filename = strtolower($docType) . '_' . $customerId . '_' . time() . '.' . $ext;
+        $targetPath = $uploadDir . $filename;
+
+        if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+            \App\Helpers\ImageCompressor::compressIfNeeded($targetPath);
+            $relPath = 'uploads/documents/' . $filename;
+            
+            $customer = Customer::findById($customerId);
+            $leadId = $customer['lead_id'] ?? null;
+
+            Document::create([
+                'entity_type' => 'CUSTOMER',
+                'entity_id' => $customerId,
+                'lead_id' => $leadId,
+                'document_type' => $docType,
+                'document_title' => $title,
+                'file_path' => $relPath,
+                'file_size' => $file['size'],
+                'mime_type' => $file['type'] ?: 'application/octet-stream',
+                'status' => 'Verified',
+                'remarks' => $remarks ?: "Official PM Surya Ghar document uploaded by BOE: {$user['name']} ({$user['employee_code']})",
+            ]);
+
+            AuditLog::log($boeUserId, 'PM_DOCUMENT_UPLOADED', 'CUSTOMER', $customerId, "Uploaded official PM Surya Ghar document '{$title}'");
+
+            $_SESSION['success_msg'] = "Official document '{$title}' successfully uploaded and made available in Customer Login!";
+        } else {
+            $_SESSION['error_msg'] = "Failed to upload document file. Please try again.";
+        }
+
+        Response::redirect("/boe/customers/{$customerId}");
+    }
+
     public function uploadDocument(): void
     {
         $user = $this->authUser();

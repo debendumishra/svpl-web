@@ -31,20 +31,90 @@ $title = "My Solar Journey — SVPL Customer Portal";
         <div class="d-flex align-items-center gap-2 mb-1">
             <h3 class="font-heading fw-bold mb-0 text-navy">Welcome, <?= htmlspecialchars($customer['first_name'] . ' ' . ($customer['last_name'] ?? '')) ?>!</h3>
             <span class="badge bg-success text-white fw-bold px-2 py-1" style="font-size: 0.72rem;">PM Surya Ghar Beneficiary</span>
+            <?php if (!empty($customer['pm_surya_ghar_id'])): ?>
+                <span class="badge bg-primary text-white font-monospace px-2 py-1" style="font-size: 0.72rem;">
+                    <i class="bi bi-patch-check-fill me-1"></i> ID: <?= htmlspecialchars($customer['pm_surya_ghar_id']) ?>
+                </span>
+            <?php endif; ?>
         </div>
         <p class="text-secondary small mb-0">
             Consumer Code: <span class="badge bg-light text-dark border font-monospace"><?= htmlspecialchars($customer['customer_code']) ?></span> | 
-            DISCOM Account: <strong class="text-primary"><?= htmlspecialchars($customer['consumer_number'] ?? 'TPCODL-0411298812') ?></strong>
+            DISCOM Account: <strong class="text-primary"><?= htmlspecialchars($customer['consumer_number'] ?? 'N/A') ?></strong>
+            <?php if (!empty($customer['notification_number'])): ?>
+                | Notification: <span class="font-monospace text-navy fw-bold"><?= htmlspecialchars($customer['notification_number']) ?></span>
+            <?php endif; ?>
         </p>
     </div>
-    <div class="d-flex gap-2">
-        <?php if ($lead): ?>
-            <a href="<?= url('/print/quotation/' . $lead['id']) ?>" target="_blank" class="btn btn-svpl-navy btn-sm shadow-sm">
-                <i class="bi bi-file-earmark-pdf me-1 text-warning"></i> Download Official Proposal
-            </a>
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+        <button type="button" class="btn btn-outline-primary btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalConsumerAgreement">
+            <i class="bi bi-file-earmark-text me-1 text-primary"></i> My Solar Agreement
+        </button>
+        <a href="<?= url('/customer/quotation') ?>" class="btn btn-svpl-navy btn-sm shadow-sm">
+            <i class="bi bi-file-earmark-pdf me-1 text-warning"></i> Official Quotation
+        </a>
+        <?php if (empty($customer['converted_to_advisor'])): ?>
+            <button type="button" class="btn btn-warning btn-sm text-dark fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalConvertToAdvisor">
+                <i class="bi bi-award-fill me-1"></i> Become an Advisor
+            </button>
         <?php endif; ?>
     </div>
 </div>
+
+<?php if ((int)($customer['converted_to_advisor'] ?? 0) === 2): ?>
+    <!-- ADVISOR CONVERSION PENDING VERIFICATION BANNER -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 text-white overflow-hidden animate-fade-in" style="background: linear-gradient(135deg, #061528 0%, #0f2d59 60%, #0369a1 100%); border-left: 5px solid #0ea5e9 !important;">
+        <div class="card-body p-3 p-md-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div style="background: rgba(14, 165, 233, 0.2); color: #38bdf8; width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold; flex-shrink: 0; border: 1px solid rgba(56, 189, 248, 0.3);">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <h6 class="fw-bold font-heading mb-0 text-white">Solar Advisor Application Under Verification</h6>
+                        <span class="badge bg-info text-dark fw-bold" style="font-size: 0.68rem;">Fee ₹<?= number_format(advisor_joining_fee()) ?> Submitted</span>
+                    </div>
+                    <p class="text-white-50 small mb-0">
+                        Your payment UTR is currently being verified by SVPL Accounts. Once confirmed, your account will upgrade to Solar Advisor. You can continue tracking your 15-stage installation below.
+                    </p>
+                </div>
+            </div>
+            <div>
+                <span class="badge bg-light text-navy fw-bold px-3 py-2 border shadow-sm">
+                    <i class="bi bi-clock-history text-primary me-1"></i> Verification Pending
+                </span>
+            </div>
+        </div>
+    </div>
+<?php elseif (empty($customer['converted_to_advisor'])): ?>
+    <!-- UPGRADE TO ADVISOR PROMOTION BANNER -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 text-white overflow-hidden animate-fade-in" style="background: linear-gradient(135deg, #061528 0%, #0f2d59 60%, #1e3a8a 100%); border-left: 5px solid #f59e0b !important;">
+        <div class="card-body p-4 p-md-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #061528; width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; font-weight: bold; flex-shrink: 0; box-shadow: 0 4px 12px rgba(245,158,11,0.35);">
+                    <i class="bi bi-award-fill"></i>
+                </div>
+                <div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                        <h5 class="fw-bold font-heading mb-0 text-white">Upgrade to Certified Solar Advisor (Mitra)</h5>
+                        <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.72rem;">9-Level Commission Plan</span>
+                    </div>
+                    <p class="text-white-50 small mb-0" style="max-width: 650px;">
+                        Recommend PM Surya Ghar solar rooftop systems to your neighbors and earn up to <strong>₹10,000 per 3 kW direct installation</strong> + multi-tier team overrides, monthly performance bonuses, and official SVPL identity credentials.
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end d-none d-sm-block">
+                    <span class="text-white-50 small d-block">Joining & Kit Fee:</span>
+                    <strong class="text-warning fs-5">₹<?= number_format(advisor_joining_fee()) ?></strong>
+                </div>
+                <a href="<?= url('/customer/become-advisor') ?>" class="btn btn-warning text-dark fw-bold px-4 py-2 shadow d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); border: 0;">
+                    <i class="bi bi-stars"></i> <span>Upgrade Now</span>
+                </a>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
 
 <!-- 15-STAGE LIVE INSTALLATION PROGRESS TRACKER -->
 <div class="card card-svpl p-4 bg-white border-0 shadow-sm mb-4 animate-fade-in stagger-1">
@@ -377,6 +447,32 @@ $title = "My Solar Journey — SVPL Customer Portal";
 
     <!-- Right Column: Document Locker & Assigned Solar Advisor -->
     <div class="col-lg-6">
+        <!-- PM Surya Ghar Agreement Card -->
+        <div class="card card-svpl p-3 p-md-4 bg-white border-0 shadow-sm mb-4 border-start border-4 border-success">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #059669; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0;">
+                        <i class="bi bi-file-earmark-check-fill"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h6 class="font-heading fw-bold mb-0 text-navy">Model Draft Agreement (Annexure 2)</h6>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle py-1" style="font-size: 0.68rem;">E-Signed ✓</span>
+                        </div>
+                        <p class="text-secondary small mb-0">Official 4-page PM Surya Ghar Consumer-Vendor contract</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalConsumerAgreement">
+                        <i class="bi bi-eye-fill me-1"></i> View Agreement
+                    </button>
+                    <a href="<?= url('/customer/agreement') ?>" target="_blank" class="btn btn-outline-secondary btn-sm" title="Print in new tab">
+                        <i class="bi bi-printer-fill"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <div class="card card-svpl p-4 bg-white border-0 shadow-sm mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="font-heading fw-bold mb-0 text-navy">Verified KYC & Rooftop Documents</h5>
@@ -445,3 +541,4 @@ $title = "My Solar Journey — SVPL Customer Portal";
         </div>
     </div>
 </div>
+

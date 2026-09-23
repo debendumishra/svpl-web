@@ -30,9 +30,41 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     
     <meta name="base-url" content="<?= base_path_url() ?>">
     
-    <!-- Solar Theme & Network CSS -->
-    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css') ?>">
-    <link rel="stylesheet" href="<?= asset('assets/css/network-tree.css') ?>">
+    <!-- Scripts (Loaded in Head for Inline View Support) -->
+    <script>window.SVPL_BASE_URL = '<?= rtrim(url(''), '/') ?>';</script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Solar Theme & Network CSS with Cache-Busting -->
+    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/network-tree.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
+
+    <style>
+        .app-header { position: sticky; top: 0; z-index: 1030; background: #FFFFFF; width: 100%; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
+        .app-header-strip { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; height: 56px !important; min-height: 56px !important; max-height: 56px !important; padding: 0 12px !important; background: #FFFFFF !important; border-bottom: 1px solid #E2E8F0 !important; box-sizing: border-box !important; }
+        .app-header-left { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 8px !important; min-width: 0 !important; flex: 1 1 auto !important; overflow: hidden !important; }
+        .app-header-emblem { width: 36px !important; height: 36px !important; min-width: 36px !important; border-radius: 9px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; font-weight: 800 !important; font-size: 1.1rem !important; flex-shrink: 0 !important; }
+        .app-header-title-wrap { display: flex !important; flex-direction: column !important; justify-content: center !important; min-width: 0 !important; overflow: hidden !important; line-height: 1.2 !important; }
+        .app-header-title-row { display: flex !important; align-items: center !important; gap: 6px !important; overflow: hidden !important; white-space: nowrap !important; }
+        .app-header-title { font-family: 'Outfit', sans-serif !important; font-weight: 700 !important; font-size: 0.92rem !important; color: #0F172A !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin: 0 !important; }
+        .app-header-subtitle { font-size: 0.7rem !important; color: #64748B !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: flex !important; align-items: center !important; gap: 4px !important; margin-top: 1px !important; }
+        .app-header-right { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 6px !important; flex-shrink: 0 !important; margin-left: auto !important; }
+        .app-header-btn { width: 36px; height: 36px; min-width: 36px; max-width: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.92rem; font-weight: 600; flex-shrink: 0; text-decoration: none; border: 1px solid #E2E8F0; background: #F8FAFC; color: #334155; }
+        .app-header-btn.d-none { display: none !important; }
+        @media (min-width: 992px) {
+            .app-header-btn.d-lg-none { display: none !important; }
+            .app-header-btn.d-none.d-lg-inline-flex,
+            .app-header-btn.d-lg-inline-flex { display: inline-flex !important; }
+            .portal-sidebar { display: flex !important; visibility: visible !important; }
+        }
+        @media (max-width: 991.98px) {
+            .app-header-btn.d-none.d-lg-inline-flex { display: none !important; }
+            .app-header-btn.d-lg-none { display: inline-flex !important; }
+            .portal-sidebar { display: none !important; }
+        }
+        .app-header-logout { border: 1px solid #FCA5A5 !important; background-color: #FEF2F2 !important; color: #DC2626 !important; }
+        .app-header-logout:hover { background-color: #DC2626 !important; color: #FFFFFF !important; border-color: #DC2626 !important; }
+    </style>
 </head>
 <body>
 
@@ -41,7 +73,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         
         <!-- CONSTANT TOP HEADER (STICKY) -->
         <header class="app-header">
-            <!-- Top Status Live Ticker Bar (Desktop) -->
+            <!-- Top Status Live Ticker Bar (Desktop Only) -->
             <div class="live-ticker-bar px-3 d-none d-lg-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
@@ -57,42 +89,45 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
 
             <!-- Primary App Bar with Mobile & Desktop Toggles -->
-            <div class="px-2 px-md-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
-                <div class="d-flex align-items-center gap-2 gap-md-3">
+            <div class="app-header-strip">
+                <div class="app-header-left">
                     <!-- Mobile Hamburger Button (triggers Offcanvas) -->
-                    <button class="btn btn-light border btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMobileDrawer" aria-label="Open Mobile Menu">
+                    <button class="app-header-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMobileDrawer" aria-label="Open Mobile Menu">
                         <i class="bi bi-list fs-5"></i>
                     </button>
 
                     <!-- Desktop Sidebar Toggle Button -->
-                    <button class="btn btn-light border btn-sm d-none d-lg-inline-block" id="sidebarToggleBtn" title="Toggle Sidebar Expand/Collapse">
+                    <button class="app-header-btn d-none d-lg-inline-flex" id="sidebarToggleBtn" title="Toggle Sidebar Expand/Collapse">
                         <i class="bi bi-layout-sidebar-inset fs-5"></i>
                     </button>
 
-                    <a href="<?= url('/admin/dashboard') ?>" class="d-flex align-items-center gap-2 text-decoration-none">
+                    <a href="<?= url('/admin/dashboard') ?>" class="d-flex align-items-center gap-2 text-decoration-none min-w-0 overflow-hidden">
                         <?php if ($logoUrl = company_logo_url()): ?>
-                            <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 36px; width: auto; max-width: 150px; object-fit: contain;">
-                            <span class="badge bg-warning text-dark ms-1 fw-bold d-none d-sm-inline-block" style="font-size: 0.65rem;">ADMIN</span>
+                            <img src="<?= htmlspecialchars($logoUrl) ?>" alt="<?= htmlspecialchars(company_name()) ?>" style="max-height: 32px; width: auto; max-width: 140px; object-fit: contain;">
+                            <span class="badge bg-warning text-dark fw-bold d-none d-sm-inline-block" style="font-size: 0.65rem; letter-spacing: 0.05em;">ADMIN</span>
                         <?php else: ?>
-                            <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900; font-size: 1rem;">
+                            <div class="app-header-emblem" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #061528;">
                                 ☀
                             </div>
-                            <div>
-                                <span class="font-heading fw-bold text-navy" style="font-size: 1.05rem; letter-spacing: -0.3px;"><?= htmlspecialchars(company_short_name()) ?></span>
-                                <span class="badge bg-warning text-dark ms-1 fw-bold d-none d-sm-inline-block" style="font-size: 0.65rem;">ADMIN</span>
+                            <div class="app-header-title-wrap">
+                                <div class="app-header-title-row">
+                                    <span class="app-header-title"><?= htmlspecialchars(company_short_name()) ?></span>
+                                    <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.62rem; letter-spacing: 0.05em;">ADMIN</span>
+                                </div>
+                                <span class="app-header-subtitle">Executive Command Center</span>
                             </div>
                         <?php endif; ?>
                     </a>
                 </div>
 
-                <div class="d-flex align-items-center gap-1 gap-md-2">
-                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-sm-inline-flex">
-                        <i class="bi bi-plus-circle-fill me-1"></i> + New Lead
+                <div class="app-header-right">
+                    <a href="<?= url('/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-md-inline-flex align-items-center gap-1 px-3" style="height: 36px; font-size: 0.82rem;">
+                        <i class="bi bi-plus-circle-fill"></i> <span>+ Lead</span>
                     </a>
-                    <a href="<?= url('/') ?>" target="_blank" class="btn btn-light border btn-sm" title="Public Home">
-                        <i class="bi bi-globe"></i>
+                    <a href="<?= url('/') ?>" target="_blank" class="app-header-btn" title="View Public Website">
+                        <i class="bi bi-globe text-primary"></i>
                     </a>
-                    <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm" title="Sign Out">
+                    <a href="<?= url('/logout') ?>" class="app-header-btn app-header-logout" title="Sign Out">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
@@ -198,6 +233,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/boe') !== false || strpos($activeUri, '/manager/boe') !== false) ? 'active' : '' ?>" href="<?= url('/admin/boe-management') ?>">
+                                    <i class="bi bi-people-fill text-info"></i> <span>BOE Staff Desk</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/admin/commissions') !== false ? 'active' : '' ?>" href="<?= url('/admin/commissions') ?>">
                                     <i class="bi bi-cash-stack"></i> <span>9-Level Commissions</span>
                                 </a>
@@ -286,7 +326,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         <div class="app-body-container">
             
             <!-- DESKTOP EXPANDABLE PORTAL SIDEBAR -->
-            <aside class="portal-sidebar d-none d-lg-flex" id="appSidebar">
+            <aside class="portal-sidebar" id="appSidebar">
                 <div class="py-2 flex-grow-1">
                     
                     <!-- Core Command Accordion -->
@@ -364,6 +404,11 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                             <li class="nav-item">
                                 <a class="nav-link <?= (strpos($activeUri, '/admin/engineers') !== false || strpos($activeUri, '/manager/engineers') !== false) ? 'active' : '' ?>" href="<?= url('/admin/engineers') ?>">
                                     <i class="bi bi-person-badge-fill text-warning"></i> <span class="sidebar-text">Engineers Desk</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link <?= (strpos($activeUri, '/admin/boe') !== false || strpos($activeUri, '/manager/boe') !== false) ? 'active' : '' ?>" href="<?= url('/admin/boe-management') ?>">
+                                    <i class="bi bi-people-fill text-info"></i> <span class="sidebar-text">BOE Staff Desk</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -499,9 +544,6 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     </div>
 
     <!-- Scripts -->
-    <script>window.SVPL_BASE_URL = '<?= rtrim(url(''), '/') ?>';</script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= asset('assets/js/app.js') ?>"></script>
     <script src="<?= asset('assets/js/image-compressor.js') ?>"></script>
     <script src="<?= asset('assets/js/photo-crop-studio.js') ?>"></script>

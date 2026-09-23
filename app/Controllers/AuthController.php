@@ -21,6 +21,7 @@ use App\Models\AuditLog;
 use App\Models\Payment;
 use App\Models\Location;
 use App\Helpers\Database;
+use App\Services\MailService;
 
 class AuthController
 {
@@ -120,19 +121,15 @@ class AuthController
         $post = $_POST;
         $mobile = trim($post['mobile'] ?? '');
         $email = trim($post['email'] ?? '');
-        $password = $post['password'] ?? 'Password@123';
+        $password = !empty($post['password']) ? trim($post['password']) : 'Password@123';
         $refCode = trim($post['referral_code'] ?? '');
         $captcha = trim($post['captcha'] ?? '');
-        $paymentMethod = trim($post['payment_method'] ?? 'UPI');
-        $transactionRef = trim($post['transaction_ref'] ?? '');
-        $paymentDate = trim($post['payment_date'] ?? date('Y-m-d'));
-        $paymentRemarks = trim($post['payment_remarks'] ?? '');
 
-        // Validation
-        if (empty($post['first_name']) || empty($post['last_name']) || empty($mobile) || empty($post['district']) || empty($post['block']) || empty($transactionRef)) {
+        // Validation - Free Registration
+        if (empty($post['first_name']) || empty($post['last_name']) || empty($mobile) || empty($post['district']) || empty($post['block'])) {
             Response::view('public/register_advisor', [
                 'pageTitle' => 'Join as Solar Advisor — SVPL',
-                'error' => 'Please fill in all mandatory fields (*) including the ₹2,700 Onboarding Fee Transaction UTR/Ref number.',
+                'error' => 'Please fill in all mandatory fields (*) marked on the registration form.',
                 'post' => $post,
                 'districts' => Location::getDistricts(),
             ]);
@@ -199,21 +196,21 @@ class AuthController
 
         Database::beginTransaction();
         try {
-            // 1. Create User (inactive until payment confirmed by admin)
+            // 1. Create User (Active immediately for Free Registration)
             $userId = User::create([
                 'role' => 'ADVISOR',
                 'email' => !empty($email) ? $email : null,
                 'mobile' => $mobile,
                 'password_hash' => password_hash($password, PASSWORD_BCRYPT),
                 'full_name' => trim($post['first_name'] . ' ' . $post['last_name']),
-                'is_active' => 0,
+                'is_active' => 1,
             ]);
 
             // 2. Generate Advisor Codes
             $advCode = Advisor::generateAdvisorCode();
             $newRefCode = Advisor::generateReferralCode();
 
-            // 3. Create Advisor Profile (PENDING_APPROVAL status)
+            // 3. Create Advisor Profile (ACTIVE status, fee unpaid)
             $advId = Advisor::create([
                 'user_id' => $userId,
                 'advisor_code' => $advCode,
@@ -243,7 +240,7 @@ class AuthController
                 'account_holder' => trim($post['account_holder'] ?? ''),
                 'account_number' => trim($post['account_number'] ?? ''),
                 'ifsc_code' => trim($post['ifsc_code'] ?? ''),
-                'status' => 'PENDING_APPROVAL',
+                'status' => 'ACTIVE',
                 'joining_fee' => advisor_joining_fee(),
                 'joining_fee_paid' => 0,
             ]);
@@ -261,20 +258,7 @@ class AuthController
                 ]);
             }
 
-            // 4. Create Payment record for Admin Verification
-            $currentFee = advisor_joining_fee();
-            $paymentId = Payment::create([
-                'entity_type' => 'ADVISOR',
-                'entity_id' => $advId,
-                'purpose' => 'JOINING_FEE',
-                'amount' => $currentFee,
-                'payment_method' => $paymentMethod,
-                'transaction_ref' => $transactionRef,
-                'status' => 'PENDING',
-                'payment_date' => $paymentDate,
-            ]);
-
-            // 5. Update Genealogy Closure Table
+            // 5. Update Genealogy Closure Table (free network tree building)
             Genealogy::addAdvisor($advId, $sponsorId);
 
             // 6. Initialize Wallet
@@ -287,19 +271,29 @@ class AuthController
             ]);
 
             // 7. Log Audit Trail
-            AuditLog::log($userId, 'ADVISOR_REGISTERED', 'ADVISOR', $advId, "Advisor {$advCode} registered with fee ₹" . number_format($currentFee) . " pending verification (UTR: {$transactionRef})");
+            AuditLog::log($userId, 'ADVISOR_REGISTERED_FREE', 'ADVISOR', $advId, "Advisor {$advCode} registered free (network enabled, fee pending)");
 
             Database::commit();
 
-            // Render Awaiting Verification screen with details
+            // 8. Dispatch Email Credentials if email address provided
+            $emailSent = false;
+            if (!empty($email)) {
+                $emailSent = MailService::sendAdvisorCredentials(
+                    $email,
+                    trim($post['first_name'] . ' ' . $post['last_name']),
+                    $advCode,
+                    $mobile,
+                    $password,
+                    $newRefCode
+                );
+            }
+
+            // Render Free Registration Success screen
             $advData = Advisor::findById($advId);
-            Response::view('public/advisor_registered_pending', [
-                'pageTitle' => 'Registration Submitted — Awaiting Verification — SVPL',
+            Response::view('public/advisor_registered_success', [
+                'pageTitle' => 'Advisor Registration Successful — SVPL',
                 'advisor' => $advData,
-                'paymentMethod' => $paymentMethod,
-                'transactionRef' => $transactionRef,
-                'paymentDate' => $paymentDate,
-                'paymentRemarks' => $paymentRemarks,
+                'emailSent' => $emailSent,
             ]);
         } catch (\Throwable $e) {
             Database::rollBack();
@@ -307,6 +301,7 @@ class AuthController
                 'pageTitle' => 'Join as Solar Advisor — SVPL',
                 'error' => 'Registration failed: ' . $e->getMessage(),
                 'post' => $post,
+                'districts' => Location::getDistricts(),
             ]);
         }
     }
@@ -315,6 +310,12 @@ class AuthController
     {
         $user = AuthService::user();
         if ($user && ($user['role'] ?? '') === 'ADVISOR') {
+            $advisor = Advisor::findByUserId((int) $user['id']);
+            if (empty($advisor['joining_fee_paid'])) {
+                $_SESSION['payment_error'] = 'Customer Registration is locked until your one-time registration fee payment of ₹' . number_format(advisor_joining_fee()) . ' is received and approved by admin.';
+                Response::redirect('/advisor/dashboard');
+                return;
+            }
             Response::redirect('/advisor/register-customer');
             return;
         }

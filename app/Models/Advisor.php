@@ -38,6 +38,23 @@ class Advisor
                                    WHERE a.referral_code = ? OR a.advisor_code = ? OR a.mobile = ? OR u.mobile = ?", [$code, $code, $code, $code]);
     }
 
+    public static function getImmediateSponsor(?int $sponsorId): ?array
+    {
+        if (empty($sponsorId)) {
+            return null;
+        }
+
+        return Database::fetchOne(
+            "SELECT a.id, a.advisor_code, a.referral_code, a.first_name, a.last_name, 
+                    a.mobile, a.email, a.district, a.block, a.state, a.status, a.photo_url,
+                    u.full_name as user_full_name, u.mobile as user_mobile, u.email as user_email
+             FROM advisors a
+             JOIN users u ON a.user_id = u.id
+             WHERE a.id = ?",
+            [$sponsorId]
+        );
+    }
+
     public static function create(array $data): int
     {
         $sql = "INSERT INTO advisors (
@@ -76,9 +93,9 @@ class Advisor
             $data['state'] ?? 'Odisha',
             $data['district'],
             $data['block'],
-            $data['gram_panchayat'],
+            $data['gram_panchayat'] ?? '',
             $data['village'] ?? null,
-            $data['pincode'],
+            $data['pincode'] ?? '751024',
             $data['address_line'] ?? null,
             $data['aadhaar_number'] ?? null,
             $data['pan_number'] ?? null,

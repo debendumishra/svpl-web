@@ -43,6 +43,108 @@ class AdminController
         $totalSubsidies = Database::fetchOne("SELECT COALESCE(SUM(subsidy_amount), 0) as total FROM leads WHERE stage = 'SUBSIDY_RECEIVED'")['total'] ?? 0;
         $pendingPaymentsCount = Payment::countPendingAdvisorPayments();
 
+        // Real-Time Executive Alerts
+        $unclaimedRegistrations = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM customers c 
+            LEFT JOIN leads l ON l.customer_id = c.id 
+            WHERE c.assigned_boe_id IS NULL AND (l.stage = 'REGISTRATION' OR l.stage IS NULL)
+        ")['cnt'] ?? 0);
+
+        $pendingAdvisorApprovals = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM advisors a 
+            LEFT JOIN payments p ON p.entity_type = 'ADVISOR' AND p.entity_id = a.id AND p.purpose = 'JOINING_FEE' 
+            WHERE (a.status = 'PENDING' OR a.joining_fee_paid = 0 OR p.status = 'PENDING')
+        ")['cnt'] ?? 0);
+
+        $crucialStagesBreakdown = [
+            'DOCUMENTS'         => (int)(Database::fetchOne("SELECT COUNT(*) as cnt FROM leads WHERE stage = 'DOCUMENTS'")['cnt'] ?? 0),
+            'GOVT_PORTAL'       => (int)(Database::fetchOne("SELECT COUNT(*) as cnt FROM leads WHERE stage = 'GOVT_PORTAL'")['cnt'] ?? 0),
+            'LOAN_APPLIED'      => (int)(Database::fetchOne("SELECT COUNT(*) as cnt FROM leads WHERE stage = 'LOAN_APPLIED'")['cnt'] ?? 0),
+            'NET_METER_APPLIED' => (int)(Database::fetchOne("SELECT COUNT(*) as cnt FROM leads WHERE stage = 'NET_METER_APPLIED'")['cnt'] ?? 0),
+            'SUBSIDY_APPLIED'   => (int)(Database::fetchOne("SELECT COUNT(*) as cnt FROM leads WHERE stage = 'SUBSIDY_APPLIED'")['cnt'] ?? 0),
+        ];
+        $totalCrucialStagesPending = array_sum($crucialStagesBreakdown);
+
+        $pendingDespatches = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM leads l 
+            WHERE l.stage = 'LOAN_SANCTIONED' 
+              AND NOT EXISTS (SELECT 1 FROM package_dispatches pd WHERE pd.lead_id = l.id)
+        ")['cnt'] ?? 0);
+
+        $customerReceivePending = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM package_dispatches pd 
+            WHERE pd.customer_acknowledged = 0 
+              AND pd.status != 'Cancelled'
+        ")['cnt'] ?? 0);
+
+        $engineerInstallationPending = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM leads l 
+            WHERE l.stage IN ('INSTRUMENT_DESPATCHED', 'INSTALLATION_COMMENCED')
+        ")['cnt'] ?? 0);
+
+        $pendingWithdrawals = Database::fetchOne("
+            SELECT COUNT(*) as cnt, COALESCE(SUM(amount), 0) as total_amount 
+            FROM withdrawal_requests 
+            WHERE status = 'PENDING'
+        ");
+        $pendingWithdrawalsCount = (int)($pendingWithdrawals['cnt'] ?? 0);
+        $pendingWithdrawalsAmount = (float)($pendingWithdrawals['total_amount'] ?? 0.0);
+
+        $pendingCommissions = Database::fetchOne("
+            SELECT COUNT(*) as cnt, COALESCE(SUM(commission_amount), 0) as total_amount 
+            FROM commissions 
+            WHERE status = 'PENDING'
+        ");
+        $pendingCommissionsCount = (int)($pendingCommissions['cnt'] ?? 0);
+        $pendingCommissionsAmount = (float)($pendingCommissions['total_amount'] ?? 0.0);
+
+        $boeStalledApplications = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM customers c 
+            JOIN leads l ON l.customer_id = c.id 
+            WHERE c.assigned_boe_id IS NOT NULL 
+              AND l.stage IN ('REGISTRATION', 'DOCUMENTS') 
+              AND (l.updated_at < DATE_SUB(NOW(), INTERVAL 2 DAY) OR (l.updated_at IS NULL AND l.created_at < DATE_SUB(NOW(), INTERVAL 2 DAY)))
+        ")['cnt'] ?? 0);
+
+        $pendingIdCards = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM advisors 
+            WHERE (id_card_number IS NULL OR id_card_number = '') AND status != 'INACTIVE'
+        ")['cnt'] ?? 0);
+
+        $unassignedDirectLeads = (int)(Database::fetchOne("
+            SELECT COUNT(*) as cnt 
+            FROM leads 
+            WHERE advisor_id IS NULL
+        ")['cnt'] ?? 0);
+
+        $alerts = [
+            'unclaimedRegistrations'       => $unclaimedRegistrations,
+            'pendingAdvisorApprovals'      => $pendingAdvisorApprovals,
+            'crucialStagesBreakdown'       => $crucialStagesBreakdown,
+            'totalCrucialStagesPending'    => $totalCrucialStagesPending,
+            'pendingDespatches'            => $pendingDespatches,
+            'customerReceivePending'       => $customerReceivePending,
+            'engineerInstallationPending'  => $engineerInstallationPending,
+            'pendingWithdrawalsCount'      => $pendingWithdrawalsCount,
+            'pendingWithdrawalsAmount'     => $pendingWithdrawalsAmount,
+            'pendingCommissionsCount'      => $pendingCommissionsCount,
+            'pendingCommissionsAmount'     => $pendingCommissionsAmount,
+            'boeStalledApplications'       => $boeStalledApplications,
+            'pendingIdCards'               => $pendingIdCards,
+            'unassignedDirectLeads'        => $unassignedDirectLeads,
+            'totalAlertCount'              => ($unclaimedRegistrations + $pendingAdvisorApprovals + $totalCrucialStagesPending + 
+                                              $pendingDespatches + $customerReceivePending + $engineerInstallationPending + 
+                                              $pendingWithdrawalsCount + $pendingCommissionsCount + $boeStalledApplications + 
+                                              $pendingIdCards + $unassignedDirectLeads),
+        ];
+
         // Stage breakdown
         $stageStats = Database::fetchAll("SELECT stage, COUNT(*) as count FROM leads GROUP BY stage");
 
@@ -59,6 +161,7 @@ class AdminController
             'totalCommissions' => (float) $totalCommissions,
             'totalSubsidies' => (float) $totalSubsidies,
             'pendingPaymentsCount' => (int) $pendingPaymentsCount,
+            'alerts' => $alerts,
             'stageStats' => $stageStats,
             'recentLeads' => $recentLeads,
             'recentAdvisors' => $recentAdvisors,
@@ -369,7 +472,7 @@ class AdminController
 
         $res = Payment::confirmAdvisorPayment($paymentId, $adminId);
         if ($res) {
-            Response::redirect('/admin/payments?success=' . urlencode('Payment of ₹2,700 confirmed successfully! Advisor account is now ACTIVE and can log in.'));
+            Response::redirect('/admin/payments?success=' . urlencode('Payment of ₹' . number_format(advisor_joining_fee()) . ' confirmed successfully! Advisor registration fee is paid and customer registration is now UNLOCKED.'));
         } else {
             Response::redirect('/admin/payments?error=' . urlencode('Failed to confirm payment. Please try again.'));
         }
@@ -1320,6 +1423,78 @@ class AdminController
         ]);
 
         unset($_SESSION['success_msg'], $_SESSION['error_msg']);
+    }
+
+    public function exportWithdrawals(): void
+    {
+        $statusFilter = $_GET['status'] ?? 'ALL';
+        $withdrawals = \App\Models\WithdrawalRequest::getAll($statusFilter);
+
+        $filename = 'SVPL_Bank_Withdrawals_' . strtoupper($statusFilter) . '_' . date('Ymd_His') . '.csv';
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+        // UTF-8 BOM for Microsoft Excel
+        fputs($output, "\xEF\xBB\xBF");
+
+        fputcsv($output, [
+            'Request Code',
+            'Requested Date & Time',
+            'Advisor Code',
+            'Advisor Name',
+            'Mobile',
+            'Gross Amount (Rs)',
+            '5% Statutory TDS (Rs)',
+            'Net Payable (Rs)',
+            'Bank Name',
+            'Bank Branch',
+            'Account Holder',
+            'Account Number',
+            'IFSC Code',
+            'Status',
+            'Bank UTR Number',
+            'Processed By',
+            'Processed At',
+            'Admin Remarks'
+        ]);
+
+        foreach ($withdrawals as $w) {
+            fputcsv($output, [
+                $w['request_code'],
+                $w['requested_at'],
+                $w['advisor_code'] ?? '',
+                $w['advisor_name'] ?? $w['account_holder'] ?? '',
+                $w['mobile'] ?? '',
+                number_format((float)$w['amount'], 2, '.', ''),
+                number_format((float)$w['tds_amount'], 2, '.', ''),
+                number_format((float)$w['net_payable'], 2, '.', ''),
+                $w['bank_name'] ?? '',
+                $w['bank_branch'] ?? '',
+                $w['account_holder'] ?? '',
+                $w['account_number'] ?? '',
+                $w['ifsc_code'] ?? '',
+                $w['status'],
+                $w['utr_number'] ?? '',
+                $w['processor_name'] ?? '',
+                $w['processed_at'] ?? '',
+                $w['admin_remarks'] ?? ''
+            ]);
+        }
+        fclose($output);
+        exit;
+    }
+
+    public function printWithdrawals(): void
+    {
+        $statusFilter = $_GET['status'] ?? 'ALL';
+        $withdrawals = \App\Models\WithdrawalRequest::getAll($statusFilter);
+
+        Response::view('printable/admin_withdrawals_report', [
+            'pageTitle' => 'Bank Withdrawals & Payouts Report — SVPL Admin',
+            'withdrawals' => $withdrawals,
+            'statusFilter' => $statusFilter
+        ]);
     }
 
     public function approveWithdrawal(int $id): void

@@ -98,8 +98,31 @@ $standardInstruments = $standardInstruments ?? \App\Models\PackageDispatch::STAN
         </div>
     </div>
 
+<style>
+.dispatches-table-card {
+    overflow: visible !important;
+}
+.dispatches-table-card .table-responsive {
+    overflow: visible !important;
+    min-height: 280px;
+}
+@media (max-width: 991.98px) {
+    .dispatches-table-card .table-responsive {
+        overflow-x: auto !important;
+    }
+}
+.dropdown-menu {
+    z-index: 1070 !important;
+}
+.btn-action-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+</style>
+
     <!-- DISPATCHES TABLE -->
-    <div class="card card-svpl p-3 p-md-4 bg-white border shadow-sm rounded-3">
+    <div class="card card-svpl dispatches-table-card p-3 p-md-4 bg-white border shadow-sm rounded-3">
         <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
             <h5 class="fw-bold text-navy mb-0">
                 <i class="bi bi-list-task text-primary me-1"></i> Dispatches & Shipment Records
@@ -120,13 +143,13 @@ $standardInstruments = $standardInstruments ?? \App\Models\PackageDispatch::STAN
                         <th>Materials / BOM</th>
                         <th>Date</th>
                         <th>Status</th>
-                        <th class="text-end">Update</th>
+                        <th class="text-end">Actions & Documents</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($dispatches)): ?>
                         <tr>
-                            <td colspan="9" class="text-center py-5 text-muted">
+                            <td colspan="10" class="text-center py-5 text-muted">
                                 <i class="bi bi-box-seam fs-1 d-block mb-2 text-secondary"></i>
                                 No equipment dispatches recorded yet. Click <strong>"+ Despatch Solar Instruments"</strong> to dispatch materials.
                             </td>
@@ -136,6 +159,7 @@ $standardInstruments = $standardInstruments ?? \App\Models\PackageDispatch::STAN
                             <?php 
                                 $itemsList = !empty($d['items_json']) ? json_decode($d['items_json'], true) : [];
                                 $mediaList = !empty($d['media_urls']) ? json_decode($d['media_urls'], true) : [];
+                                $encodedDispatch = htmlspecialchars(json_encode($d), ENT_QUOTES, 'UTF-8');
                             ?>
                             <tr class="dispatch-row">
                                 <td>
@@ -151,7 +175,7 @@ $standardInstruments = $standardInstruments ?? \App\Models\PackageDispatch::STAN
                                 <td>
                                     <?php if ($d['dispatch_type'] === 'SOLAR_EQUIPMENT'): ?>
                                         <span class="badge bg-primary text-white">
-                                            <i class="bi bi-sun"></i> Solar Instruments
+                                             <i class="bi bi-sun"></i> Solar Instruments
                                         </span>
                                     <?php elseif ($d['dispatch_type'] === 'ADVISOR_KIT'): ?>
                                         <span class="badge bg-warning text-dark">
@@ -210,8 +234,8 @@ $standardInstruments = $standardInstruments ?? \App\Models\PackageDispatch::STAN
                                 </td>
                                 <td style="max-width: 200px;">
                                     <?php if (!empty($itemsList) && is_array($itemsList)): ?>
-                                        <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-1" 
-                                                onclick="viewDispatchBOM(<?= htmlspecialchars(json_encode($d), ENT_QUOTES, 'UTF-8') ?>)"
+                                        <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2 btn-view-bom shadow-sm" 
+                                                data-dispatch="<?= $encodedDispatch ?>"
                                                 style="font-size: 0.72rem;">
                                             <i class="bi bi-card-checklist me-1"></i> <?= count($itemsList) ?> Items BOM
                                         </button>
@@ -240,45 +264,45 @@ $standardInstruments = $standardInstruments ?? \App\Models\PackageDispatch::STAN
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end text-nowrap">
-                                    <div class="d-inline-flex align-items-center gap-1">
-                                        <!-- Direct Document Links -->
-                                        <div class="btn-group btn-group-sm">
+                                    <div class="d-inline-flex align-items-center gap-2">
+                                        <!-- Split E-Way Bill Button with Documents Dropdown -->
+                                        <div class="btn-group btn-group-sm shadow-sm" role="group">
                                             <a href="<?= url('/print/eway-bill/' . $d['id']) ?>" target="_blank" class="btn btn-warning btn-sm text-dark fw-bold" title="Generate & Print E-Way Bill (EWB-01)">
-                                                <i class="bi bi-truck"></i> E-Way Bill
+                                                <i class="bi bi-truck me-1"></i> E-Way Bill
                                             </a>
-                                            <button type="button" class="btn btn-warning btn-sm dropdown-toggle dropdown-toggle-split text-dark" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <button type="button" class="btn btn-warning btn-sm dropdown-toggle dropdown-toggle-split text-dark px-2" data-bs-toggle="dropdown" aria-expanded="false" data-bs-popper-config='{"strategy":"fixed"}' title="More Dispatch Documents">
                                                 <span class="visually-hidden">Toggle Dropdown</span>
                                             </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="font-size: 0.8rem; z-index: 1050;">
-                                                <li><h6 class="dropdown-header text-uppercase fw-bold text-navy py-1">Official Dispatch Documents</h6></li>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 py-2" style="font-size: 0.82rem; min-width: 240px; z-index: 99999;">
+                                                <li><h6 class="dropdown-header text-uppercase fw-bold text-navy py-1" style="font-size: 0.72rem;"><i class="bi bi-file-earmark-text text-primary me-1"></i>Official Dispatch Documents</h6></li>
                                                 <li>
-                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-1" href="<?= url('/print/eway-bill/' . $d['id']) ?>" target="_blank">
-                                                        <i class="bi bi-truck text-warning"></i> Print E-Way Bill (EWB-01)
+                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= url('/print/eway-bill/' . $d['id']) ?>" target="_blank">
+                                                        <i class="bi bi-truck text-warning fs-6"></i> <span>Print E-Way Bill (EWB-01)</span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-1" href="<?= url('/print/dispatch-invoice/' . $d['id']) ?>" target="_blank">
-                                                        <i class="bi bi-receipt-cutoff text-primary"></i> Print GST Tax Invoice & BOM
+                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= url('/print/dispatch-invoice/' . $d['id']) ?>" target="_blank">
+                                                        <i class="bi bi-receipt-cutoff text-primary fs-6"></i> <span>Print GST Tax Invoice & BOM</span>
                                                     </a>
                                                 </li>
                                                 <li>
-                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-1" href="<?= url('/print/dispatch-challan/' . $d['id']) ?>" target="_blank">
-                                                        <i class="bi bi-file-earmark-text text-info"></i> Print Delivery Challan / Gate Pass
+                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2" href="<?= url('/print/dispatch-challan/' . $d['id']) ?>" target="_blank">
+                                                        <i class="bi bi-file-earmark-text text-info fs-6"></i> <span>Print Delivery Challan / Gate Pass</span>
                                                     </a>
                                                 </li>
                                                 <li><hr class="dropdown-divider my-1"></li>
                                                 <li>
-                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-1" href="javascript:void(0)" onclick="viewDispatchBOM(<?= htmlspecialchars(json_encode($d), ENT_QUOTES, 'UTF-8') ?>)">
-                                                        <i class="bi bi-eye text-success"></i> View Equipment Checklist
+                                                    <a class="dropdown-item d-flex align-items-center gap-2 py-2 btn-view-bom" href="javascript:void(0)" data-dispatch="<?= $encodedDispatch ?>">
+                                                        <i class="bi bi-card-checklist text-success fs-6"></i> <span>View Equipment Checklist</span>
                                                     </a>
                                                 </li>
                                             </ul>
                                         </div>
 
-                                        <!-- Status update dropdown -->
+                                        <!-- Status update dropdown form -->
                                         <form method="POST" action="<?= (strpos($_SERVER['REQUEST_URI'] ?? '', '/manager') !== false) ? url('/manager/dispatches/update-status') : url('/admin/dispatches/update-status') ?>" class="d-inline-block m-0">
                                             <input type="hidden" name="dispatch_id" value="<?= $d['id'] ?>">
-                                            <select name="status" class="form-select form-select-sm py-0" style="font-size: 0.75rem; width: 105px;" onchange="this.form.submit()">
+                                            <select name="status" class="form-select form-select-sm py-1 fw-medium" style="font-size: 0.75rem; width: 115px;" onchange="this.form.submit()" title="Change Dispatch Status">
                                                 <option value="Dispatched" <?= $d['status'] === 'Dispatched' ? 'selected' : '' ?>>Dispatched</option>
                                                 <option value="In Transit" <?= $d['status'] === 'In Transit' ? 'selected' : '' ?>>In Transit</option>
                                                 <option value="Out for Delivery" <?= $d['status'] === 'Out for Delivery' ? 'selected' : '' ?>>Out for Delivery</option>
@@ -649,9 +673,42 @@ function openDispatchDoc(type) {
         alert('Please select a valid dispatch record.');
         return;
     }
-    const printUrl = '<?= url("/print/") ?>' + type + '/' + currentViewingDispatch.id;
+    const baseUrl = '<?= rtrim(url("/print"), "/") ?>';
+    const printUrl = baseUrl + '/' + type + '/' + currentViewingDispatch.id;
     window.open(printUrl, '_blank');
 }
+
+// Delegate click handler for view BOM buttons & initialize dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure all Bootstrap dropdowns inside tables float cleanly using fixed strategy
+    if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(el) {
+            bootstrap.Dropdown.getOrCreateInstance(el, {
+                popperConfig: function() {
+                    return { strategy: 'fixed' };
+                }
+            });
+        });
+    }
+
+    document.body.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-view-bom');
+        if (btn) {
+            e.preventDefault();
+            let data = btn.getAttribute('data-dispatch');
+            if (data) {
+                try {
+                    data = JSON.parse(data);
+                } catch(err) {
+                    console.error('Error parsing dispatch data:', err);
+                }
+            }
+            if (data && typeof data === 'object') {
+                viewDispatchBOM(data);
+            }
+        }
+    });
+});
 
 function updateBomLiveCounter() {
     const total = document.querySelectorAll('.bom-checkbox').length;
@@ -884,6 +941,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (opt && opt.dataset && opt.dataset.address) {
                 genAddr.value = opt.dataset.address;
             }
+        });
+    }
+
+    // Initialize all Bootstrap dropdowns with fixed popper strategy
+    if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+        document.querySelectorAll('[data-bs-toggle="dropdown"]').forEach(function(btn) {
+            bootstrap.Dropdown.getOrCreateInstance(btn, {
+                popperConfig: { strategy: 'fixed' }
+            });
         });
     }
 });

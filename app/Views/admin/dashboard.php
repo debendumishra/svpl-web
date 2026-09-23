@@ -27,24 +27,345 @@ $title = "Executive Command Center — SVPL Admin";
     </div>
 </div>
 
-<?php if (!empty($pendingPaymentsCount) && $pendingPaymentsCount > 0): ?>
-    <div class="alert alert-warning border border-warning d-flex justify-content-between align-items-center mb-4 p-3 rounded-3 shadow-sm animate-fade-in" role="alert">
-        <div class="d-flex align-items-center gap-3">
-            <div class="p-2 bg-warning rounded-circle text-dark fs-4">
-                <i class="bi bi-shield-exclamation"></i>
+<?php 
+$totalAlerts = $alerts['totalAlertCount'] ?? 0;
+?>
+
+<!-- ========================================================================= -->
+<!-- EXECUTIVE ACTION CENTER & REAL-TIME CRITICAL ALERTS -->
+<!-- ========================================================================= -->
+<div class="card card-svpl border-0 shadow-sm rounded-3 mb-4 overflow-hidden animate-fade-in" style="background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%); border-left: 4px solid #f59e0b !important;">
+    <div class="card-header bg-white py-3 px-3 px-md-4 border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-2">
+            <div style="background: #fef3c7; color: #b45309; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                <i class="bi bi-bell-fill"></i>
             </div>
             <div>
-                <h6 class="fw-bold text-navy mb-0">
-                    <?= $pendingPaymentsCount ?> Advisor Onboarding Payment(s) Awaiting Confirmation (₹<?= number_format(advisor_joining_fee()) ?> each)
-                </h6>
-                <p class="small text-secondary mb-0">Newly registered advisors cannot log in until their UTR payment details are confirmed by Manager/Superadmin.</p>
+                <h5 class="font-heading fw-bold text-navy mb-0">Executive Action & Critical Alerts Hub</h5>
+                <span class="text-secondary small">Real-time operational bottlenecks & pending approvals across Odisha ecosystem</span>
             </div>
         </div>
-        <a href="<?= url('/admin/payments') ?>" class="btn btn-dark btn-sm fw-bold px-3">
-            <i class="bi bi-check2-circle text-warning me-1"></i> Review & Activate
-        </a>
+        <div class="d-flex align-items-center gap-2">
+            <?php if ($totalAlerts > 0): ?>
+                <span class="badge bg-danger px-3 py-2 fs-6 shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> <?= $totalAlerts ?> Pending Actions
+                </span>
+            <?php else: ?>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-bold">
+                    <i class="bi bi-check-circle-fill me-1"></i> All Operational Queues Clear
+                </span>
+            <?php endif; ?>
+            <a href="<?= url('/admin/dashboard') ?>" class="btn btn-light border btn-sm" title="Refresh Dashboard Status">
+                <i class="bi bi-arrow-clockwise"></i>
+            </a>
+        </div>
     </div>
-<?php endif; ?>
+
+    <div class="card-body p-3 p-md-4">
+        <!-- PRIMARY 9-ALERT CARDS GRID -->
+        <div class="row g-3">
+            
+            <!-- 1. Customer Registered but Not Yet Claimed by BOE -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['unclaimedRegistrations'] > 0) ? 'bg-danger-subtle text-danger' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-person-x-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">1. Unclaimed Registrations</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Customer Registered (No BOE)</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['unclaimedRegistrations'] > 0) ? 'bg-danger' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['unclaimedRegistrations'] ?> Leads
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        New customer registrations waiting in the pool. Not yet claimed by any Back Office Executive.
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['unclaimedRegistrations'] > 0) ? 'text-danger fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['unclaimedRegistrations'] > 0) ? '⚠ Needs BOE Assignment' : '✓ Queue Cleared' ?>
+                        </span>
+                        <a href="<?= url('/admin/boe-management') ?>" class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            Claim Pool →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Advisor Joined and Approval Pending -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['pendingAdvisorApprovals'] > 0) ? 'bg-warning-subtle text-warning-emphasis' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-person-check-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">2. Advisor Approvals Pending</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">₹2,700 Onboarding Fee Verification</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['pendingAdvisorApprovals'] > 0) ? 'bg-warning text-dark fw-bold' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['pendingAdvisorApprovals'] ?> Pending
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Newly registered field advisors awaiting bank UTR payment confirmation & ID activation.
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['pendingAdvisorApprovals'] > 0) ? 'text-warning-emphasis fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['pendingAdvisorApprovals'] > 0) ? '⚠ Awaiting UTR Verification' : '✓ All Approved' ?>
+                        </span>
+                        <a href="<?= url('/admin/payments') ?>" class="btn btn-sm btn-outline-warning text-dark py-0 px-2 fw-bold" style="font-size: 0.75rem;">
+                            Review & Activate →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. 15 Point Crucial Stages Pending -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['totalCrucialStagesPending'] > 0) ? 'bg-primary-subtle text-primary' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-kanban-fill"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">3. 15-Point Crucial Stages</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Milestone Pipeline Bottlenecks</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['totalCrucialStagesPending'] > 0) ? 'bg-primary' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['totalCrucialStagesPending'] ?> Leads
+                        </span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-1 mb-2" style="font-size: 0.68rem;">
+                        <span class="badge bg-light text-dark border">Docs: <strong><?= $alerts['crucialStagesBreakdown']['DOCUMENTS'] ?></strong></span>
+                        <span class="badge bg-light text-dark border">Feasibility: <strong><?= $alerts['crucialStagesBreakdown']['GOVT_PORTAL'] ?></strong></span>
+                        <span class="badge bg-light text-dark border">Loan: <strong><?= $alerts['crucialStagesBreakdown']['LOAN_APPLIED'] ?></strong></span>
+                        <span class="badge bg-light text-dark border">Net Meter: <strong><?= $alerts['crucialStagesBreakdown']['NET_METER_APPLIED'] ?></strong></span>
+                        <span class="badge bg-light text-dark border">Subsidy: <strong><?= $alerts['crucialStagesBreakdown']['SUBSIDY_APPLIED'] ?></strong></span>
+                    </div>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small text-primary fw-semibold" style="font-size: 0.75rem;">Stage 1–15 Workflow</span>
+                        <a href="<?= url('/admin/leads') ?>" class="btn btn-sm btn-outline-primary py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            View Pipeline →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Despatch Pending -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['pendingDespatches'] > 0) ? 'bg-warning-subtle text-dark' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-truck"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">4. Despatch Pending</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Stage 6: Solar Kit & Instruments</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['pendingDespatches'] > 0) ? 'bg-warning text-dark fw-bold' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['pendingDespatches'] ?> Ready
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Loan Sanctioned customers waiting for BOS equipment BOM, E-Way Bill & delivery dispatch.
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['pendingDespatches'] > 0) ? 'text-warning-emphasis fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['pendingDespatches'] > 0) ? '⚡ Ready for Shipment' : '✓ All Despatched' ?>
+                        </span>
+                        <a href="<?= url('/admin/dispatches') ?>" class="btn btn-sm btn-outline-warning text-dark py-0 px-2 fw-bold" style="font-size: 0.75rem;">
+                            Despatch Now →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Customer Receive Pending -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['customerReceivePending'] > 0) ? 'bg-info-subtle text-info-emphasis' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">5. Customer Receive Pending</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Delivery Receipt Acknowledgment</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['customerReceivePending'] > 0) ? 'bg-info text-dark fw-bold' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['customerReceivePending'] ?> In Transit
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Dispatched solar equipment shipments where customer OTP/signature confirmation is pending.
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small text-info-emphasis fw-semibold" style="font-size: 0.75rem;">
+                            <?= ($alerts['customerReceivePending'] > 0) ? '🚚 Awaiting Client Ack' : '✓ All Acknowledged' ?>
+                        </span>
+                        <a href="<?= url('/admin/dispatches') ?>" class="btn btn-sm btn-outline-info py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            Track Shipments →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Engineer Installation Pending -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['engineerInstallationPending'] > 0) ? 'bg-danger-subtle text-danger' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-tools"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">6. Engineer Install Pending</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Stage 7–8: Field Solar Erection</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['engineerInstallationPending'] > 0) ? 'bg-danger' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['engineerInstallationPending'] ?> Pending
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Delivered equipment awaiting rooftop structural assembly, inverter wiring & engineer sign-off.
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['engineerInstallationPending'] > 0) ? 'text-danger fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['engineerInstallationPending'] > 0) ? '⚡ Field Action Required' : '✓ All Synced' ?>
+                        </span>
+                        <a href="<?= url('/admin/engineers') ?>" class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            Assign Engineers →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Advisor Claim Bank Credit -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['pendingWithdrawalsCount'] > 0) ? 'bg-danger-subtle text-danger' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-bank"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">7. Advisor Claim Bank Credit</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Advisor Wallet Payout Requests</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['pendingWithdrawalsCount'] > 0) ? 'bg-danger' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['pendingWithdrawalsCount'] ?> Requests
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Advisors requested bank transfer with statutory 5% TDS. Total Pending: <strong>₹<?= number_format($alerts['pendingWithdrawalsAmount'], 2) ?></strong>
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['pendingWithdrawalsCount'] > 0) ? 'text-danger fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['pendingWithdrawalsCount'] > 0) ? '₹' . number_format($alerts['pendingWithdrawalsAmount']) . ' to disburse' : '✓ All Settled' ?>
+                        </span>
+                        <a href="<?= url('/admin/withdrawals?status=PENDING') ?>" class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            Settle Bank UTR →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Commission Credit Pending -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['pendingCommissionsCount'] > 0) ? 'bg-success-subtle text-success' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">8. Commission Credit Pending</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">9-Level Network Payout Approval</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['pendingCommissionsCount'] > 0) ? 'bg-success' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['pendingCommissionsCount'] ?> Credits
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Generated MLM commission slabs awaiting executive authorization. Total: <strong>₹<?= number_format($alerts['pendingCommissionsAmount'], 2) ?></strong>
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['pendingCommissionsCount'] > 0) ? 'text-success fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['pendingCommissionsCount'] > 0) ? '₹' . number_format($alerts['pendingCommissionsAmount']) . ' Payout' : '✓ Up to Date' ?>
+                        </span>
+                        <a href="<?= url('/admin/commissions') ?>" class="btn btn-sm btn-outline-success py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            Disburse Credits →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. BOE Claimed but Not Processed Application -->
+            <div class="col-xl-4 col-md-6">
+                <div class="p-3 rounded-3 border bg-white h-100 shadow-sm d-flex flex-column justify-content-between position-relative hover-lift">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="p-2 rounded-2 <?= ($alerts['boeStalledApplications'] > 0) ? 'bg-danger-subtle text-danger' : 'bg-light text-secondary' ?> fs-5">
+                                <i class="bi bi-hourglass-split"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-navy mb-0" style="font-size: 0.92rem;">9. BOE Stalled Applications</h6>
+                                <span class="text-muted small" style="font-size: 0.72rem;">Claimed but Idle for > 48 Hours</span>
+                            </div>
+                        </div>
+                        <span class="badge <?= ($alerts['boeStalledApplications'] > 0) ? 'bg-danger' : 'bg-secondary' ?> rounded-pill px-2 py-1">
+                            <?= $alerts['boeStalledApplications'] ?> Stalled
+                        </span>
+                    </div>
+                    <p class="text-secondary small mb-3" style="font-size: 0.76rem;">
+                        Customer applications claimed by a BOE with no document upload or stage advance in 48+ hours.
+                    </p>
+                    <div class="pt-2 border-top d-flex justify-content-between align-items-center">
+                        <span class="small <?= ($alerts['boeStalledApplications'] > 0) ? 'text-danger fw-bold' : 'text-muted' ?>" style="font-size: 0.75rem;">
+                            <?= ($alerts['boeStalledApplications'] > 0) ? '⚠ SLA Breach Warning' : '✓ SLA On Track' ?>
+                        </span>
+                        <a href="<?= url('/admin/boe-management') ?>" class="btn btn-sm btn-outline-danger py-0 px-2 fw-semibold" style="font-size: 0.75rem;">
+                            Audit BOEs →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ADDITIONAL OPERATIONAL ACTION STRIP -->
+        <div class="mt-3 pt-3 border-top d-flex justify-content-between align-items-center flex-wrap gap-2 bg-light p-2 rounded-2">
+            <div class="d-flex align-items-center gap-3 flex-wrap">
+                <span class="small fw-bold text-navy"><i class="bi bi-sliders text-warning me-1"></i> Quick Action Counters:</span>
+                <a href="<?= url('/admin/id-cards') ?>" class="text-decoration-none small d-inline-flex align-items-center gap-1">
+                    <span class="badge bg-white text-dark border"><i class="bi bi-person-badge text-primary me-1"></i> ID Cards Pending: <strong><?= $alerts['pendingIdCards'] ?></strong></span>
+                </a>
+                <a href="<?= url('/admin/leads') ?>" class="text-decoration-none small d-inline-flex align-items-center gap-1">
+                    <span class="badge bg-white text-dark border"><i class="bi bi-globe text-info me-1"></i> Direct Web Leads: <strong><?= $alerts['unassignedDirectLeads'] ?></strong></span>
+                </a>
+            </div>
+            <div class="small text-muted">
+                <i class="bi bi-clock-history me-1"></i> Live query auto-refreshed on page load
+            </div>
+        </div>
+
+    </div>
+</div>
 
 <!-- 6 EXECUTIVE KPI METRICS GRID -->
 <div class="row g-3 mb-4 animate-fade-in stagger-1">

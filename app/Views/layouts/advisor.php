@@ -8,6 +8,16 @@ $advisorCode = $_SESSION['advisor_code'] ?? 'SVPL-ADV-8842';
 $referralCode = $_SESSION['referral_code'] ?? 'SVPL';
 $qualificationStatus = $_SESSION['qualification_status'] ?? 'QUALIFIED';
 $activeUri = $_SERVER['REQUEST_URI'] ?? '';
+
+// Check if advisor registration fee is paid & approved
+$isFeePaid = false;
+if (isset($_SESSION['advisor_id'])) {
+    $advCheck = \App\Models\Advisor::findById((int)$_SESSION['advisor_id']);
+    $isFeePaid = $advCheck && (int)($advCheck['joining_fee_paid'] ?? 0) === 1;
+} elseif (isset($_SESSION['user_id'])) {
+    $advCheck = \App\Models\Advisor::findByUserId((int)$_SESSION['user_id']);
+    $isFeePaid = $advCheck && (int)($advCheck['joining_fee_paid'] ?? 0) === 1;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -32,9 +42,39 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     
     <meta name="base-url" content="<?= base_path_url() ?>">
     
-    <!-- Solar Theme & Network CSS -->
-    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css') ?>">
-    <link rel="stylesheet" href="<?= asset('assets/css/network-tree.css') ?>">
+    <!-- Scripts (Loaded in Head for Inline View Support) -->
+    <script>window.SVPL_BASE_URL = '<?= rtrim(url(''), '/') ?>';</script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Solar Theme & Network CSS with Cache-Busting -->
+    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/network-tree.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
+
+    <style>
+        .app-header { position: sticky; top: 0; z-index: 1030; background: #FFFFFF; width: 100%; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
+        .app-header-strip { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; height: 56px !important; min-height: 56px !important; max-height: 56px !important; padding: 0 12px !important; background: #FFFFFF !important; border-bottom: 1px solid #E2E8F0 !important; box-sizing: border-box !important; }
+        .app-header-left { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 8px !important; min-width: 0 !important; flex: 1 1 auto !important; overflow: hidden !important; }
+        .app-header-emblem { width: 36px !important; height: 36px !important; min-width: 36px !important; border-radius: 9px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; font-weight: 800 !important; font-size: 1.1rem !important; flex-shrink: 0 !important; }
+        .app-header-title-wrap { display: flex !important; flex-direction: column !important; justify-content: center !important; min-width: 0 !important; overflow: hidden !important; line-height: 1.2 !important; }
+        .app-header-title-row { display: flex !important; align-items: center !important; gap: 6px !important; overflow: hidden !important; white-space: nowrap !important; }
+        .app-header-title { font-family: 'Outfit', sans-serif !important; font-weight: 700 !important; font-size: 0.92rem !important; color: #0F172A !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin: 0 !important; }
+        .app-header-subtitle { font-size: 0.7rem !important; color: #64748B !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; display: flex !important; align-items: center !important; gap: 4px !important; margin-top: 1px !important; }
+        .app-header-right { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 6px !important; flex-shrink: 0 !important; margin-left: auto !important; }
+        .app-header-btn { width: 36px; height: 36px; min-width: 36px; max-width: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 0.92rem; font-weight: 600; flex-shrink: 0; text-decoration: none; border: 1px solid #E2E8F0; background: #F8FAFC; color: #334155; }
+        .app-header-btn.d-none { display: none !important; }
+        @media (min-width: 992px) {
+            .app-header-btn.d-lg-none { display: none !important; }
+            .app-header-btn.d-none.d-lg-inline-flex,
+            .app-header-btn.d-lg-inline-flex { display: inline-flex !important; }
+        }
+        @media (max-width: 991.98px) {
+            .app-header-btn.d-none.d-lg-inline-flex { display: none !important; }
+            .app-header-btn.d-lg-none { display: inline-flex !important; }
+        }
+        .app-header-logout { border: 1px solid #FCA5A5 !important; background-color: #FEF2F2 !important; color: #DC2626 !important; }
+        .app-header-logout:hover { background-color: #DC2626 !important; color: #FFFFFF !important; border-color: #DC2626 !important; }
+    </style>
 </head>
 <body>
 
@@ -43,7 +83,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
         
         <!-- CONSTANT TOP HEADER (STICKY) -->
         <header class="app-header">
-            <!-- Ticker (Desktop) -->
+            <!-- Ticker (Desktop Only) -->
             <div class="live-ticker-bar px-3 d-none d-lg-block">
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center gap-3">
@@ -57,69 +97,85 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
             </div>
 
             <!-- Primary Header Strip with User Details & Quick Actions -->
-            <div class="px-2 px-md-3 py-2 d-flex justify-content-between align-items-center border-bottom bg-white">
-                <div class="d-flex align-items-center gap-2 gap-md-3">
+            <div class="app-header-strip">
+                <div class="app-header-left">
                     <!-- Mobile Hamburger Button -->
-                    <button class="btn btn-light border btn-sm d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#advisorMobileDrawer" aria-label="Open Mobile Menu">
+                    <button class="app-header-btn d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#advisorMobileDrawer" aria-label="Open Mobile Menu">
                         <i class="bi bi-list fs-5"></i>
                     </button>
 
-                    <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #061528; font-weight: 900;">
+                    <div class="app-header-emblem" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: #061528;">
                         ☀
                     </div>
-                    <div>
-                        <div class="fw-bold font-heading text-navy" style="font-size: 0.95rem; line-height: 1.2;">
-                            <?= htmlspecialchars($advisorName) ?>
-                        </div>
-                        <div class="d-flex align-items-center gap-1">
-                            <span class="badge bg-light text-dark border font-monospace" style="font-size: 0.65rem;"><?= htmlspecialchars($advisorCode) ?></span>
-                            <span class="badge <?= $qualificationStatus === 'QUALIFIED' ? 'bg-success' : 'bg-warning text-dark' ?>" style="font-size: 0.62rem;">
+                    <div class="app-header-title-wrap">
+                        <div class="app-header-title-row">
+                            <span class="app-header-title"><?= htmlspecialchars($advisorName) ?></span>
+                            <span class="badge <?= $qualificationStatus === 'QUALIFIED' ? 'bg-success' : 'bg-warning text-dark' ?> fw-semibold" style="font-size: 0.62rem;">
                                 <?= htmlspecialchars($qualificationStatus) ?>
                             </span>
                         </div>
+                        <span class="app-header-subtitle">
+                            <span class="badge bg-light text-dark border font-monospace px-1" style="font-size: 0.65rem;"><?= htmlspecialchars($advisorCode) ?></span>
+                            <span class="d-none d-sm-inline text-muted">• Solar Advisor</span>
+                        </span>
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center gap-1 gap-md-2">
-                    <div class="d-none d-sm-flex align-items-center gap-1 bg-light p-1 px-2 rounded-pill border small">
+                <div class="app-header-right">
+                    <a href="<?= url('/advisor/my-solar') ?>" class="btn btn-outline-success btn-sm fw-bold d-none d-md-inline-flex align-items-center gap-1 shadow-sm px-2" title="Track your personal rooftop solar project" style="height: 36px; font-size: 0.8rem;">
+                        <i class="bi bi-house-door-fill text-success"></i> <span>My Rooftop Solar</span>
+                    </a>
+                    <div class="d-none d-xl-flex align-items-center gap-1 bg-light p-1 px-2 rounded-pill border small" style="height: 36px;">
                         <span class="text-secondary" style="font-size: 0.72rem;">Ref:</span>
                         <span class="badge bg-primary font-monospace cursor-pointer btn-copy" data-copy="<?= htmlspecialchars($referralCode) ?>" title="Click to copy">
                             <?= htmlspecialchars($referralCode) ?> <i class="bi bi-clipboard ms-1"></i>
                         </span>
                     </div>
-                    <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-md-inline-flex">
-                        <i class="bi bi-plus-circle-fill me-1"></i> + Register Customer
+                    <?php if ($isFeePaid): ?>
+                        <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-svpl-solar btn-sm shadow-sm d-none d-lg-inline-flex align-items-center gap-1 px-3" style="height: 36px; font-size: 0.82rem;">
+                            <i class="bi bi-plus-circle-fill"></i> <span>+ Customer</span>
+                        </a>
+                    <?php endif; ?>
+                    <a href="<?= url('/advisor/qr-code') ?>" class="app-header-btn" title="Doorstep QR Code">
+                        <i class="bi bi-qr-code text-dark"></i>
                     </a>
-                    <a href="<?= url('/advisor/qr-code') ?>" class="btn btn-outline-dark btn-sm" title="Doorstep QR Code">
-                        <i class="bi bi-qr-code"></i>
-                    </a>
-                    <a href="<?= url('/logout') ?>" class="btn btn-outline-danger btn-sm" title="Sign Out">
+                    <a href="<?= url('/logout') ?>" class="app-header-btn app-header-logout" title="Sign Out">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Horizontal Tab Navigation Bar (Desktop & Tablet) -->
-            <div class="bg-light px-3 py-1 border-bottom d-none d-lg-flex gap-1 overflow-x-auto">
-                <a href="<?= url('/advisor/dashboard') ?>" class="btn btn-sm <?= $activeUri === url('/advisor/dashboard') ? 'btn-primary' : 'btn-light border' ?>">
-                    <i class="bi bi-speedometer2 me-1"></i> Command Center
+            <div class="bg-light px-3 py-1 border-bottom d-none d-lg-flex gap-1 align-items-center overflow-x-auto" style="min-height: 42px;">
+                <a href="<?= url('/advisor/dashboard') ?>" class="btn btn-sm <?= $activeUri === url('/advisor/dashboard') ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' ?> fw-semibold py-1 px-2" style="font-size: 0.78rem;">
+                    <i class="bi bi-speedometer2 me-1"></i> Dashboard
                 </a>
-                <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/register-customer') !== false ? 'btn-svpl-solar' : 'btn-outline-warning text-dark border' ?> fw-bold">
-                    <i class="bi bi-person-plus-fill me-1"></i> + Register Customer
+                <a href="<?= url('/advisor/my-solar') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/my-solar') !== false ? 'btn-success text-white shadow-sm' : 'btn-outline-success border' ?> fw-bold py-1 px-2" style="font-size: 0.78rem;">
+                    <i class="bi bi-house-door-fill text-warning me-1"></i> My Rooftop Solar (15 Stages)
                 </a>
-                <a href="<?= url('/advisor/customers') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/customers') !== false ? 'btn-primary' : 'btn-light border' ?>">
-                    <i class="bi bi-people me-1"></i> My Customers
+                <?php if ($isFeePaid): ?>
+                    <a href="<?= url('/advisor/register-customer') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/register-customer') !== false ? 'btn-svpl-solar shadow-sm' : 'btn-outline-warning text-dark border' ?> fw-bold py-1 px-2" style="font-size: 0.78rem;">
+                        <i class="bi bi-person-plus-fill me-1"></i> + Register Customer
+                    </a>
+                    <a href="<?= url('/advisor/customers') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/customers') !== false ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' ?> fw-semibold py-1 px-2" style="font-size: 0.78rem;">
+                        <i class="bi bi-people me-1"></i> Customers
+                    </a>
+                <?php endif; ?>
+                <a href="<?= url('/advisor/network') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/network') !== false ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' ?> fw-semibold py-1 px-2" style="font-size: 0.78rem;">
+                    <i class="bi bi-bezier2 me-1"></i> 9-Level Network
                 </a>
-                <a href="<?= url('/advisor/network') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/network') !== false ? 'btn-primary' : 'btn-light border' ?>">
-                    <i class="bi bi-bezier2 me-1"></i> 9-Level Tree
+                <a href="<?= url('/advisor/wallet') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/wallet') !== false ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' ?> fw-semibold py-1 px-2" style="font-size: 0.78rem;">
+                    <i class="bi bi-wallet2 me-1"></i> Wallet & Payout
                 </a>
-                <a href="<?= url('/advisor/wallet') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/wallet') !== false ? 'btn-primary' : 'btn-light border' ?>">
-                    <i class="bi bi-wallet2 me-1"></i> Commission Wallet
-                </a>
-                <a href="<?= url('/advisor/id-card') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/id-card') !== false ? 'btn-primary' : 'btn-light border' ?>">
-                    <i class="bi bi-person-vcard me-1"></i> ID Card & Letter
-                </a>
-                <a href="<?= url('/advisor/qr-code') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/qr-code') !== false ? 'btn-primary' : 'btn-light border' ?>">
+                <?php if ($isFeePaid): ?>
+                    <a href="<?= url('/advisor/id-card') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/id-card') !== false ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' ?> fw-semibold py-1 px-2" style="font-size: 0.78rem;">
+                        <i class="bi bi-person-vcard me-1"></i> ID Card & Letter
+                    </a>
+                    <a href="<?= url('/advisor/leaflet') ?>" target="_blank" class="btn btn-sm btn-light border text-secondary fw-semibold py-1 px-2" style="font-size: 0.78rem;">
+                        <i class="bi bi-file-earmark-pdf text-warning me-1"></i> Leaflet
+                    </a>
+                <?php endif; ?>
+                <a href="<?= url('/advisor/qr-code') ?>" class="btn btn-sm <?= strpos($activeUri, '/advisor/qr-code') !== false ? 'btn-primary shadow-sm' : 'btn-light border text-secondary' ?> fw-semibold py-1 px-2" style="font-size: 0.78rem;">
                     <i class="bi bi-qr-code-scan me-1"></i> Doorstep QR
                 </a>
             </div>
@@ -152,7 +208,7 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                         </div>
                     </div>
 
-                    <!-- Command & Identity Accordion -->
+                    <!-- Core Workspace Accordion -->
                     <div class="nav-category-header" data-bs-toggle="collapse" data-bs-target="#advMobCommand" aria-expanded="true">
                         <span><i class="bi bi-speedometer2 text-warning me-1"></i> Core Workspace</span>
                         <i class="bi bi-chevron-down collapse-arrow"></i>
@@ -165,20 +221,39 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/advisor/register-customer') !== false ? 'active text-warning fw-bold' : 'text-warning fw-bold' ?>" href="<?= url('/advisor/register-customer') ?>">
-                                    <i class="bi bi-person-plus-fill text-warning"></i> <span>+ Register Customer</span>
+                                <a class="nav-link <?= strpos($activeUri, '/advisor/my-solar') !== false ? 'active text-success fw-bold' : 'text-success fw-bold' ?>" href="<?= url('/advisor/my-solar') ?>">
+                                    <i class="bi bi-house-door-fill text-success"></i> <span>My Rooftop Solar (15 Stages)</span>
                                 </a>
                             </li>
+                            <?php if ($isFeePaid): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link <?= strpos($activeUri, '/advisor/register-customer') !== false ? 'active text-warning fw-bold' : 'text-warning fw-bold' ?>" href="<?= url('/advisor/register-customer') ?>">
+                                        <i class="bi bi-person-plus-fill text-warning"></i> <span>+ Register Customer</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/advisor/qr-code') !== false ? 'active' : '' ?>" href="<?= url('/advisor/qr-code') ?>">
                                     <i class="bi bi-qr-code-scan"></i> <span>Doorstep QR Code</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/advisor/id-card') !== false ? 'active' : '' ?>" href="<?= url('/advisor/id-card') ?>">
-                                    <i class="bi bi-person-vcard"></i> <span>ID Card & Letter</span>
-                                </a>
-                            </li>
+                            <?php if ($isFeePaid): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link <?= strpos($activeUri, '/advisor/id-card') !== false ? 'active' : '' ?>" href="<?= url('/advisor/id-card') ?>">
+                                        <i class="bi bi-person-vcard"></i> <span>ID Card & Letter</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= url('/advisor/leaflet') ?>" target="_blank">
+                                        <i class="bi bi-file-earmark-pdf text-warning"></i> <span>Marketing Leaflet</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="<?= url('/advisor/invoice') ?>" target="_blank">
+                                        <i class="bi bi-receipt-cutoff text-info"></i> <span>GST Tax Invoice</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                         </ul>
                     </div>
 
@@ -189,16 +264,18 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                     </div>
                     <div class="collapse show" id="advMobCustNet">
                         <ul class="nav flex-column mb-1">
-                            <li class="nav-item">
-                                <a class="nav-link text-warning fw-bold" href="<?= url('/advisor/register-customer') ?>">
-                                    <i class="bi bi-plus-circle-fill text-warning"></i> <span>+ Register Customer</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>" href="<?= url('/advisor/customers') ?>">
-                                    <i class="bi bi-people"></i> <span>My Direct Customers</span>
-                                </a>
-                            </li>
+                            <?php if ($isFeePaid): ?>
+                                <li class="nav-item">
+                                    <a class="nav-link text-warning fw-bold" href="<?= url('/advisor/register-customer') ?>">
+                                        <i class="bi bi-plus-circle-fill text-warning"></i> <span>+ Register Customer</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>" href="<?= url('/advisor/customers') ?>">
+                                        <i class="bi bi-people"></i> <span>My Direct Customers</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
                             <li class="nav-item">
                                 <a class="nav-link <?= strpos($activeUri, '/advisor/network') !== false ? 'active' : '' ?>" href="<?= url('/advisor/network') ?>">
                                     <i class="bi bi-bezier2"></i> <span>9-Level Tree Visualizer</span>
@@ -251,10 +328,17 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
                 <i class="bi bi-speedometer2"></i>
                 <span>Home</span>
             </a>
-            <a href="<?= url('/advisor/customers') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>">
-                <i class="bi bi-people"></i>
-                <span>Clients</span>
-            </a>
+            <?php if ($isFeePaid): ?>
+                <a href="<?= url('/advisor/customers') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/customers') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-people"></i>
+                    <span>Clients</span>
+                </a>
+            <?php else: ?>
+                <a href="<?= url('/advisor/my-solar') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/my-solar') !== false ? 'active' : '' ?>">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>My Solar</span>
+                </a>
+            <?php endif; ?>
             <a href="<?= url('/advisor/network') ?>" class="mob-nav-item <?= strpos($activeUri, '/advisor/network') !== false ? 'active' : '' ?>">
                 <i class="bi bi-bezier2"></i>
                 <span>9-Tree</span>
@@ -271,9 +355,6 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     </div>
 
     <!-- Scripts -->
-    <script>window.SVPL_BASE_URL = '<?= rtrim(url(''), '/') ?>';</script>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="<?= asset('assets/js/app.js') ?>"></script>
     <script src="<?= asset('assets/js/image-compressor.js') ?>"></script>
     <script src="<?= asset('assets/js/photo-crop-studio.js') ?>"></script>
