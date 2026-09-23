@@ -2,7 +2,7 @@
 /**
  * Surya Vistaara Pvt. Ltd. (SVPL)
  * Self-Healing Database Auto-Migrator
- * Safely checks and adds any missing columns or tables without altering existing data.
+ * Safely creates all missing tables and adds missing columns without touching existing data.
  */
 
 declare(strict_types=1);
@@ -25,7 +25,86 @@ class AutoMigrator
                 $db->exec("SET FOREIGN_KEY_CHECKS = 0;");
             }
 
-            // 1. Ensure Engineers table
+            // 1. withdrawal_requests
+            $db->exec("
+                CREATE TABLE IF NOT EXISTS `withdrawal_requests` (
+                  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                  `request_code` VARCHAR(50) NOT NULL UNIQUE,
+                  `user_id` INT UNSIGNED NOT NULL,
+                  `advisor_id` INT UNSIGNED NOT NULL,
+                  `amount` DECIMAL(12,2) NOT NULL,
+                  `tds_amount` DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+                  `net_payable` DECIMAL(12,2) NOT NULL,
+                  `bank_name` VARCHAR(100) NULL,
+                  `bank_branch` VARCHAR(100) NULL,
+                  `account_holder` VARCHAR(150) NULL,
+                  `account_number` VARCHAR(50) NULL,
+                  `ifsc_code` VARCHAR(20) NULL,
+                  `status` ENUM('PENDING', 'APPROVED', 'PAID', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+                  `admin_remarks` TEXT NULL,
+                  `processed_by_user_id` INT UNSIGNED NULL,
+                  `utr_number` VARCHAR(100) NULL,
+                  `requested_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  `processed_at` DATETIME NULL,
+                  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  INDEX `idx_wr_user` (`user_id`),
+                  INDEX `idx_wr_advisor` (`advisor_id`),
+                  INDEX `idx_wr_status` (`status`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ");
+            $messages[] = "Verified table: withdrawal_requests";
+
+            // 2. package_dispatches
+            $db->exec("
+                CREATE TABLE IF NOT EXISTS `package_dispatches` (
+                  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                  `lead_id` INT UNSIGNED NULL,
+                  `advisor_id` INT UNSIGNED NULL,
+                  `engineer_id` INT UNSIGNED NULL,
+                  `dispatch_type` VARCHAR(50) NOT NULL DEFAULT 'SOLAR_EQUIPMENT',
+                  `tracking_number` VARCHAR(100) NULL,
+                  `courier_partner` VARCHAR(100) NULL DEFAULT 'SVPL Logistics Odisha',
+                  `dispatch_date` DATE NULL,
+                  `delivery_date` DATE NULL,
+                  `status` VARCHAR(50) NOT NULL DEFAULT 'Dispatched',
+                  `customer_acknowledged` TINYINT(1) NOT NULL DEFAULT 0,
+                  `customer_acknowledged_at` DATETIME NULL,
+                  `customer_acknowledgment_notes` TEXT NULL,
+                  `items_included` TEXT NULL,
+                  `delivery_address` TEXT NULL,
+                  `remarks` TEXT NULL,
+                  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                  INDEX `idx_pd_lead` (`lead_id`),
+                  INDEX `idx_pd_advisor` (`advisor_id`),
+                  INDEX `idx_pd_engineer` (`engineer_id`)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ");
+
+            // Ensure package_dispatches columns
+            if (Database::tableExists('package_dispatches')) {
+                $cols = Database::fetchAll("DESCRIBE `package_dispatches`");
+                $colNames = array_column($cols, 'Field');
+
+                if (!in_array('engineer_id', $colNames)) {
+                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `engineer_id` INT UNSIGNED NULL AFTER `advisor_id`");
+                    $messages[] = "Added column: package_dispatches.engineer_id";
+                }
+                if (!in_array('customer_acknowledged', $colNames)) {
+                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `customer_acknowledged` TINYINT(1) NOT NULL DEFAULT 0 AFTER `status`");
+                    $messages[] = "Added column: package_dispatches.customer_acknowledged";
+                }
+                if (!in_array('customer_acknowledged_at', $colNames)) {
+                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `customer_acknowledged_at` DATETIME NULL AFTER `customer_acknowledged`");
+                    $messages[] = "Added column: package_dispatches.customer_acknowledged_at";
+                }
+                if (!in_array('customer_acknowledgment_notes', $colNames)) {
+                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `customer_acknowledgment_notes` TEXT NULL AFTER `customer_acknowledged_at`");
+                    $messages[] = "Added column: package_dispatches.customer_acknowledgment_notes";
+                }
+            }
+
+            // 3. engineers table
             $db->exec("
                 CREATE TABLE IF NOT EXISTS `engineers` (
                     `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -49,32 +128,8 @@ class AutoMigrator
                     INDEX `idx_eng_status` (`is_active`)
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             ");
-            $messages[] = "Verified table: engineers";
 
-            // 2. Ensure package_dispatches columns
-            if (Database::tableExists('package_dispatches')) {
-                $cols = Database::fetchAll("DESCRIBE `package_dispatches`");
-                $colNames = array_column($cols, 'Field');
-
-                if (!in_array('engineer_id', $colNames)) {
-                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `engineer_id` INT UNSIGNED NULL AFTER `advisor_id`");
-                    $messages[] = "Added column: package_dispatches.engineer_id";
-                }
-                if (!in_array('customer_acknowledged', $colNames)) {
-                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `customer_acknowledged` TINYINT(1) NOT NULL DEFAULT 0 AFTER `status`");
-                    $messages[] = "Added column: package_dispatches.customer_acknowledged";
-                }
-                if (!in_array('customer_acknowledged_at', $colNames)) {
-                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `customer_acknowledged_at` DATETIME NULL AFTER `customer_acknowledged`");
-                    $messages[] = "Added column: package_dispatches.customer_acknowledged_at";
-                }
-                if (!in_array('customer_acknowledgment_notes', $colNames)) {
-                    $db->exec("ALTER TABLE `package_dispatches` ADD COLUMN `customer_acknowledgment_notes` TEXT NULL AFTER `customer_acknowledged_at`");
-                    $messages[] = "Added column: package_dispatches.customer_acknowledgment_notes";
-                }
-            }
-
-            // 3. Ensure customers columns
+            // 4. Ensure customers columns
             if (Database::tableExists('customers')) {
                 $cols = Database::fetchAll("DESCRIBE `customers`");
                 $colNames = array_column($cols, 'Field');
@@ -105,7 +160,7 @@ class AutoMigrator
                 }
             }
 
-            // 4. Ensure company_ledger
+            // 5. company_ledger
             $db->exec("
                 CREATE TABLE IF NOT EXISTS `company_ledger` (
                   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -136,7 +191,7 @@ class AutoMigrator
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             ");
 
-            // 5. Ensure withdrawals
+            // 6. withdrawals
             $db->exec("
                 CREATE TABLE IF NOT EXISTS `withdrawals` (
                   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -161,7 +216,7 @@ class AutoMigrator
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             ");
 
-            // 6. Ensure instant_payouts
+            // 7. instant_payouts
             $db->exec("
                 CREATE TABLE IF NOT EXISTS `instant_payouts` (
                   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -190,7 +245,33 @@ class AutoMigrator
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
             ");
 
-            // 7. Ensure commission tables
+            // 8. discoms
+            $db->exec("
+                CREATE TABLE IF NOT EXISTS `discom_providers` (
+                  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                  `code` VARCHAR(50) NOT NULL UNIQUE,
+                  `name` VARCHAR(150) NOT NULL,
+                  `full_name` VARCHAR(255) NOT NULL,
+                  `headquarters` VARCHAR(150) NOT NULL DEFAULT 'Bhubaneswar, Odisha',
+                  `contact_email` VARCHAR(150) NULL,
+                  `contact_phone` VARCHAR(50) NULL,
+                  `portal_url` VARCHAR(255) NULL,
+                  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+                  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ");
+
+            $db->exec("
+                CREATE TABLE IF NOT EXISTS `district_discoms` (
+                  `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                  `district` VARCHAR(80) NOT NULL UNIQUE,
+                  `discom_id` INT UNSIGNED NOT NULL,
+                  `discom_code` VARCHAR(50) NOT NULL,
+                  FOREIGN KEY (`discom_id`) REFERENCES `discom_providers` (`id`) ON DELETE CASCADE
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+            ");
+
+            // 9. Commission Engine Tables
             $db->exec("
                 CREATE TABLE IF NOT EXISTS `commission_rules` (
                   `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
