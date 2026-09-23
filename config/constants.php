@@ -181,6 +181,28 @@ if (!function_exists('asset')) {
     }
 }
 
+// Universal Versioned Asset generator (Safe for XAMPP & Shared Hosting)
+if (!function_exists('asset_url')) {
+    function asset_url(string $path = ''): string {
+        $base = base_path_url();
+        $cleanPath = '/' . ltrim($path, '/');
+        
+        $purePath = parse_url($cleanPath, PHP_URL_PATH) ?? $cleanPath;
+        $candidate1 = dirname(__DIR__) . '/public' . $purePath;
+        $candidate2 = dirname(__DIR__) . $purePath;
+        
+        $v = '2.0.1';
+        if (file_exists($candidate1) && is_file($candidate1)) {
+            $v = (string)filemtime($candidate1);
+        } elseif (file_exists($candidate2) && is_file($candidate2)) {
+            $v = (string)filemtime($candidate2);
+        }
+        
+        $sep = strpos($cleanPath, '?') !== false ? '&' : '?';
+        return $base . $cleanPath . $sep . 'v=' . $v;
+    }
+}
+
 // Universal Photo / Upload URL Resolver
 if (!function_exists('resolve_photo_url')) {
     function resolve_photo_url(?string $photoUrl): ?string {

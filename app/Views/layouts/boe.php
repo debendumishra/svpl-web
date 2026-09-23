@@ -29,9 +29,9 @@ $currentUri = $_SERVER['REQUEST_URI'] ?? '';
         <link rel="icon" href="<?= htmlspecialchars($favUrl) ?>">
     <?php endif; ?>
 
-    <!-- Bootstrap 5 CSS & Solar Theme with Cache-Busting -->
+    <!-- Bootstrap 5 CSS & Solar Theme with Safe Cache-Busting -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
+    <link rel="stylesheet" href="<?= asset_url('assets/css/solar-theme.css') ?>">
     
     <style>
         :root {

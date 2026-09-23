@@ -35,9 +35,9 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Solar Theme & Network CSS with Cache-Busting -->
-    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
-    <link rel="stylesheet" href="<?= asset('assets/css/network-tree.css?v=' . filemtime(dirname(__DIR__, 2) . '/public/assets/css/solar-theme.css')) ?>">
+    <!-- Solar Theme & Network CSS with Safe Cache-Busting -->
+    <link rel="stylesheet" href="<?= asset_url('assets/css/solar-theme.css') ?>">
+    <link rel="stylesheet" href="<?= asset_url('assets/css/network-tree.css') ?>">
 
     <style>
         .app-header { position: sticky; top: 0; z-index: 1030; background: #FFFFFF; width: 100%; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }

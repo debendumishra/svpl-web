@@ -30,12 +30,8 @@ $activeUri = $_SERVER['REQUEST_URI'] ?? '';
     
     <meta name="base-url" content="<?= base_path_url() ?>">
     
-    <!-- Solar Theme CSS with Cache-Busting -->
-    <?php 
-    $cssFile = dirname(__DIR__, 3) . '/public/assets/css/solar-theme.css';
-    $cssVer = file_exists($cssFile) ? filemtime($cssFile) : time();
-    ?>
-    <link rel="stylesheet" href="<?= asset('assets/css/solar-theme.css?v=' . $cssVer) ?>">
+    <!-- Solar Theme CSS with Safe Cache-Busting -->
+    <link rel="stylesheet" href="<?= asset_url('assets/css/solar-theme.css') ?>">
 
     <style>
         .app-header { position: sticky; top: 0; z-index: 1030; background: #FFFFFF; width: 100%; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }

@@ -16,8 +16,11 @@ $parsedPath = parse_url($rawUri, PHP_URL_PATH) ?? '';
 $cleanAssetPath = preg_replace('#^/(svpl[-_]?web|public)#i', '', $parsedPath);
 
 if (preg_match('#^/(assets|uploads)/(.*)$#', $cleanAssetPath, $matches)) {
-    $assetFile = dirname(__DIR__) . '/public/' . $matches[1] . '/' . $matches[2];
-    if (file_exists($assetFile) && is_file($assetFile)) {
+    $cand1 = dirname(__DIR__) . '/public/' . $matches[1] . '/' . $matches[2];
+    $cand2 = dirname(__DIR__) . '/' . $matches[1] . '/' . $matches[2];
+    $assetFile = (file_exists($cand1) && is_file($cand1)) ? $cand1 : ((file_exists($cand2) && is_file($cand2)) ? $cand2 : null);
+
+    if ($assetFile) {
         $ext = strtolower(pathinfo($assetFile, PATHINFO_EXTENSION));
         $mimeTypes = [
             'css'   => 'text/css; charset=UTF-8',
@@ -36,6 +39,11 @@ if (preg_match('#^/(assets|uploads)/(.*)$#', $cleanAssetPath, $matches)) {
         ];
 
         $contentType = $mimeTypes[$ext] ?? (function_exists('mime_content_type') ? mime_content_type($assetFile) : 'application/octet-stream');
+        
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+        
         header('Content-Type: ' . $contentType);
         header('Content-Length: ' . (string)filesize($assetFile));
         header('Cache-Control: public, max-age=31536000');
