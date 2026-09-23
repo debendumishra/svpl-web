@@ -62,6 +62,10 @@ try {
     if (!Database::tableExists('users') || !Database::tableExists('settings')) {
         require_once dirname(__DIR__) . '/database/setup.php';
         \DatabaseSetup::run();
+    } else {
+        // Run self-healing schema checks to guarantee missing columns are added
+        require_once dirname(__DIR__) . '/database/auto_migrate.php';
+        \Database\AutoMigrator::run();
     }
 } catch (\Throwable $t) {
     error_log("Database initialization notice: " . $t->getMessage());

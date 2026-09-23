@@ -130,6 +130,13 @@ class DatabaseSetup
                 }
             }
 
+            // 4. Run Self-Healing Column & Table Auto Migrations
+            require_once __DIR__ . '/auto_migrate.php';
+            $migrationRes = \Database\AutoMigrator::run();
+            if (!empty($migrationRes['messages'])) {
+                $results['messages'] = array_merge($results['messages'], $migrationRes['messages']);
+            }
+
             if ($driver === 'mysql') {
                 $db->exec("SET FOREIGN_KEY_CHECKS = 1;");
             }
