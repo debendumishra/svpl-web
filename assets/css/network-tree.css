@@ -1,0 +1,567 @@
+/**
+ * Surya Vistaara Pvt. Ltd. (SVPL)
+ * Interactive Multi-Level Network Org-Tree & File Explorer Stylesheet
+ * High-Contrast, Dynamic Backgrounds & Vibrant Level-Coded Aesthetics
+ */
+
+/* ==========================================================================
+   BASE TREE CONTAINER & GENEALOGY DEFAULTS
+   ========================================================================== */
+.tree-container {
+    overflow-x: auto;
+    padding: 2.5rem 1rem;
+    text-align: center;
+    background: #F8FAFC;
+    border-radius: 12px;
+}
+
+.tree, .tree ul, .tree li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.tree {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+.tree ul {
+    display: flex;
+    justify-content: center;
+    padding-top: 24px;
+}
+
+.tree li {
+    text-align: center;
+    padding: 24px 12px 0 12px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+/* Connectors */
+.tree li::before, .tree li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #0EA5E9;
+    width: 50%;
+    height: 24px;
+}
+
+.tree li::after {
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #0EA5E9;
+}
+
+.tree li:only-child::after, .tree li:only-child::before {
+    display: none;
+}
+
+.tree li:only-child {
+    padding-top: 0;
+}
+
+.tree li:first-child::before, .tree li:last-child::after {
+    border: 0 none;
+}
+
+.tree li:last-child::before {
+    border-right: 2px solid #0EA5E9;
+    border-radius: 0 6px 0 0;
+}
+
+.tree li:first-child::after {
+    border-radius: 6px 0 0 0;
+}
+
+.tree ul ul::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #0EA5E9;
+    width: 0;
+    height: 24px;
+}
+
+/* ==========================================================================
+   IMMERSIVE CANVAS BACKGROUND THEMES (BLUEPRINT, DARK NEON, LIGHT MESH)
+   ========================================================================== */
+.pool-tree-viewport {
+    border-radius: 14px;
+    overflow: auto;
+    min-height: 520px;
+    max-height: 780px;
+    position: relative;
+    padding: 3rem 2rem;
+    box-shadow: inset 0 3px 12px rgba(0,0,0,0.15);
+    cursor: grab;
+    user-select: none;
+    transition: background 0.3s ease, border 0.3s ease;
+}
+
+.pool-tree-viewport:active {
+    cursor: grabbing;
+}
+
+.pool-tree-content {
+    display: inline-block;
+    min-width: 100%;
+    text-align: center;
+    transform-origin: 50% 0%;
+    transition: transform 0.15s ease-out;
+}
+
+/* Theme 1: Cyber Blueprint (Default Dark Matrix Canvas) */
+.pool-tree-viewport.theme-blueprint {
+    background-color: #0B132B;
+    background-image: 
+        radial-gradient(circle at 50% 0%, #1C2541 0%, #0B132B 75%),
+        linear-gradient(rgba(56, 189, 248, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.08) 1px, transparent 1px);
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+    border: 1px solid #1E293B;
+}
+.pool-tree-viewport.theme-blueprint .tree li::before,
+.pool-tree-viewport.theme-blueprint .tree li::after,
+.pool-tree-viewport.theme-blueprint .tree ul ul::before {
+    border-color: #38BDF8;
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+}
+
+/* Theme 2: Midnight Aurora Canvas */
+.pool-tree-viewport.theme-aurora {
+    background-color: #030712;
+    background-image: 
+        radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+        radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 24px 24px;
+    border: 1px solid #1F2937;
+}
+.pool-tree-viewport.theme-aurora .tree li::before,
+.pool-tree-viewport.theme-aurora .tree li::after,
+.pool-tree-viewport.theme-aurora .tree ul ul::before {
+    border-color: #10B981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* Theme 3: Solar Light Studio Canvas */
+.pool-tree-viewport.theme-light {
+    background-color: #F8FAFC;
+    background-image: 
+        radial-gradient(circle at 50% 0%, #E0F2FE 0%, #F8FAFC 80%),
+        linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+    background-size: 100% 100%, 24px 24px, 24px 24px;
+    border: 1px solid #CBD5E1;
+}
+.pool-tree-viewport.theme-light .tree li::before,
+.pool-tree-viewport.theme-light .tree li::after,
+.pool-tree-viewport.theme-light .tree ul ul::before {
+    border-color: #0284C7;
+    box-shadow: 0 0 4px rgba(2, 132, 199, 0.25);
+}
+
+/* Floating Toolbar */
+.tree-canvas-toolbar {
+    position: sticky;
+    top: 12px;
+    left: 12px;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    padding: 6px 10px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.pool-tree-viewport.theme-light .tree-canvas-toolbar {
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid #CBD5E1;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* ==========================================================================
+   VIBRANT LEVEL-CODED POOL NODE CARDS
+   ========================================================================== */
+.pool-node-card {
+    display: inline-block;
+    width: 236px;
+    background: #FFFFFF;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    text-align: left;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+.pool-node-card:hover {
+    transform: translateY(-5px) scale(1.03);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.22);
+    z-index: 15;
+}
+.pool-node-card.active-selected {
+    outline: 3px solid #38BDF8;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+}
+
+/* Node Level Themes */
+
+/* Level 1: Root Master Node (Royal Gold) */
+.pool-node-card.node-level-1 {
+    border-color: #F59E0B;
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+}
+.pool-node-card.node-level-1 .pool-node-header {
+    background: linear-gradient(135deg, #B45309 0%, #F59E0B 50%, #FBBF24 100%);
+    color: #FFFFFF;
+}
+.pool-node-card.node-level-1 .pb-badge {
+    background: #FFFFFF;
+    color: #92400E;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Level 2: Emerald Jade */
+.pool-node-card.node-level-2 {
+    border-color: #10B981;
+    box-shadow: 0 8px 22px rgba(16, 185, 129, 0.2);
+}
+.pool-node-card.node-level-2 .pool-node-header {
+    background: linear-gradient(135deg, #065F46 0%, #059669 50%, #10B981 100%);
+    color: #FFFFFF;
+}
+.pool-node-card.node-level-2 .pb-badge {
+    background: #FFFFFF;
+    color: #065F46;
+}
+
+/* Level 3: Electric Sapphire */
+.pool-node-card.node-level-3 {
+    border-color: #0284C7;
+    box-shadow: 0 8px 22px rgba(2, 132, 199, 0.2);
+}
+.pool-node-card.node-level-3 .pool-node-header {
+    background: linear-gradient(135deg, #0369A1 0%, #0284C7 50%, #38BDF8 100%);
+    color: #FFFFFF;
+}
+.pool-node-card.node-level-3 .pb-badge {
+    background: #FFFFFF;
+    color: #075985;
+}
+
+/* Level 4+: Royal Purple */
+.pool-node-card.node-level-4, 
+.pool-node-card.node-level-5, 
+.pool-node-card.node-level-6 {
+    border-color: #8B5CF6;
+    box-shadow: 0 8px 22px rgba(139, 92, 246, 0.2);
+}
+.pool-node-card.node-level-4 .pool-node-header,
+.pool-node-card.node-level-5 .pool-node-header,
+.pool-node-card.node-level-6 .pool-node-header {
+    background: linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #A78BFA 100%);
+    color: #FFFFFF;
+}
+.pool-node-card.node-level-4 .pb-badge,
+.pool-node-card.node-level-5 .pb-badge,
+.pool-node-card.node-level-6 .pb-badge {
+    background: #FFFFFF;
+    color: #5B21B6;
+}
+
+/* Node Header & Badges */
+.pool-node-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #F1F5F9;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.pb-badge {
+    font-family: 'Inter', monospace;
+    font-weight: 800;
+    font-size: 0.82rem;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #0284C7;
+    color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+.pool-node-level {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Node Body */
+.pool-node-body {
+    padding: 10px 12px;
+    background: #FFFFFF;
+}
+.node-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.node-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+    color: #F8FAFC;
+    font-weight: 700;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.pool-node-card.node-level-1 .node-avatar {
+    background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+    color: #0F172A;
+}
+.pool-node-card.node-level-2 .node-avatar {
+    background: linear-gradient(135deg, #047857 0%, #10B981 100%);
+}
+
+.pool-node-name {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #0F172A;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+.pool-node-code {
+    font-family: monospace;
+    font-size: 0.72rem;
+    color: #64748B;
+}
+
+/* 3-Child Slot Indicator */
+.pool-slots-bar {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    margin-top: 6px;
+}
+.slot-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #E2E8F0;
+    border: 1px solid #CBD5E1;
+}
+.slot-dot.filled {
+    background: #10B981;
+    border-color: #059669;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.7);
+}
+
+.pool-node-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #F8FAFC;
+    border-top: 1px solid #F1F5F9;
+    font-size: 0.75rem;
+}
+
+/* Node Expand/Collapse Toggle Button */
+.node-expander-btn {
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #0284C7;
+    color: #FFFFFF;
+    border: 2px solid #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    z-index: 20;
+    transition: all 0.2s;
+}
+.node-expander-btn:hover {
+    background: #0369A1;
+    transform: translateX(-50%) scale(1.2);
+}
+
+/* ==========================================================================
+   FILE EXPLORER DIRECTORY TREE (WINDOWS 11 / VS CODE STYLE)
+   ========================================================================== */
+.file-explorer-container {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+.explorer-search-bar {
+    background: #F8FAFC;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 12px 16px;
+}
+.explorer-tree-view {
+    padding: 14px 10px;
+    max-height: 640px;
+    overflow-y: auto;
+    font-family: 'Inter', -apple-system, sans-serif;
+}
+.fe-branch {
+    list-style: none;
+    margin: 0;
+    padding-left: 20px;
+    position: relative;
+}
+.fe-branch.root-branch {
+    padding-left: 0;
+}
+.fe-branch::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 9px;
+    bottom: 14px;
+    border-left: 1px dashed #CBD5E1;
+}
+.fe-branch.root-branch::before {
+    display: none;
+}
+
+.fe-node {
+    list-style: none;
+    margin: 3px 0;
+    position: relative;
+}
+.fe-node::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -11px;
+    width: 11px;
+    border-top: 1px dashed #CBD5E1;
+}
+.fe-branch.root-branch > .fe-node::before {
+    display: none;
+}
+
+.fe-row {
+    display: flex;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    gap: 8px;
+}
+.fe-row:hover {
+    background: #F1F5F9;
+}
+.fe-row.active-selected {
+    background: #E0F2FE;
+    border-left: 3px solid #0284C7;
+    box-shadow: 0 2px 6px rgba(2, 132, 199, 0.12);
+}
+
+.fe-toggle {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: #64748B;
+    border-radius: 4px;
+    transition: transform 0.2s;
+}
+.fe-toggle:hover {
+    background: #E2E8F0;
+    color: #0F172A;
+}
+.fe-toggle.expanded {
+    transform: rotate(90deg);
+}
+.fe-toggle.no-children {
+    visibility: hidden;
+}
+
+.fe-icon {
+    font-size: 1.15rem;
+    color: #F59E0B;
+}
+.fe-icon.open {
+    color: #D97706;
+}
+
+.fe-badge-pb {
+    font-family: monospace;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: #10B981;
+    color: #FFFFFF;
+}
+.fe-badge-pb.level-1 {
+    background: linear-gradient(135deg, #D97706 0%, #F59E0B 100%);
+    color: #0F172A;
+}
+
+.fe-name {
+    font-weight: 600;
+    font-size: 0.86rem;
+    color: #1E293B;
+}
+.fe-code {
+    font-family: monospace;
+    font-size: 0.75rem;
+    color: #64748B;
+}
+.fe-meta {
+    margin-left: auto;
+    font-size: 0.75rem;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Side Inspector Pane */
+.inspector-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 20px;
+}

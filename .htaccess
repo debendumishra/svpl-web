@@ -2,11 +2,12 @@ DirectoryIndex index.php public/index.php
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
 
     # Prevent loop if already accessing public directory
     RewriteRule ^public/ - [L]
 
-    # Directly serve existing files or directories
+    # Directly serve existing files or directories in root
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]

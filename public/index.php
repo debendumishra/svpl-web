@@ -10,6 +10,41 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/config/constants.php';
 $appConfig = require dirname(__DIR__) . '/config/app.php';
 
+// Static Asset Fallback Server for Shared Hosting / LiteSpeed
+$rawUri = $_SERVER['REQUEST_URI'] ?? '';
+$parsedPath = parse_url($rawUri, PHP_URL_PATH) ?? '';
+$cleanAssetPath = preg_replace('#^/(svpl[-_]?web|public)#i', '', $parsedPath);
+
+if (preg_match('#^/(assets|uploads)/(.*)$#', $cleanAssetPath, $matches)) {
+    $assetFile = dirname(__DIR__) . '/public/' . $matches[1] . '/' . $matches[2];
+    if (file_exists($assetFile) && is_file($assetFile)) {
+        $ext = strtolower(pathinfo($assetFile, PATHINFO_EXTENSION));
+        $mimeTypes = [
+            'css'   => 'text/css; charset=UTF-8',
+            'js'    => 'application/javascript; charset=UTF-8',
+            'png'   => 'image/png',
+            'jpg'   => 'image/jpeg',
+            'jpeg'  => 'image/jpeg',
+            'gif'   => 'image/gif',
+            'svg'   => 'image/svg+xml',
+            'webp'  => 'image/webp',
+            'ico'   => 'image/x-icon',
+            'woff'  => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf'   => 'font/ttf',
+            'pdf'   => 'application/pdf',
+        ];
+
+        $contentType = $mimeTypes[$ext] ?? (function_exists('mime_content_type') ? mime_content_type($assetFile) : 'application/octet-stream');
+        header('Content-Type: ' . $contentType);
+        header('Content-Length: ' . (string)filesize($assetFile));
+        header('Cache-Control: public, max-age=31536000');
+        header('Access-Control-Allow-Origin: *');
+        readfile($assetFile);
+        exit;
+    }
+}
+
 // Error Handling Configuration (Controlled by .env APP_DEBUG or APP_ENV)
 $appEnv = strtolower(getenv('APP_ENV') ?: 'production');
 $appDebug = getenv('APP_DEBUG') === 'true' || $appEnv === 'development';
