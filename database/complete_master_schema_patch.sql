@@ -1,8 +1,8 @@
 -- =========================================================================
 -- Surya Vistaara Pvt. Ltd. (SVPL) - Complete Master Database Schema Patch
 -- Target Database: u230808862_svpl / svpl_db
--- Generated: 2026-09-23 16:42:18
--- All 48 Tables with Safe IF NOT EXISTS & Foreign Key Protection
+-- Generated: 2026-09-23 16:49:17
+-- All 48 Tables with Safe IF NOT EXISTS (No AFTER clauses for 100% compatibility)
 -- =========================================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -130,6 +130,8 @@ CREATE TABLE IF NOT EXISTS `advisors` (
   `ifsc_code` varchar(20) DEFAULT NULL,
   `passbook_doc_id` int(10) unsigned DEFAULT NULL,
   `status` varchar(50) NOT NULL DEFAULT 'ACTIVE',
+  `free_registration` tinyint(1) NOT NULL DEFAULT 0,
+  `id_card_generated` tinyint(1) NOT NULL DEFAULT 0,
   `qualification_status` enum('NEW','ACTIVE','QUALIFIED','PROMOTED','INACTIVE','SUSPENDED') NOT NULL DEFAULT 'NEW',
   `current_level` tinyint(3) unsigned NOT NULL DEFAULT 1,
   `customer_count` int(10) unsigned NOT NULL DEFAULT 0,
@@ -579,7 +581,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
   CONSTRAINT `customers_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL,
   CONSTRAINT `customers_ibfk_2` FOREIGN KEY (`advisor_id`) REFERENCES `advisors` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_cus_assigned_boe` FOREIGN KEY (`assigned_boe_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=1594 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1595 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for table `discom_providers`
@@ -664,7 +666,7 @@ CREATE TABLE IF NOT EXISTS `documents` (
   KEY `idx_doc_entity` (`entity_type`,`entity_id`),
   KEY `idx_doc_lead` (`lead_id`),
   KEY `idx_doc_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------
 -- Table structure for table `engineers`
@@ -1214,28 +1216,58 @@ CREATE TABLE IF NOT EXISTS `withdrawal_requests` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
--- Ensure Missing Columns on Pre-existing Tables
+-- Ensure Missing Columns on Pre-existing Tables (Safe ALTER)
 -- =========================================================
 
--- Customers table missing columns
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `father_husband_name` VARCHAR(150) NULL AFTER `last_name`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `pm_surya_ghar_id` VARCHAR(100) NULL AFTER `consumer_number`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `notification_number` VARCHAR(100) NULL AFTER `pm_surya_ghar_id`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `customer_signature` MEDIUMTEXT NULL AFTER `profile_photo`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `agreement_accepted` TINYINT(1) NOT NULL DEFAULT 0 AFTER `customer_signature`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `agreement_accepted_at` DATETIME NULL AFTER `agreement_accepted`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `district` VARCHAR(80) NULL AFTER `city`;
-ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `pincode` VARCHAR(10) NULL AFTER `district`;
+-- Customers table columns
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `father_husband_name` VARCHAR(150) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `profile_photo` VARCHAR(255) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `consumer_number` VARCHAR(50) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `pm_surya_ghar_id` VARCHAR(100) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `notification_number` VARCHAR(100) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `customer_signature` MEDIUMTEXT NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `agreement_accepted` TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `agreement_accepted_at` DATETIME NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `city` VARCHAR(100) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `district` VARCHAR(80) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `state` VARCHAR(50) DEFAULT 'Odisha';
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `pincode` VARCHAR(10) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `sanctioned_load_kw` DECIMAL(5,2) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `proposed_system_capacity_kw` DECIMAL(5,2) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `total_project_cost` DECIMAL(12,2) NULL;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `central_subsidy` DECIMAL(10,2) NULL DEFAULT 78000.00;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `state_subsidy` DECIMAL(10,2) NULL DEFAULT 60000.00;
+ALTER TABLE `customers` ADD COLUMN IF NOT EXISTS `customer_share` DECIMAL(12,2) NULL;
 
--- Package dispatches table missing columns
-ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `engineer_id` INT UNSIGNED NULL AFTER `advisor_id`;
-ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `customer_acknowledged` TINYINT(1) NOT NULL DEFAULT 0 AFTER `status`;
-ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `customer_acknowledged_at` DATETIME NULL AFTER `customer_acknowledged`;
-ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `customer_acknowledgment_notes` TEXT NULL AFTER `customer_acknowledged_at`;
+-- Package dispatches table columns
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `engineer_id` INT UNSIGNED NULL;
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `customer_acknowledged` TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `customer_acknowledged_at` DATETIME NULL;
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `customer_acknowledgment_notes` TEXT NULL;
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `items_included` TEXT NULL;
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `delivery_address` TEXT NULL;
+ALTER TABLE `package_dispatches` ADD COLUMN IF NOT EXISTS `remarks` TEXT NULL;
 
--- Advisors table missing columns
-ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `free_registration` TINYINT(1) NOT NULL DEFAULT 0 AFTER `status`;
-ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `id_card_generated` TINYINT(1) NOT NULL DEFAULT 0 AFTER `free_registration`;
+-- Advisors table columns
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `free_registration` TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `id_card_generated` TINYINT(1) NOT NULL DEFAULT 0;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `profile_photo` VARCHAR(255) NULL;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `aadhaar_number` VARCHAR(30) NULL;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `pan_number` VARCHAR(30) NULL;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `bank_name` VARCHAR(100) NULL;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `account_number` VARCHAR(50) NULL;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `ifsc_code` VARCHAR(20) NULL;
+ALTER TABLE `advisors` ADD COLUMN IF NOT EXISTS `upi_id` VARCHAR(100) NULL;
+
+-- Leads table columns
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `consumer_number` VARCHAR(50) NULL;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `father_husband_name` VARCHAR(150) NULL;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `sanctioned_load_kw` DECIMAL(5,2) NULL;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `proposed_capacity_kw` DECIMAL(5,2) NULL;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `estimated_project_cost` DECIMAL(12,2) NULL;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `central_subsidy` DECIMAL(10,2) NULL DEFAULT 78000.00;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `state_subsidy` DECIMAL(10,2) NULL DEFAULT 60000.00;
+ALTER TABLE `leads` ADD COLUMN IF NOT EXISTS `net_cost` DECIMAL(12,2) NULL;
 
 -- =========================================================
 -- Default Seed Data (DISCOM Providers & Districts)
